@@ -22,7 +22,11 @@ export async function getAll<T>(
   console.log(url)
   try {
     const res = await fetch(url, { cache: "no-store", next: { tags: [entity] } });
+    console.log(res)
+
     const text = await res.text();
+    console.log(text)
+
     if (!res.ok) {
       console.error(`getAll failed: ${res.status} ${url}`, text.slice(0, 300));
       return {
@@ -39,6 +43,8 @@ export async function getAll<T>(
         },
       };
     }
+    console.log(JSON.parse(text))
+
     return JSON.parse(text) as PagedResponse<T>;
   } catch (e) {
     console.error(`Invalid JSON response from ${url}`, e);
