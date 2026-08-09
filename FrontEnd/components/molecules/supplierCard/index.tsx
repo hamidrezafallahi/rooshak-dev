@@ -1,6 +1,7 @@
+"use client";
 import React from 'react';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -12,6 +13,7 @@ export default function SupplierCard({
   supplier: IUser;
 }) {
   const locale = useLocale();
+  const t = useTranslations('common');
 
   return (
     <Link
@@ -44,8 +46,8 @@ export default function SupplierCard({
           <p>📞 {supplier.phoneNumber || '—'}</p>
           <p>
             {supplier.role
-              ? `نقش: ${supplier.role}`
-              : 'تامین‌کننده'}
+              ? t('roleLabel', { role: supplier.role })
+              : t('supplier')}
           </p>
         </div>
 
@@ -56,7 +58,7 @@ export default function SupplierCard({
         )}
 
         <span className="inline-block pt-2 font-medium text-primary text-sm">
-          مشاهده تامین‌کننده →
+          {t('viewSupplier')}
         </span>
       </div>
     </Link>

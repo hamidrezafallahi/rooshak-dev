@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import { getAll } from '@lib/getAll';
@@ -11,7 +11,8 @@ import BrandCard from '../brandCard';
 export const dynamic = "force-dynamic";
 
 export default async function LandingBrands( ) {
-    const locale = await getLocale()
+    const locale = await getLocale();
+    const t = await getTranslations('landing');
    const response = await getAll<IBrand>("brands", {
      page: 1,
      pageSize: 5,
@@ -22,14 +23,14 @@ export default async function LandingBrands( ) {
       {/* Header */}
       <div className="flex sm:flex-row flex-col flex-wrap sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h2 className="font-semibold text-2xl sm:text-3xl">برندها</h2>
+          <h2 className="font-semibold text-2xl sm:text-3xl">{t('brandsTitle')}</h2>
           <p className="text-gray-600 text-sm">
-           برند های موجود
+           {t('brandsSubtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link href={`/${locale}/brands`} className="text-sm underline">
-            مشاهده همه برند ها
+            {t('viewAllBrands')}
           </Link>
         </div>
       </div>

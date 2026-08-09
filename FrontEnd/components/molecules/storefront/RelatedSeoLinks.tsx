@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 type LinkItem = {
@@ -11,14 +12,15 @@ type Props = {
   links: LinkItem[];
 };
 
-export default function RelatedSeoLinks({ locale, title, links }: Props) {
+export default async function RelatedSeoLinks({ locale, title, links }: Props) {
+  const t = await getTranslations('storefront');
   const items = links.filter((link) => link.href && link.label);
   if (!items.length) return null;
 
   return (
     <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
       <h2 className="mb-3 text-lg font-semibold text-white">
-        {title || (locale === 'fa' ? 'مسیرهای مرتبط' : 'Related links')}
+        {title || t('relatedLinks')}
       </h2>
       <div className="flex flex-wrap gap-2">
         {items.map((item) => (

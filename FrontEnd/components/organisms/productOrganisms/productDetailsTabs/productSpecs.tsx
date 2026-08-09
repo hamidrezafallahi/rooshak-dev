@@ -1,8 +1,11 @@
+import { getTranslations } from 'next-intl/server';
+
 import { serverApiBaseUrl } from '@lib/api';
 import { SimpleResponse } from '@models/base';
 import { ISpecificationResponse } from '@models/product';
 
 export default async function ProductSpecs({ id }: {id:number}) { 
+  const t = await getTranslations();
    const response = await fetch(
       `${serverApiBaseUrl}/Products/getSpecifications/${id}`,
       {
@@ -18,7 +21,7 @@ export default async function ProductSpecs({ id }: {id:number}) {
   if (!specs.data || specs.data.specifications.length === 0) {
     return (
       <p className="text-gray-400 text-sm">
-        مشخصات فنی برای این محصول ثبت نشده است.
+        {t('product.noSpecs')}
       </p>
     );
   }

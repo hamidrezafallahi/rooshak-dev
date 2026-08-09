@@ -43,7 +43,7 @@ export default function FinalizeOrder({
   );
 
   const handleFinalizeOrder = async () => {
-    alert("این قسمت در حال توسعه میباشد ")
+    alert(t('common.underDevelopment'));
     // const res: IBaseQueryResponse<{ orderId: number }> = await itemMutate({
     //   url: "api/Payments/request",
     //   body: { orderId },

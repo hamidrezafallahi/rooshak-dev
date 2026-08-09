@@ -1,4 +1,9 @@
-import { useLocale } from 'next-intl';
+"use client";
+
+import {
+  useLocale,
+  useTranslations,
+} from 'next-intl';
 
 import { IComment } from '@models/comment';
 
@@ -8,9 +13,10 @@ export default function ProductComments({
   comments: IComment[];
 }) {
   const locale = useLocale();
+  const t = useTranslations();
   return (
     <section className="bg-white shadow-lg p-4 rounded-2xl">
-      <h3 className="mb-2 font-semibold text-lg">نظرات کاربران</h3>
+      <h3 className="mb-2 font-semibold text-lg">{t('product.userReviews')}</h3>
 
       {comments.map((c: IComment) => (
         <article key={c.id} className="mb-2 pb-2 border-b">

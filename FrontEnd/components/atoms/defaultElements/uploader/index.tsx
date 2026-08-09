@@ -1,3 +1,4 @@
+"use client";
 import React, {
   ChangeEvent,
   DragEvent,
@@ -5,6 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { toMediaUrl } from '@utils/toMediaUrl';
@@ -23,13 +26,16 @@ const resolvePreviewUrl = (src: string | null | undefined): string | null => {
 };
 
 const Uploader = ({ ...props }: UploaderProps) => {
+  const t = useTranslations();
   const {
     value,
     defaultValue,
     onChange,
-    placeHolder = 'Drag & Drop یا کلیک کنید تا تصویر انتخاب شود',
+    placeHolder,
     className = '',
   } = props;
+  const resolvedPlaceholder =
+    placeHolder === undefined ? t('uploader.placeholder') : placeHolder;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | null>(
     resolvePreviewUrl(defaultValue),
@@ -120,12 +126,12 @@ const Uploader = ({ ...props }: UploaderProps) => {
         onDragOver={handleDragOver}
         className="flex justify-center items-center w-full h-full"
       >
-        {!showPreview && placeHolder && (
+        {!showPreview && resolvedPlaceholder && (
           <div className="flex flex-col justify-center items-center gap-1 p-3 w-full h-full text-center">
-            <span>{placeHolder}</span>
+            <span>{resolvedPlaceholder}</span>
             {previewFailed && (
               <span className="text-xs text-amber-600">
-                تصویر قبلی یافت نشد؛ لطفاً دوباره آپلود کنید
+                {t('uploader.previousNotFound')}
               </span>
             )}
           </div>

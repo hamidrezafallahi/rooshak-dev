@@ -1,6 +1,11 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 import type { IIconConfig } from '../type';
 
 export const RialIcon = ({ config }: { config?: IIconConfig }) => {
+  const t = useTranslations();
   const size = config?.size ?? 26;
   const strokeWidth = config?.strokeWidth ?? 1;
   const stroke = config?.stroke ?? "currentColor";
@@ -51,7 +56,7 @@ export const RialIcon = ({ config }: { config?: IIconConfig }) => {
         fontFamily={"iranSansLight"}
         // style={{fontStretch:"expanded",fontFamily:"serif"}}
       >
-        ریال
+        {t('common.rial')}
       </text>
     </svg>
   );

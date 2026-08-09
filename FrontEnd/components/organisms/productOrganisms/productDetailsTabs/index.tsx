@@ -1,4 +1,6 @@
 // ProductDetailsTabs.tsx
+import { getTranslations } from 'next-intl/server';
+
 import { IDetailedProduct } from '@models/product';
 
 import ProductComments from './productComments';
@@ -9,14 +11,15 @@ interface Props {
   product: IDetailedProduct;
 }
 
-export function ProductDetailsTabs({ product }: Props) {
+export async function ProductDetailsTabs({ product }: Props) {
+  const t = await getTranslations();
   return (
     <section
       className="bg-white shadow-sm mt-12 p-6 rounded-2xl"
       aria-labelledby="product-tabs"
     >
       <h2 id="product-tabs" className="sr-only">
-        جزئیات محصول
+        {t('product.productDetails')}
       </h2>
 
       <ProductDetailsTabsClient>

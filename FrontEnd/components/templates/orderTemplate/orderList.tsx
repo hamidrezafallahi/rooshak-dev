@@ -61,7 +61,7 @@ function OrderList({...props}: OrderListProps) {
             <div className="space-y-4 lg:col-span-1 bg-zinc-900 rounded-lg h-[calc(100dvh-60px)] overflow-hidden">
       <div className="flex items-center gap-3 mb-4 font-semibold text-xl">
         <BackToLandingPageButton />
-        <div>سفارشات من</div>
+        <div>{t("order.myOrders")}</div>
       </div>
             <div className="hidden-show-scrollbar flex flex-col gap-2 h-[calc(100dvh-120px)] overflow-y-auto">
       {data?.data?.map((order: IOrder) => (
@@ -75,18 +75,22 @@ function OrderList({...props}: OrderListProps) {
           }}
         >
           <div className="flex justify-between text-sm">
-            <span>شماره سفارش: {order.id}</span>
+            <span>{t("order.orderNumber", { id: order.id })}</span>
             {order?.status !== undefined && (
               <span className='text-primary text-xs'>{t(OrderStatusText[order.status])}</span>
             )}
           </div>
 
           <div className="mt-2 text-gray-400 text-xs">
-            {order.items.length} کالا • مجموع {order.totalPrice} تومان
+            {t("order.itemsSummary", {
+              count: order.items.length,
+              total: order.totalPrice,
+              currency: t("common.currency"),
+            })}
           </div>
 
           <div className="mt-1 text-gray-500 text-xs">
-            تاریخ: {formatToJalali(order.orderDate)}
+            {t("order.date", { date: formatToJalali(order.orderDate) })}
           </div>
           
         </Button>

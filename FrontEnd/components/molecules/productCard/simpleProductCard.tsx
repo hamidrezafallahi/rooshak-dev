@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -14,6 +14,7 @@ export async function SimpleProductCard({
   product: ISimpleProduct;
 }) {
   const locale = await getLocale();
+  const t = await getTranslations('common');
   return (
     <article
       key={product.id}
@@ -34,7 +35,7 @@ export async function SimpleProductCard({
             href={`/${locale}/products/${product.slug || product.id}`}
             className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs"
           >
-            مشاهده
+            {t('view')}
           </Link>
           {product.suppliers&&product.suppliers?.length > 0 && (
             <div className="flex flex-row-reverse flex-1 p-1 overflow-hidden">

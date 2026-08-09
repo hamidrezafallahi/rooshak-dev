@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import {
+  getLocale,
+  getTranslations,
+} from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -18,10 +21,11 @@ export async function BrandSuppliers({ id }: { id: number }) {
   const suppliersResponse: SimpleResponse<IUser[]> = await response.json();
   const suppliers: IUser[] = suppliersResponse.data;
   const locale = await getLocale();
+  const t = await getTranslations();
 
   return (
     <div className="my-10">
-      <h2 className="mb-4 font-bold text-xl">تامین‌کنندگان برند</h2>
+      <h2 className="mb-4 font-bold text-xl">{t('product.brandSuppliers')}</h2>
       <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {suppliers.map((s) => (
           <Link

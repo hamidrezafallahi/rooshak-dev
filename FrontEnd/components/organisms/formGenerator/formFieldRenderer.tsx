@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import { Checkbox } from '@components/atoms/defaultElements/customCheckbox';
 import CustomDatePicker
   from '@components/atoms/defaultElements/customDatePicker';
@@ -50,6 +52,7 @@ const FormFieldRenderer = ({
   watch,
   trigger,
 }: FormFieldRendererProps) => {
+  const t = useTranslations();
   switch (field.Type) {
     case 'text':
     case 'number':
@@ -108,7 +111,7 @@ const FormFieldRenderer = ({
       const options = field.Options?.map((op) => ({
         label: op.label,
         value: op.value,
-      })) || [{ label: 'گزینه ای پیدا نشد', value: '' }];
+      })) || [{ label: t('common.noOptionsFound'), value: '' }];
       return (
         <FieldShell caption={field.Caption} help={field.Help} error={error}>
           <Select

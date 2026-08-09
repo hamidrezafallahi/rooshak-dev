@@ -1,13 +1,15 @@
+"use client";
 import React from 'react';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
 import { IBrand } from '@models/brand';
 
 export default function BrandCard({brand}:{brand:IBrand}) {
-    const locale = useLocale()
+    const locale = useLocale();
+    const t = useTranslations('common');
   return (
               <Link
             href={`/${locale}/brands/${brand.slug || brand.id}`}
@@ -27,7 +29,7 @@ export default function BrandCard({brand}:{brand:IBrand}) {
                 <h3 className="font-medium">{brand.name}</h3>
                 <p className="text-gray-600 text-xs">{brand.description}</p>
                 <span className="inline-block mt-3 font-medium text-primary text-sm">
-                  مشاهده برند →
+                  {t('viewBrandArrow')}
                 </span>
               </div>
             </Link>

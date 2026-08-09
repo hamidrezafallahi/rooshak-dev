@@ -5,6 +5,8 @@ import {
   useState,
 } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 type TabKey = 'desc' | 'specs' | 'comments';
 
 export default function ProductDetailsTabsClient({
@@ -13,23 +15,24 @@ export default function ProductDetailsTabsClient({
   children: ReactNode[];
 }) {
   const [active, setActive] = useState<TabKey>('desc');
+  const t = useTranslations();
  
   return (
     <>
       {/* Tabs Header */}
       <div className="flex gap-6 mb-6 border-b overflow-x-auto text-sm">
         <TabButton
-          label="توضیحات"
+          label={t('product.description')}
           active={active === 'desc'}
           onClick={() => setActive('desc')}
         />
         <TabButton
-          label="مشخصات فنی"
+          label={t('product.specs')}
           active={active === 'specs'}
           onClick={() => setActive('specs')}
         />
         <TabButton
-          label="نظرات کاربران"
+          label={t('product.userReviews')}
           active={active === 'comments'}
           onClick={() => setActive('comments')}
         />

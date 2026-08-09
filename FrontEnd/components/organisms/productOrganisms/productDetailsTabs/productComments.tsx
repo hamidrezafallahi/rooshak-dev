@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { serverApiBaseUrl } from '@lib/api';
 import { SimpleResponse } from '@models/base';
 import {
@@ -13,6 +15,7 @@ interface ProductCommentsProps {
 }
 
 export default async function ProductComments({ id,locale }: ProductCommentsProps) {
+  const t = await getTranslations();
   if (!id) throw new Error("Product ID is required");
 
   const response = await fetch(
@@ -31,7 +34,7 @@ export default async function ProductComments({ id,locale }: ProductCommentsProp
     <section className="space-y-4">
       {comments.data.length === 0 && (
         <p className="text-gray-500 text-sm">
-          هنوز نظری برای این محصول ثبت نشده است.
+          {t('product.noComments')}
         </p>
       )}
 

@@ -5,6 +5,7 @@ import React, {
   useRef,
 } from 'react';
 
+import { useTranslations } from 'next-intl';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
+  const t = useTranslations();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const leftBtnRef = useRef<HTMLButtonElement | null>(null);
   const rightBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -145,7 +147,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
   if (!items || items.length === 0) {
     return (
       <div className="flex justify-center items-center w-full h-full text-white/90 text-sm">
-        پیشنهادی موجود نیست
+        {t('landing.noOffers')}
       </div>
     );
   }
@@ -155,7 +157,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
       <button
         ref={leftBtnRef}
         onClick={handlePrev}
-        aria-label="قبلی"
+        aria-label={t('common.previous')}
         style={{ display: "none" }}
         className="top-1/2 left-1 z-30 absolute justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
       >
@@ -165,7 +167,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
       <button
         ref={rightBtnRef}
         onClick={handleNext}
-        aria-label="بعدی"
+        aria-label={t('common.next')}
         style={{ display: "none" }}
         className="top-1/2 right-1 z-30 absolute justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
       >
@@ -197,6 +199,7 @@ function CompactOfferCard({
   offer: SpecialOffer;
   onAdd: () => void;
 }) {
+  const t = useTranslations();
   const target = new Date(offer.endDate).getTime();
 
   return (
@@ -213,7 +216,7 @@ function CompactOfferCard({
         {offer.product.discountId > 0 && (
           <div className="top-2 absolute bg-yellow-400 px-2 py-1 rounded text-rose-700 text-xs end-2">
             <span>{offer.product.discountAmount}</span>
-            <span className="text-xs">{"ت"}</span>
+            <span className="text-xs">{t('common.tomanShort')}</span>
           </div>
         )}
       </div>
@@ -226,14 +229,14 @@ function CompactOfferCard({
 
         <div className="flex justify-between items-center gap-2 w-full">
           <div className="bg-white bg-opacity-70 p-1 rounded w-full font-semibold text-rose-600 text-sm">
-            قیمت : {offer.product.finalPrice}
+            {t('common.priceColon', { price: offer.product.finalPrice })}
           </div>
           <button
             onClick={onAdd}
             className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 px-2 py-1 rounded text-white text-xs"
           >
             <ShoppingCartIcon />
-            افزودن
+            {t('common.add')}
           </button>
         </div>
       </div>

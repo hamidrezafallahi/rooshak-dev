@@ -179,7 +179,7 @@ export default function FormGenerator({
           } else {
             const { showErrorToast } = await import('@utils/core');
             showErrorToast(
-              res?.error || 'ذخیره انجام نشد. لطفاً دوباره تلاش کنید.',
+              res?.error || t('common.saveFailed'),
               '',
               5000,
             );
@@ -187,7 +187,7 @@ export default function FormGenerator({
         } catch (err) {
           const { showErrorToast } = await import('@utils/core');
           const message =
-            err instanceof Error ? err.message : 'ذخیره انجام نشد. لطفاً دوباره تلاش کنید.';
+            err instanceof Error ? err.message : t('common.saveFailed');
           showErrorToast(message, '', 5000);
         }
       })();

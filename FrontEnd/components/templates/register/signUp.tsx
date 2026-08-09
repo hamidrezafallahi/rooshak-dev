@@ -41,7 +41,7 @@ export function SignUpForm({ className, setIsLogin, ...props }: IProps) {
         case "fullName":
           if (!value.trim()) fieldError = t("register.fullNameRequired");
           else if (value.trim().length < 2)
-            fieldError = "حداقل ۲ کاراکتر وارد کنید";
+            fieldError = t("register.minTwoChars");
           break;
 
         case "email":
@@ -87,7 +87,7 @@ export function SignUpForm({ className, setIsLogin, ...props }: IProps) {
     if (!signup.fullName.trim())
       newErrors.fullName = t("register.fullNameRequired");
     else if (signup.fullName.trim().length < 2)
-      newErrors.fullName = "حداقل ۲ کاراکتر";
+      newErrors.fullName = t("register.minTwoCharsShort");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!signup.email.trim()) newErrors.email = t("register.emailRequired");
@@ -132,11 +132,11 @@ const handleRegister = async () => {
       showSuccessToast(t("register.success"));
       setIsLogin(true);
     } else {
-      showErrorToast(res.error || 'خطا در ثبت نام');
+      showErrorToast(res.error || t("register.registerError"));
     }
   } catch (error) {
-    console.error("خطا:", error);
-    showErrorToast('خطای اتصال');
+    console.error(error);
+    showErrorToast(t("register.connectionError"));
   }
 };
 

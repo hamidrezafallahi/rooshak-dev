@@ -4,11 +4,14 @@ import React, {
   useState,
 } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 interface CountdownDisplayClientProps {
   targetTime: number;
 }
 
 export default function CountdownDisplayClient({ targetTime }: CountdownDisplayClientProps) {
+  const t = useTranslations('countdown');
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(targetTime));
 
   useEffect(() => {
@@ -24,17 +27,17 @@ export default function CountdownDisplayClient({ targetTime }: CountdownDisplayC
   if (isExpired)
     return (
       <p className="bg-gray-950 bg-opacity-80 p-1 rounded font-semibold text-yellow-200">
-        زمان تخفیف به پایان رسیده  
+        {t('expired')}
       </p>
     );
 
   return (
     <div className="flex items-center gap-1 text-center">
-      <TimeBox value={timeLeft.hours} label="ساعت" />
+      <TimeBox value={timeLeft.hours} label={t('hours')} />
       <span className="font-bold">:</span>
-      <TimeBox value={timeLeft.minutes} label="دقیقه" />
+      <TimeBox value={timeLeft.minutes} label={t('minutes')} />
       <span className="font-bold">:</span>
-      <TimeBox value={timeLeft.seconds} label="ثانیه" />
+      <TimeBox value={timeLeft.seconds} label={t('seconds')} />
     </div>
   );
 }

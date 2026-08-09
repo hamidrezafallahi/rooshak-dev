@@ -1,150 +1,150 @@
 {
-  "brand":{
-    "name":"روشاک",
-    "icon":"آیکون"
+  "brand": {
+    "name": "روشاک",
+    "icon": "آیکون"
   },
-  "blog":{
-    "author":"نویسنده",
-    "tableOfContents":"فهرست مطالب",
-    "introduction":"مقدمه",
-    "content":"محتوا",
-    "conclusion":"نتیجه‌گیری",
-    "share":"اشتراک گذاری",
-    "createdAt":"تاریخ ایجاد",
-    "updatedAt":"آخرین ویرایش",
-    "title":"مقالات کریستال",
-    "subtitle":"راهنمای خرید، نگهداری و انتخاب ظروف کریستال",
-    "empty":"مقاله‌ای یافت نشد",
-    "emptyHint":"به‌زودی مطالب جدید منتشر می‌شود.",
-    "landingTitle":"از بلاگ روشاک بخوانید",
-    "landingSubtitle":"راهنماها و نکات کاربردی درباره خرید و نگهداری ظروف کریستال",
-    "viewAll":"مشاهده همه مقالات",
-    "readMore":"ادامه مطلب"
+  "blog": {
+    "author": "نویسنده",
+    "tableOfContents": "فهرست مطالب",
+    "introduction": "مقدمه",
+    "content": "محتوا",
+    "conclusion": "نتیجه‌گیری",
+    "share": "اشتراک گذاری",
+    "createdAt": "تاریخ ایجاد",
+    "updatedAt": "آخرین ویرایش",
+    "title": "مقالات کریستال",
+    "subtitle": "راهنمای خرید، نگهداری و انتخاب ظروف کریستال",
+    "empty": "مقاله‌ای یافت نشد",
+    "emptyHint": "به‌زودی مطالب جدید منتشر می‌شود.",
+    "landingTitle": "از بلاگ روشاک بخوانید",
+    "landingSubtitle": "راهنماها و نکات کاربردی درباره خرید و نگهداری ظروف کریستال",
+    "viewAll": "مشاهده همه مقالات",
+    "readMore": "ادامه مطلب"
   },
-  "header":{
-    "home":"صفحه اصلی",
-    "products":"محصولات",
-    "categories":"دسته‌بندی‌ها",
-    "brands":"برندها",
-    "suppliers":"تأمین‌کنندگان",
-    "tags":"برچسب‌ها",
-    "discounts":"تخفیف‌ها",
-    "blogs":"مقالات",
-    "landing page":"بازگشت به صفحه اصلی",
-    "register":"ثبت‌نام / ورود",
-    "shopping cart":"سبد خرید",
-    "theme":"تغییر تم",
-    "lang":"تغییر زبان",
-    "mainNav":"منوی اصلی",
-    "openMenu":"باز کردن منو",
-    "closeMenu":"بستن منو"
+  "header": {
+    "home": "صفحه اصلی",
+    "products": "محصولات",
+    "categories": "دسته‌بندی‌ها",
+    "brands": "برندها",
+    "suppliers": "تأمین‌کنندگان",
+    "tags": "برچسب‌ها",
+    "discounts": "تخفیف‌ها",
+    "blogs": "مقالات",
+    "landing page": "بازگشت به صفحه اصلی",
+    "register": "ثبت‌نام / ورود",
+    "shopping cart": "سبد خرید",
+    "theme": "تغییر تم",
+    "lang": "تغییر زبان",
+    "mainNav": "منوی اصلی",
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو"
   },
-  "footer":{
-    "tagline":"فروشگاه تخصصی ظروف کریستال روشاک؛ اصالت، درخشش و ارسال مطمئن به سراسر ایران.",
-    "copyright":"© {year} {brand}. تمامی حقوق محفوظ است.",
-    "columns":{
-      "shop":"فروشگاه",
-      "discover":"کاوش",
-      "account":"حساب کاربری"
+  "footer": {
+    "tagline": "فروشگاه تخصصی ظروف کریستال روشاک؛ اصالت، درخشش و ارسال مطمئن به سراسر ایران.",
+    "copyright": "© {year} {brand}. تمامی حقوق محفوظ است.",
+    "columns": {
+      "shop": "فروشگاه",
+      "discover": "کاوش",
+      "account": "حساب کاربری"
     },
-    "links":{
-      "products":"محصولات",
-      "categories":"دسته‌بندی‌ها",
-      "brands":"برندها",
-      "discounts":"تخفیف‌ها",
-      "blog":"مقالات",
-      "suppliers":"تأمین‌کنندگان",
-      "tags":"برچسب‌ها",
-      "sitemap":"نقشه سایت",
-      "register":"ورود / ثبت‌نام",
-      "cart":"سبد خرید",
-      "orders":"سفارش‌ها"
+    "links": {
+      "products": "محصولات",
+      "categories": "دسته‌بندی‌ها",
+      "brands": "برندها",
+      "discounts": "تخفیف‌ها",
+      "blog": "مقالات",
+      "suppliers": "تأمین‌کنندگان",
+      "tags": "برچسب‌ها",
+      "sitemap": "نقشه سایت",
+      "register": "ورود / ثبت‌نام",
+      "cart": "سبد خرید",
+      "orders": "سفارش‌ها"
     }
   },
-  "seo":{
-    "homeTitle":"روشاک | فروشگاه تخصصی ظروف کریستال اصل",
-    "homeDescription":"خرید انواع ظروف کریستال اصل، سرویس پذیرایی، گیلاس و دکوری کریستال از برندهای معتبر با قیمت شفاف و ارسال سریع در روشاک شاپ.",
-    "homeKeywords":"ظروف کریستال,کریستال اصل,سرویس کریستال,گیلاس کریستال,خرید کریستال,روشاک,rooshakshop"
+  "seo": {
+    "homeTitle": "روشاک | فروشگاه تخصصی ظروف کریستال اصل",
+    "homeDescription": "خرید انواع ظروف کریستال اصل، سرویس پذیرایی، گیلاس و دکوری کریستال از برندهای معتبر با قیمت شفاف و ارسال سریع در روشاک شاپ.",
+    "homeKeywords": "ظروف کریستال,کریستال اصل,سرویس کریستال,گیلاس کریستال,خرید کریستال,روشاک,rooshakshop"
   },
-  "htmlSitemap":{
-    "title":"نقشه سایت",
-    "description":"فهرست صفحات فارسی و انگلیسی فروشگاه روشاک شامل محصولات، مقالات، برندها، دسته‌بندی‌ها و تأمین‌کنندگان.",
-    "mainPages":"صفحات اصلی",
-    "products":"محصولات",
-    "blogs":"مقالات",
-    "brands":"برندها",
-    "categories":"دسته‌بندی‌ها",
-    "suppliers":"تأمین‌کنندگان",
-    "tags":"برچسب‌ها",
-    "languages":"نسخه‌های زبانی",
-    "persian":"نسخه فارسی",
-    "english":"نسخه انگلیسی",
-    "xmlHint":"نقشه سایت XML برای موتورهای جستجو:",
-    "empty":"موردی برای نمایش وجود ندارد.",
-    "brandPrefix":"برند",
-    "categoryPrefix":"دسته",
-    "supplierPrefix":"تأمین‌کننده",
-    "tagPrefix":"برچسب"
+  "htmlSitemap": {
+    "title": "نقشه سایت",
+    "description": "فهرست صفحات فارسی و انگلیسی فروشگاه روشاک شامل محصولات، مقالات، برندها، دسته‌بندی‌ها و تأمین‌کنندگان.",
+    "mainPages": "صفحات اصلی",
+    "products": "محصولات",
+    "blogs": "مقالات",
+    "brands": "برندها",
+    "categories": "دسته‌بندی‌ها",
+    "suppliers": "تأمین‌کنندگان",
+    "tags": "برچسب‌ها",
+    "languages": "نسخه‌های زبانی",
+    "persian": "نسخه فارسی",
+    "english": "نسخه انگلیسی",
+    "xmlHint": "نقشه سایت XML برای موتورهای جستجو:",
+    "empty": "موردی برای نمایش وجود ندارد.",
+    "brandPrefix": "برند",
+    "categoryPrefix": "دسته",
+    "supplierPrefix": "تأمین‌کننده",
+    "tagPrefix": "برچسب"
   },
-  "store":{
-    "error":"خطا",
-    "fetchError":"خطا در دریافت اطلاعات",
-    "serverError":"مشکلی در ارتباط با سرور پیش آمد. لطفاً دوباره تلاش کنید.",
-    "viewBrand":"مشاهده برند",
-    "showingCount":"نمایش {count} مورد",
-    "ofTotal":"از {total}",
-    "pageSuffix":" — صفحه {page}",
-    "notFound":"یافت نشد",
-    "notFoundHint":"مورد درخواستی وجود ندارد یا حذف شده است.",
-    "loadError":"خطا در بارگذاری",
-    "loadErrorHint":"متأسفانه در بارگذاری این صفحه مشکلی پیش آمده است.",
-    "backHome":"بازگشت به خانه"
+  "store": {
+    "error": "خطا",
+    "fetchError": "خطا در دریافت اطلاعات",
+    "serverError": "مشکلی در ارتباط با سرور پیش آمد. لطفاً دوباره تلاش کنید.",
+    "viewBrand": "مشاهده برند",
+    "showingCount": "نمایش {count} مورد",
+    "ofTotal": "از {total}",
+    "pageSuffix": " — صفحه {page}",
+    "notFound": "یافت نشد",
+    "notFoundHint": "مورد درخواستی وجود ندارد یا حذف شده است.",
+    "loadError": "خطا در بارگذاری",
+    "loadErrorHint": "متأسفانه در بارگذاری این صفحه مشکلی پیش آمده است.",
+    "backHome": "بازگشت به خانه"
   },
-  "productsPage":{
-    "title":"ظروف کریستال",
-    "description":"مجموعه تخصصی ظروف کریستال اصل، سرویس پذیرایی، گیلاس و دکوری با کیفیت برتر",
-    "empty":"محصولی یافت نشد",
-    "emptyHint":"در حال حاضر محصولی برای نمایش وجود ندارد.",
-    "loadError":"خطا در دریافت محصولات"
+  "productsPage": {
+    "title": "ظروف کریستال",
+    "description": "مجموعه تخصصی ظروف کریستال اصل، سرویس پذیرایی، گیلاس و دکوری با کیفیت برتر",
+    "empty": "محصولی یافت نشد",
+    "emptyHint": "در حال حاضر محصولی برای نمایش وجود ندارد.",
+    "loadError": "خطا در دریافت محصولات"
   },
-  "categoriesPage":{
-    "title":"دسته‌بندی‌ها",
-    "description":"کاوش در دسته‌بندی‌های ظروف کریستال، پذیرایی و دکوری",
-    "empty":"دسته‌بندی‌ای یافت نشد",
-    "emptyHint":"هنوز دسته‌بندی‌ای ثبت نشده است."
+  "categoriesPage": {
+    "title": "دسته‌بندی‌ها",
+    "description": "کاوش در دسته‌بندی‌های ظروف کریستال، پذیرایی و دکوری",
+    "empty": "دسته‌بندی‌ای یافت نشد",
+    "emptyHint": "هنوز دسته‌بندی‌ای ثبت نشده است."
   },
-  "brandsPage":{
-    "title":"برندهای کریستال",
-    "description":"برندهای معتبر ظروف کریستال را اینجا ببینید",
-    "empty":"برندی یافت نشد",
-    "emptyHint":"هنوز برندی برای نمایش وجود ندارد."
+  "brandsPage": {
+    "title": "برندهای کریستال",
+    "description": "برندهای معتبر ظروف کریستال را اینجا ببینید",
+    "empty": "برندی یافت نشد",
+    "emptyHint": "هنوز برندی برای نمایش وجود ندارد."
   },
-  "tagsPage":{
-    "title":"برچسب‌ها",
-    "description":"ظروف کریستال را بر اساس برچسب و کاربرد کاوش کنید",
-    "empty":"برچسبی یافت نشد",
-    "emptyHint":"هنوز برچسبی ثبت نشده است."
+  "tagsPage": {
+    "title": "برچسب‌ها",
+    "description": "ظروف کریستال را بر اساس برچسب و کاربرد کاوش کنید",
+    "empty": "برچسبی یافت نشد",
+    "emptyHint": "هنوز برچسبی ثبت نشده است."
   },
-  "suppliersPage":{
-    "title":"تأمین‌کنندگان",
-    "description":"فهرست تأمین‌کنندگان معتبر ظروف کریستال روشاک",
-    "empty":"تأمین‌کننده‌ای یافت نشد",
-    "emptyHint":"هنوز تأمین‌کننده‌ای ثبت نشده است."
+  "suppliersPage": {
+    "title": "تأمین‌کنندگان",
+    "description": "فهرست تأمین‌کنندگان معتبر ظروف کریستال روشاک",
+    "empty": "تأمین‌کننده‌ای یافت نشد",
+    "emptyHint": "هنوز تأمین‌کننده‌ای ثبت نشده است."
   },
-  "discountsPage":{
-    "title":"تخفیف‌های کریستال",
-    "description":"پیشنهادها و تخفیف‌های ویژه ظروف کریستال",
-    "empty":"تخفیفی یافت نشد",
-    "emptyHint":"در حال حاضر پیشنهاد فعالی وجود ندارد.",
-    "comingSoon":"به‌زودی پیشنهادهای ویژه اینجا نمایش داده می‌شود."
+  "discountsPage": {
+    "title": "تخفیف‌های کریستال",
+    "description": "پیشنهادها و تخفیف‌های ویژه ظروف کریستال",
+    "empty": "تخفیفی یافت نشد",
+    "emptyHint": "در حال حاضر پیشنهاد فعالی وجود ندارد.",
+    "comingSoon": "به‌زودی پیشنهادهای ویژه اینجا نمایش داده می‌شود."
   },
-  "registerPage":{
-    "metaTitle":"ورود / ثبت‌نام",
-    "metaDescription":"وارد حساب کاربری شوید یا حساب جدید بسازید."
+  "registerPage": {
+    "metaTitle": "ورود / ثبت‌نام",
+    "metaDescription": "وارد حساب کاربری شوید یا حساب جدید بسازید."
   },
-  "cartPage":{
-    "metaTitle":"سبد خرید",
-    "metaDescription":"بررسی اقلام سبد خرید و ادامه سفارش."
+  "cartPage": {
+    "metaTitle": "سبد خرید",
+    "metaDescription": "بررسی اقلام سبد خرید و ادامه سفارش."
   },
   "title": {
     "notification": "اعلان ها"
@@ -236,24 +236,23 @@
       }
     }
   },
-
   "general": {
     "changePassWord": "تغییر رمز عبور",
     "save": "ذخیره",
     "saving": "در حال ذخیره...",
-    "new":"جدید",
-    "edit":"ویرایش",
-    "list":"لیست",
-    "default":"پیش فرض" ,
-    "apply":"ثبت",
-    "delete":"حذف",
-    "reset":"بازنشانی",
-    "search":"جستجو...",
-    "actions":"عملیات",
-    "back":"بازگشت",
-    "loading":"در حال بارگذاری...",
-    "paymentMethod":"روش پرداخت",
-            "loginFirst":"ابتدا وارد شوید"
+    "new": "جدید",
+    "edit": "ویرایش",
+    "list": "لیست",
+    "default": "پیش فرض",
+    "apply": "ثبت",
+    "delete": "حذف",
+    "reset": "بازنشانی",
+    "search": "جستجو...",
+    "actions": "عملیات",
+    "back": "بازگشت",
+    "loading": "در حال بارگذاری...",
+    "paymentMethod": "روش پرداخت",
+    "loginFirst": "ابتدا وارد شوید"
   },
   "admin": {
     "dashboard": "داشبورد",
@@ -372,106 +371,109 @@
     }
   },
   "register": {
-    "enter":"ورود",
+    "enter": "ورود",
     "enterEmail": "برای ورود ایمیل خود را وارد کنید",
-    "email":"ایمیل",
-    "emailPlaceHolder":"m@example.com",
-    "password":"پسوورد",
-    "forgotPassword":"رمز عبور خود را فراموش کردید ؟ ",
-    "signUp":"ثبت نام",
-    "dotHaveAnyAccount":"اکانتی ندارید ؟",
-    "startSignUp":"برای ثبت نام ایمیل خود را وارد کنید",
-    "emailRequired":"ایمیل الزامی است",
-    "invalidEmail":"فرمت ایمیل صحیح نیست",
-    "phoneRequired":"شماره موبایل الزامی است",
-    "invalidPhone":"فرمت شماره صحیح نیست (۰۹xxxxxxxxx)",
+    "email": "ایمیل",
+    "emailPlaceHolder": "m@example.com",
+    "password": "پسوورد",
+    "forgotPassword": "رمز عبور خود را فراموش کردید ؟ ",
+    "signUp": "ثبت نام",
+    "dotHaveAnyAccount": "اکانتی ندارید ؟",
+    "startSignUp": "برای ثبت نام ایمیل خود را وارد کنید",
+    "emailRequired": "ایمیل الزامی است",
+    "invalidEmail": "فرمت ایمیل صحیح نیست",
+    "phoneRequired": "شماره موبایل الزامی است",
+    "invalidPhone": "فرمت شماره صحیح نیست (۰۹xxxxxxxxx)",
     "passwordRequired": "رمز عبور الزامی است",
-    "passwordMinLength":"حداقل ۸ کاراکتر",
-    "fullNameRequired":"نام کامل الزامی است",
-    "fullName":"نام و نام خانوادگی",
-    "userDescription":"توضیحات کاربر",
-    "phoneNumber":"شماره تلفن همراه",
-    "phoneNumberPlaceholder":"********09",
-    "register":"ثبت نام",
-    "havingAccount":"من اکانت دارم",
-    "rememberMe":"مرا به خاطر بسپار",
-    "userImage":"عکس کاربر",
-    "success":"ثبت نام با موفقیت انجام شد",
-    "failed":"ثبت نام با خطا مواجه شد"
+    "passwordMinLength": "حداقل ۸ کاراکتر",
+    "fullNameRequired": "نام کامل الزامی است",
+    "fullName": "نام و نام خانوادگی",
+    "userDescription": "توضیحات کاربر",
+    "phoneNumber": "شماره تلفن همراه",
+    "phoneNumberPlaceholder": "********09",
+    "register": "ثبت نام",
+    "havingAccount": "من اکانت دارم",
+    "rememberMe": "مرا به خاطر بسپار",
+    "userImage": "عکس کاربر",
+    "success": "ثبت نام با موفقیت انجام شد",
+    "failed": "ثبت نام با خطا مواجه شد",
+    "minTwoChars": "حداقل ۲ کاراکتر وارد کنید",
+    "minTwoCharsShort": "حداقل ۲ کاراکتر",
+    "registerError": "خطا در ثبت نام",
+    "connectionError": "خطای اتصال"
   },
-  "shoppingCart":{
-    "header":{
-      "yourCart":"سبد خرید شما",
-      "items":"اقلام",
-      "reviewBeforeCheckout":"قبل از سفارش گذاری مجددا اقلام را بررسی کنید",
-      "totalDiscount":"تخفیف کلی",
-      "shipping":"هزینه ارسال",
-      "total":"مبلغ کل",
-      "freeShippingOver":"ارسال رایگان برای سفارشات بالاتر از دو میلیون تومان است",
-      "checkout":"سفارش گذاری",
-      "viewCart":"مشاهده سبد خرید"
+  "shoppingCart": {
+    "header": {
+      "yourCart": "سبد خرید شما",
+      "items": "اقلام",
+      "reviewBeforeCheckout": "قبل از سفارش گذاری مجددا اقلام را بررسی کنید",
+      "totalDiscount": "تخفیف کلی",
+      "shipping": "هزینه ارسال",
+      "total": "مبلغ کل",
+      "freeShippingOver": "ارسال رایگان برای سفارشات بالاتر از دو میلیون تومان است",
+      "checkout": "سفارش گذاری",
+      "viewCart": "مشاهده سبد خرید"
     },
-    "ShoppingCart":"سبد خرید",
-    "ItemsInYourCart":"تعداد اقلام در سبد خرید شما",
-    "days":"روز",
-    "standardShipping":"نوع ارسال استاندارد",
-    "shippingMethod":"نوع ارسال",
-    "reviewYourCartDetailsAndShippingInformation":"لطفا جزییات سبد و نحوه ارسال را مطالعه بفرمایید",
-    "shoppingCartSummary":"جمع سبد خرید",
-    "promoCode":"کد تخفیف",
-    "promoCodePlaceHolder":"کد تخفیف را وارد کنید",
-    "subTotal":"مبلغ سفارش",
-    "shipping":"هزینه ارسال",
-    "total":"مبلغ کل",
-    "freeReturns":"مهلت تست 30 روز",
-    "securePayment":"پرداخت امن",
-    "fastDelivery":"ارسال سریع",
-    "placeOrder":"سفارش گذاری",
-    "chooseAddress":"ابتدا آدرس انتخاب کنید",
-    "emptyCart":"سبد خرید شما خالی است",
-    "promoCodeSubmit":"کد تخفیف اعمال شد",
-    "discountCodeAmount":"میزان تخفیف از کد",
-    "totalDiscount":"مبلغ تخفیف محصولات"
+    "ShoppingCart": "سبد خرید",
+    "ItemsInYourCart": "تعداد اقلام در سبد خرید شما",
+    "days": "روز",
+    "standardShipping": "نوع ارسال استاندارد",
+    "shippingMethod": "نوع ارسال",
+    "reviewYourCartDetailsAndShippingInformation": "لطفا جزییات سبد و نحوه ارسال را مطالعه بفرمایید",
+    "shoppingCartSummary": "جمع سبد خرید",
+    "promoCode": "کد تخفیف",
+    "promoCodePlaceHolder": "کد تخفیف را وارد کنید",
+    "subTotal": "مبلغ سفارش",
+    "shipping": "هزینه ارسال",
+    "total": "مبلغ کل",
+    "freeReturns": "مهلت تست 30 روز",
+    "securePayment": "پرداخت امن",
+    "fastDelivery": "ارسال سریع",
+    "placeOrder": "سفارش گذاری",
+    "chooseAddress": "ابتدا آدرس انتخاب کنید",
+    "emptyCart": "سبد خرید شما خالی است",
+    "promoCodeSubmit": "کد تخفیف اعمال شد",
+    "discountCodeAmount": "میزان تخفیف از کد",
+    "totalDiscount": "مبلغ تخفیف محصولات"
   },
-  "address":{
-     "addresses":"آدرس ها",
-     "addFirstAddress":"اولین آدرس خود را ثبت کنید",
-     "addNewAddress":"اضافه کردن آدرس جدید",
-     "name":"نام",
-     "phoneNumber":"شماره تماس",
-     "state":"استان",
-     "city":"شهر",
-     "fullAddress":"آدرس کامل",
-     "postalCode":"کد پستی",
-     "saveAddress":"ذخیره آدرس",
-     "cancel":"انصراف",
-     "chooseAsDefault":"انتخاب به عنوان پیشفرض",
-     "editAddress":"ویرایش آدرس"
-
+  "address": {
+    "addresses": "آدرس ها",
+    "addFirstAddress": "اولین آدرس خود را ثبت کنید",
+    "addNewAddress": "اضافه کردن آدرس جدید",
+    "name": "نام",
+    "phoneNumber": "شماره تماس",
+    "state": "استان",
+    "city": "شهر",
+    "fullAddress": "آدرس کامل",
+    "postalCode": "کد پستی",
+    "saveAddress": "ذخیره آدرس",
+    "cancel": "انصراف",
+    "chooseAsDefault": "انتخاب به عنوان پیشفرض",
+    "editAddress": "ویرایش آدرس"
   },
-  "checkout":{
-    "proceedToCheckout":"ارسال به درگاه پرداخت",
-    "title":"سفارشات",
-        "landing page":"بازگشت به صفحه اصلی"
-
+  "checkout": {
+    "proceedToCheckout": "ارسال به درگاه پرداخت",
+    "title": "سفارشات",
+    "landing page": "بازگشت به صفحه اصلی",
+    "invoiceNumber": "فاکتور #{number}",
+    "customer": "مشتری: {name}",
+    "grandTotal": "جمع کل",
+    "payable": "قابل پرداخت"
   },
   "payment": {
     "verifying": "در حال تأیید پرداخت...",
     "waiting": "لطفاً چند لحظه صبر کنید",
     "redirect": "در حال انتقال به درگاه",
-
     "paymentFailed": "پرداخت ناموفق بود",
     "payment_issue": "در انجام پرداخت مشکلی پیش آمده است",
     "what_happened": "چه اتفاقی افتاد؟",
     "error_code": "کد خطا",
     "payment_error": "خطای پرداخت",
-
     "insufficient_funds": "موجودی کافی نیست",
     "card_declined": "کارت رد شد",
     "expired_card": "کارت منقضی شده است",
     "network_error": "خطای شبکه",
     "timeout": "زمان پرداخت به پایان رسید",
-
     "solutions_title": "راه‌حل‌های پیشنهادی",
     "retry_title": "تلاش مجدد پرداخت",
     "retry_desc": "اطمینان حاصل کنید که اطلاعات کارت بانکی صحیح است.",
@@ -479,17 +481,14 @@
     "alternative_desc": "می‌توانید از روش پرداخت دیگری استفاده کنید.",
     "support_title": "تماس با پشتیبانی",
     "support_desc": "در صورت ادامه مشکل با پشتیبانی تماس بگیرید.",
-
     "order_title": "سفارش شما",
     "order_number": "شماره سفارش",
     "failed_status": "پرداخت ناموفق",
     "order_notice": "سفارش شما به طور موقت رزرو شده است. لطفاً ظرف ۲۴ ساعت پرداخت را تکمیل کنید.",
-
     "retry_button": "تلاش مجدد پرداخت",
     "back_to_checkout": "بازگشت به صفحه پرداخت",
     "view_cart": "مشاهده سبد خرید",
     "back_home": "بازگشت به خانه",
-
     "final_confirm_title": "تأیید نهایی سفارش",
     "final_confirm_desc": "لطفاً اطلاعات سفارش خود را بررسی و تأیید کنید",
     "shipping_address": "آدرس ارسال",
@@ -504,7 +503,7 @@
     "connecting_gateway": "در حال اتصال به درگاه...",
     "currency": "تومان"
   },
-   "orderStatus": {
+  "orderStatus": {
     "pending": "در انتظار تایید",
     "confirmed": "تایید شده",
     "paid": "پرداخت شده",
@@ -512,25 +511,165 @@
     "delivered": "تحویل داده شده",
     "cancelled": "لغو شده"
   },
-  "comments":{
-    "yourComment":"نظر شما",
-        "yourRate":"امتیاز شما"
-
+  "comments": {
+    "yourComment": "نظر شما",
+    "yourRate": "امتیاز شما"
   },
-  "product":{
-    "width":"عرض",
-    "height":"ارتفاع",
-    "depth":"عمق",
-    "weight":"وزن"
+  "product": {
+    "width": "عرض",
+    "height": "ارتفاع",
+    "depth": "عمق",
+    "weight": "وزن",
+    "suppliersTitle": "تأمین‌کنندگان این محصول",
+    "suppliersCount": "{count} تأمین‌کننده",
+    "userReviews": "نظرات کاربران",
+    "productDetails": "جزئیات محصول",
+    "description": "توضیحات",
+    "specs": "مشخصات فنی",
+    "noSpecs": "مشخصات فنی برای این محصول ثبت نشده است.",
+    "noComments": "هنوز نظری برای این محصول ثبت نشده است.",
+    "writeCommentPlaceholder": "نظر خود را بنویسید...",
+    "submitComment": "ثبت نظر",
+    "pleaseWriteComment": "لطفا نظر خود را بنویسید",
+    "pleaseEnterComment": "لطفا نظر خود را وارد کنید",
+    "brandProducts": "محصولات برند",
+    "brandSuppliers": "تامین‌کنندگان برند",
+    "brandCategories": "دسته‌بندی‌ها",
+    "tagProducts": "محصولات دسته بندی"
   },
-  "category":{
-    "subCategories":"زیر مجموعه این دسته بندی",
-    "noSubCategory":"زیر دسته بندی ای وجود ندارد",
-    "noCategorySupplier":"تامین کننده ای وجود ندارد",
-    "goToParent":"برو به دسته بندی والد"
+  "category": {
+    "subCategories": "زیر مجموعه این دسته بندی",
+    "noSubCategory": "زیر دسته بندی ای وجود ندارد",
+    "noCategorySupplier": "تامین کننده ای وجود ندارد",
+    "goToParent": "برو به دسته بندی والد"
   },
-  "common":{
-    "loading":"در حال بارگذاری"
+  "common": {
+    "loading": "در حال بارگذاری",
+    "view": "مشاهده",
+    "add": "افزودن",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "price": "قیمت",
+    "currency": "تومان",
+    "rial": "ریال",
+    "tomanShort": "ت",
+    "inStock": "موجود",
+    "outOfStock": "ناموجود",
+    "lowStock": "موجودی محدود ({count})",
+    "lowStockShort": "در حد محدود",
+    "percentOff": "٪ تخفیف",
+    "specialDiscount": "تخفیف ویژه",
+    "addToCart": "افزودن به سبد",
+    "wishlist": "علاقه‌مندی",
+    "reviewsCount": "{count} نظر",
+    "votesCount": "{count} رای",
+    "quantityCount": "{count} عدد",
+    "viewBrand": "مشاهده برند",
+    "viewBrandArrow": "مشاهده برند →",
+    "viewAllProducts": "مشاهده همه محصولات",
+    "noProductsFound": "محصولی پیدا نشد",
+    "primary": "اصلی",
+    "ratingAria": "امتیاز {value} از {max}",
+    "fiveOfFive": "۵ از ۵",
+    "pleaseSelect": "لطفا انتخاب کنید...",
+    "saveFailed": "ذخیره انجام نشد. لطفاً دوباره تلاش کنید.",
+    "noOptionsFound": "گزینه ای پیدا نشد",
+    "underDevelopment": "این قسمت در حال توسعه میباشد",
+    "scrollPrev": "اسکرول به قبلی",
+    "scrollNext": "اسکرول به بعدی",
+    "addToCartAria": "افزودن {name} به سبد",
+    "priceColon": "قیمت : {price}",
+    "supplier": "تامین‌کننده",
+    "roleLabel": "نقش: {role}",
+    "viewSupplier": "مشاهده تامین‌کننده →",
+    "supplierNotFound": "تأمین‌کننده پیدا نشد"
+  },
+  "landing": {
+    "brandsTitle": "برندها",
+    "brandsSubtitle": "برند های موجود",
+    "viewAllBrands": "مشاهده همه برند ها",
+    "categoriesTitle": "دسته‌بندی‌ها",
+    "viewAllCategories": "مشاهده همه دسته بندی ها",
+    "specialOfferTitle": "پیشنهاد ویژه امروز",
+    "specialOfferDesc": "فقط تا پایان امروز می‌توانید این محصولات را با تخفیف ویژه تهیه کنید.",
+    "noOffers": "پیشنهادی موجود نیست",
+    "selectedProducts": "محصولات منتخب",
+    "bestSellers": "پرفروش‌ترین‌ها",
+    "newest": "جدیدترین‌ها",
+    "discounters": "تخفیف‌دارها",
+    "slideDetailsAria": "مشاهده جزئیات اسلاید {index}",
+    "goToSlideAria": "رفتن به اسلاید {index}",
+    "prevSlide": "اسلاید قبلی",
+    "nextSlide": "اسلاید بعدی"
+  },
+  "order": {
+    "myOrders": "سفارشات من",
+    "selectOrder": "یک سفارش انتخاب کنید",
+    "orderDetails": "جزئیات سفارش",
+    "status": "وضعیت:",
+    "orderNumber": "شماره سفارش: {id}",
+    "itemsSummary": "{count} کالا • مجموع {total} {currency}",
+    "date": "تاریخ: {date}",
+    "orderTotal": "جمع سفارش",
+    "shippingCost": "هزینه ارسال",
+    "discount": "تخفیف",
+    "finalAmount": "مبلغ نهایی"
+  },
+  "captcha": {
+    "placeholder": "کد بالا را وارد کنید",
+    "refresh": "دریافت کد جدید"
+  },
+  "uploader": {
+    "placeholder": "Drag & Drop یا کلیک کنید تا تصویر انتخاب شود",
+    "previousNotFound": "تصویر قبلی یافت نشد؛ لطفاً دوباره آپلود کنید"
+  },
+  "countdown": {
+    "expired": "زمان تخفیف به پایان رسیده",
+    "hours": "ساعت",
+    "minutes": "دقیقه",
+    "seconds": "ثانیه"
+  },
+  "promotion": {
+    "yaldaBanner": "تخفیف ویژه شب یلدا! فقط تا پایان امشب!"
+  },
+  "storefront": {
+    "faqTitle": "سوالات متداول",
+    "relatedLinks": "مسیرهای مرتبط",
+    "seoSummary": "خلاصه سئو"
+  },
+  "navbar": {
+    "loginRegister": "ورود/ ثبت نام",
+    "systemTraining": "آموزش سیستم",
+    "aboutUs": "درباره ما",
+    "customers": "مشتریان",
+    "products": "محصولات"
+  },
+  "animatedLanding": {
+    "brandName": "آرین سیستم",
+    "software": "نرم افزار"
+  },
+  "paymentSuccess": {
+    "title": "پرداخت موفقیت‌آمیز بود!",
+    "subtitle": "سفارش شما با موفقیت ثبت شد. جزئیات خرید در زیر آمده است.",
+    "thankYou": "سپاس از خرید شما!",
+    "thankYouDesc": "سفارش شما با شماره {orderId} ثبت شد. یک ایمیل تأیید به آدرس ایمیل شما ارسال شده است.",
+    "orderDetails": "جزئیات سفارش",
+    "orderNumber": "شماره سفارش",
+    "orderDate": "تاریخ سفارش",
+    "transactionId": "شماره تراکنش",
+    "amountPaid": "مبلغ پرداخت‌شده",
+    "nextSteps": "مراحل بعدی",
+    "processing": "آماده‌سازی سفارش",
+    "processingDesc": "سفارش شما در حال آماده‌سازی است و به زودی ارسال می‌شود.",
+    "trackOrder": "پیگیری سفارش",
+    "trackOrderDesc": "می‌توانید از طریق پنل کاربری سفارش خود را پیگیری کنید.",
+    "actions": "اقدامات",
+    "printReceipt": "چاپ رسید",
+    "downloadInvoice": "دانلود فاکتور",
+    "viewOrders": "مشاهده سفارشات",
+    "backHome": "بازگشت به خانه",
+    "needHelp": "نیاز به کمک دارید؟",
+    "needHelpDesc": "تیم پشتیبانی ما ۲۴/۷ آماده پاسخگویی به سوالات شماست.",
+    "contactSupport": "تماس با پشتیبانی →"
   }
- 
 }

@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import JsonLd from '@components/molecules/storefront/JsonLd';
 
 export type FaqItem = {
@@ -27,8 +29,10 @@ export function parseFaqJson(raw?: string | null): FaqItem[] {
   }
 }
 
-export default function FaqSection({ items, locale, title }: Props) {
+export default async function FaqSection({ items, locale, title }: Props) {
   if (!items.length) return null;
+
+  const t = await getTranslations('storefront');
 
   const faqLd = {
     '@context': 'https://schema.org',
@@ -47,7 +51,7 @@ export default function FaqSection({ items, locale, title }: Props) {
     <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
       <JsonLd data={faqLd} />
       <h2 className="mb-4 text-xl font-semibold text-white">
-        {title || (locale === 'fa' ? 'سوالات متداول' : 'FAQ')}
+        {title || t('faqTitle')}
       </h2>
       <div className="space-y-3">
         {items.map((item) => (

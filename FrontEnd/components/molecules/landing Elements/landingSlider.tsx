@@ -4,7 +4,7 @@ import React, {
   useState,
 } from 'react';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -26,6 +26,7 @@ interface IProps {
 function LandingSlider({ ...props }: IProps) {
   const { images } = props;
   const locale = useLocale();
+  const t = useTranslations('landing');
   const [current, setCurrent] = useState(0);
   const length = images.length;
   useEffect(() => {
@@ -75,7 +76,7 @@ function LandingSlider({ ...props }: IProps) {
             <div className="rtl:md:right-16 rtl:right-8 bottom-8 left-8 md:left-16 absolute bg-white hover:bg-gray-200 rounded-full w-10 h-10">
               <Link
                 href={href}
-                aria-label={`مشاهده جزئیات اسلاید ${index + 1}`}
+                aria-label={t('slideDetailsAria', { index: index + 1 })}
                 className="flex justify-center items-center shadow-md w-full h-full transition-all duration-200"
               >
                 <LinkIcon />
@@ -95,7 +96,7 @@ function LandingSlider({ ...props }: IProps) {
               index === current ? "bg-white" : "bg-gray-500"
             }`}
             onClick={() => goToSlide(index)}
-            aria-label={`رفتن به اسلاید ${index + 1}`}
+            aria-label={t('goToSlideAria', { index: index + 1 })}
             aria-current={index === current ? 'true' : undefined}
           />
         ))}
@@ -105,7 +106,7 @@ function LandingSlider({ ...props }: IProps) {
       <button
         type="button"
         onClick={prevSlide}
-        aria-label="اسلاید قبلی"
+        aria-label={t('prevSlide')}
         className="top-0 left-0 z-40 absolute flex justify-center items-center px-4 h-full cursor-pointer"
       >
         <span className="inline-flex justify-center items-center bg-white/30 hover:bg-white/50 rounded-full w-10 h-10">
@@ -117,7 +118,7 @@ function LandingSlider({ ...props }: IProps) {
       <button
         type="button"
         onClick={nextSlide}
-        aria-label="اسلاید بعدی"
+        aria-label={t('nextSlide')}
         className="top-0 right-0 z-40 absolute flex justify-center items-center px-4 h-full cursor-pointer"
       >
         <span className="inline-flex justify-center items-center bg-white/30 hover:bg-white/50 rounded-full w-10 h-10">

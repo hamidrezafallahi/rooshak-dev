@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import { useDispatch } from 'react-redux';
 
 import { useGetConditionallyMutation } from '@services/base';
@@ -13,6 +14,7 @@ export default function ProductCTA({
   id: number;
   productId: number;
 }) {
+  const t = useTranslations();
   const isAuthenticated = Boolean(getCookie("candySession"));
   const [addToShoppingCart] = useGetConditionallyMutation();
   const dispatch = useDispatch();
@@ -39,11 +41,11 @@ export default function ProductCTA({
         onClick={handleAddToCart}
         className="bg-primary px-6 py-3 rounded-xl text-white"
       >
-        افزودن به سبد
+        {t('common.addToCart')}
       </button>
-      {/* <button className="px-6 py-3 border rounded-xl">
-        ❤️ علاقه‌مندی
-      </button> */}
+      <button className="px-6 py-3 border rounded-xl">
+        ❤️ {t('common.wishlist')}
+      </button>
     </div>
   );
 }

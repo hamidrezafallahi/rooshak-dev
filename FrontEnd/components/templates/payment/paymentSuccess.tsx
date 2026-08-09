@@ -3,7 +3,10 @@
 
 import { useEffect } from 'react';
 
-import { useLocale } from 'next-intl';
+import {
+  useLocale,
+  useTranslations,
+} from 'next-intl';
 import Link from 'next/link';
 import {
   useRouter,
@@ -34,14 +37,17 @@ interface IPaymentSuccessProps {
 }
 
 export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
-  const locale = useLocale()
+  const locale = useLocale();
+  const t = useTranslations('paymentSuccess');
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const orderId = searchParams.get('orderId') || 'N/A';
   const transactionId = searchParams.get('transactionId') || 'N/A';
   const amount = searchParams.get('amount') || '0';
-  const date = new Date().toLocaleDateString(locale === 'fa' ? 'fa-IR' : 'en-US');
+  const date = new Date().toLocaleDateString(
+    locale === 'fa' ? 'fa-IR' : 'en-US',
+  );
 
   // در صورت نیاز، می‌توانید داده‌ها را به سرور هم ارسال کنید
   useEffect(() => {
@@ -69,12 +75,10 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
             </div>
           </div>
           <h1 className="mb-2 font-bold text-3xl">
-            {locale === 'fa' ? 'پرداخت موفقیت‌آمیز بود!' : 'Payment Successful!'}
+            {t('title')}
           </h1>
           <p className="text-gray-400">
-            {locale === 'fa' 
-              ? 'سفارش شما با موفقیت ثبت شد. جزئیات خرید در زیر آمده است.' 
-              : 'Your order has been successfully placed. Purchase details are below.'}
+            {t('subtitle')}
           </p>
         </div>
 
@@ -90,12 +94,10 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                   </div>
                   <div>
                     <h3 className="mb-2 font-semibold text-xl">
-                      {locale === 'fa' ? 'سپاس از خرید شما!' : 'Thank You For Your Purchase!'}
+                      {t('thankYou')}
                     </h3>
                     <p className="text-gray-400">
-                      {locale === 'fa'
-                        ? `سفارش شما با شماره ${orderId} ثبت شد. یک ایمیل تأیید به آدرس ایمیل شما ارسال شده است.`
-                        : `Your order #${orderId} has been confirmed. A confirmation email has been sent to your email address.`}
+                      {t('thankYouDesc', { orderId })}
                     </p>
                   </div>
                 </div>
@@ -106,31 +108,31 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="p-6">
                 <h3 className="mb-4 font-semibold text-xl">
-                  {locale === 'fa' ? 'جزئیات سفارش' : 'Order Details'}
+                  {t('orderDetails')}
                 </h3>
                 <div className="space-y-4">
                   <div className="gap-4 grid grid-cols-2">
                     <div>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa' ? 'شماره سفارش' : 'Order Number'}
+                        {t('orderNumber')}
                       </p>
                       <p className="font-mono font-semibold">{orderId}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa' ? 'تاریخ سفارش' : 'Order Date'}
+                        {t('orderDate')}
                       </p>
                       <p>{date}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa' ? 'شماره تراکنش' : 'Transaction ID'}
+                        {t('transactionId')}
                       </p>
                       <p className="font-mono text-sm">{transactionId}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa' ? 'مبلغ پرداخت‌شده' : 'Amount Paid'}
+                        {t('amountPaid')}
                       </p>
                       <div className="flex items-center gap-1 font-semibold">
                         {amount}
@@ -146,7 +148,7 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="p-6">
                 <h3 className="mb-4 font-semibold text-xl">
-                  {locale === 'fa' ? 'مراحل بعدی' : 'Next Steps'}
+                  {t('nextSteps')}
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -155,12 +157,10 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                     </div>
                     <div>
                       <p className="font-medium">
-                        {locale === 'fa' ? 'آماده‌سازی سفارش' : 'Order Processing'}
+                        {t('processing')}
                       </p>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa'
-                          ? 'سفارش شما در حال آماده‌سازی است و به زودی ارسال می‌شود.'
-                          : 'Your order is being processed and will be shipped soon.'}
+                        {t('processingDesc')}
                       </p>
                     </div>
                   </div>
@@ -170,12 +170,10 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                     </div>
                     <div>
                       <p className="font-medium">
-                        {locale === 'fa' ? 'پیگیری سفارش' : 'Track Your Order'}
+                        {t('trackOrder')}
                       </p>
                       <p className="text-gray-400 text-sm">
-                        {locale === 'fa'
-                          ? 'می‌توانید از طریق پنل کاربری سفارش خود را پیگیری کنید.'
-                          : 'You can track your order through your account dashboard.'}
+                        {t('trackOrderDesc')}
                       </p>
                     </div>
                   </div>
@@ -189,7 +187,7 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="p-6">
                 <h3 className="mb-4 font-semibold text-xl">
-                  {locale === 'fa' ? 'اقدامات' : 'Actions'}
+                  {t('actions')}
                 </h3>
                 <div className="space-y-3">
                   <Button
@@ -198,7 +196,7 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                     variant="outline"
                   >
                     <Printer config={{className:"ml-2 w-4 h-4"}}   />
-                    {locale === 'fa' ? 'چاپ رسید' : 'Print Receipt'}
+                    {t('printReceipt')}
                   </Button>
                   <Button
                     onClick={handleDownloadInvoice}
@@ -206,18 +204,18 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                     variant="outline"
                   >
                     <Download config={{className:"ml-2 w-4 h-4"}} />
-                    {locale === 'fa' ? 'دانلود فاکتور' : 'Download Invoice'}
+                    {t('downloadInvoice')}
                   </Button>
                   <Link href={`/${locale}/orders`}>
                     <Button className="bg-primary hover:bg-primary/90 w-full text-white">
                       <Package config={{className:"ml-2 w-4 h-4"}} />
-                      {locale === 'fa' ? 'مشاهده سفارشات' : 'View Orders'}
+                      {t('viewOrders')}
                     </Button>
                   </Link>
                   <Link href={`/${locale}`}>
                     <Button className="bg-zinc-800 hover:bg-zinc-700 w-full text-white">
                       <Home config={{className:"ml-2 w-4 h-4"}} />
-                      {locale === 'fa' ? 'بازگشت به خانه' : 'Back to Home'}
+                      {t('backHome')}
                     </Button>
                   </Link>
                 </div>
@@ -228,16 +226,14 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
             <Card className="bg-zinc-900 border-zinc-800">
               <CardContent className="p-6">
                 <h4 className="mb-2 font-semibold">
-                  {locale === 'fa' ? 'نیاز به کمک دارید؟' : 'Need Help?'}
+                  {t('needHelp')}
                 </h4>
                 <p className="mb-4 text-gray-400 text-sm">
-                  {locale === 'fa'
-                    ? 'تیم پشتیبانی ما ۲۴/۷ آماده پاسخگویی به سوالات شماست.'
-                    : 'Our support team is available 24/7 to answer your questions.'}
+                  {t('needHelpDesc')}
                 </p>
                 <Link href={`/${locale}/contact`}>
                   <Button variant="link" className="p-0 text-primary">
-                    {locale === 'fa' ? 'تماس با پشتیبانی →' : 'Contact Support →'}
+                    {t('contactSupport')}
                   </Button>
                 </Link>
               </CardContent>

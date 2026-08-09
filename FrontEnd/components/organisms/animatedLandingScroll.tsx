@@ -1,7 +1,10 @@
 "use client";
 import React, { useRef, useEffect } from "react";
 
+import { useTranslations } from 'next-intl';
+
 export default function AnimatedLandingScroll() {
+  const t = useTranslations('animatedLanding');
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const desc1Ref = useRef<HTMLDivElement>(null);
@@ -56,7 +59,7 @@ export default function AnimatedLandingScroll() {
     >
       <div ref={part1Ref}>
         <div className="flex justify-center items-center bg-gray-700 h-screen text-white">
-          آرین سیستم
+          {t('brandName')}
         </div>
         <div className="relative bg-green-900 h-[200dvh]">
           <div className="top-[50dvh] sticky flex justify-center items-center">
@@ -65,20 +68,20 @@ export default function AnimatedLandingScroll() {
                 ref={logoRef}
                 className="bg-red-700 py-2 rounded h-10 overflow-hidden text-white text-center transition-all duration-300"
               >
-                آرین سیستم
+                {t('brandName')}
               </div>
               <div className="flex justify-center items-end gap-10 bg-red-400 h-20">
                 <div
                   ref={desc1Ref}
                   className="relative bg-red-700 opacity-0 rounded w-20 h-10 overflow-hidden text-white text-center"
                 >
-                  نرم افزار desc1Ref
+                  {t('software')} desc1Ref
                 </div>
                 <div
                   ref={desc2Ref}
                   className="bg-red-700 opacity-0 rounded w-20 h-10 overflow-hidden text-white text-center"
                 >
-                  نرم افزار desc2Ref
+                  {t('software')} desc2Ref
                 </div>
               </div>
             </div>

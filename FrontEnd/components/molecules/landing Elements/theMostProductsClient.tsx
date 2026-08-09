@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import { ILandingProduct } from '@models/product';
@@ -17,12 +17,6 @@ type Props = {
   discounters: ILandingProduct[];
 };
 
-const TABS: { key: TabKey; label: string }[] = [
-  { key: 'BestSeller', label: 'پرفروش‌ترین‌ها' },
-  { key: 'TheNewest', label: 'جدیدترین‌ها' },
-  { key: 'Discounters', label: 'تخفیف‌دارها' },
-];
-
 export default function TheMostProductsClient({
   bestSeller,
   theNewest,
@@ -30,6 +24,13 @@ export default function TheMostProductsClient({
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('BestSeller');
   const locale = useLocale();
+  const t = useTranslations();
+
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'BestSeller', label: t('landing.bestSellers') },
+    { key: 'TheNewest', label: t('landing.newest') },
+    { key: 'Discounters', label: t('landing.discounters') },
+  ];
 
   const items = useMemo(() => {
     switch (activeTab) {
@@ -47,7 +48,7 @@ export default function TheMostProductsClient({
     <>
       <div className="flex sm:flex-row flex-col flex-wrap sm:justify-between sm:items-center gap-4 mb-8">
         <div className="flex items-center gap-3">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <TabButton
               key={tab.key}
               active={activeTab === tab.key}
@@ -59,7 +60,7 @@ export default function TheMostProductsClient({
         </div>
         <div className="flex items-center gap-3">
           <Link href={`/${locale}/products`} className="text-sm underline">
-            مشاهده همه محصولات
+            {t('common.viewAllProducts')}
           </Link>
         </div>
       </div>

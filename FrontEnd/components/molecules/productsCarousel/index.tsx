@@ -3,7 +3,7 @@ import React, {
   useRef,
 } from 'react';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 
@@ -30,6 +30,7 @@ export default function ProductsCarousel({
   items = [],
   Loading,
 }: ProductsCarouselProps) {
+  const t = useTranslations();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scrollAmount = 300;
@@ -47,7 +48,7 @@ export default function ProductsCarousel({
     <div className="relative w-full">
       {/* عنوان */}
       <h2 className="mb-6 font-extrabold text-rose-600 text-2xl text-center">
-        محصولات منتخب
+        {t('landing.selectedProducts')}
       </h2>
 
       {/* دسکتاپ: کاروسل با دکمه */}
@@ -56,7 +57,7 @@ export default function ProductsCarousel({
         <button
           type="button"
           onClick={scrollLeft}
-          aria-label="اسکرول به قبلی"
+          aria-label={t('common.scrollPrev')}
           className="top-1/2 left-0 z-20 absolute flex justify-center items-center bg-white/80 hover:bg-white shadow rounded-full w-10 h-10 -translate-y-1/2"
         >
           <ChevronLeftIcon />
@@ -87,7 +88,7 @@ export default function ProductsCarousel({
         <button
           type="button"
           onClick={scrollRight}
-          aria-label="اسکرول به بعدی"
+          aria-label={t('common.scrollNext')}
           className="top-1/2 right-0 z-20 absolute flex justify-center items-center bg-white/80 hover:bg-white shadow rounded-full w-10 h-10 -translate-y-1/2"
         >
           <ChevronRightIcon />
@@ -116,6 +117,7 @@ export default function ProductsCarousel({
 }
 
 function ProductCard({ product }: { product: ILandingProduct }) {
+  const t = useTranslations();
   const isAuthenticated = Boolean(getCookie("candySession"));
   const locale = useLocale();
   const [addToShoppingCart] = useGetConditionallyMutation();
@@ -195,17 +197,17 @@ function ProductCard({ product }: { product: ILandingProduct }) {
               href={`/${locale}/products/${product.slug || product.id}`}
               className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs"
             >
-              مشاهده
+              {t('common.view')}
             </Link>
             <button
               type="button"
               onClick={() => {
                 handleAddToCart(product);
               }}
-              aria-label={`افزودن ${product.name} به سبد`}
+              aria-label={t('common.addToCartAria', { name: product.name })}
               className="bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-lg text-white text-xs"
             >
-              افزودن
+              {t('common.add')}
             </button>
           </div>
         </div>

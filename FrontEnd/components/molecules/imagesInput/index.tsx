@@ -1,7 +1,11 @@
+"use client";
+
 import {
   useEffect,
   useState,
 } from 'react';
+
+import { useTranslations } from 'next-intl';
 
 import Uploader from '@components/atoms/defaultElements/uploader';
 import {
@@ -18,6 +22,7 @@ export default function ImagesInput({
   onChange,
   defaultValue = [{ id: 1, file: undefined, isMain: true }],
 }: ImagesInputProps) {
+  const t = useTranslations('common');
   const [imageArray, setImageArray] =
     useState<{ id: number; file: undefined | File; isMain: boolean }[]>(
       defaultValue,
@@ -89,7 +94,7 @@ const removeImage = (e: React.MouseEvent, id: number) => {
                 onChange={() => setMainImage(item.id)}
                 className="w-4 h-4 text-blue-600"
               />
-              <span>اصلی</span> {index}
+              <span>{t('primary')}</span> {index}
             </label>
 
             {imageArray.length > 1 && (

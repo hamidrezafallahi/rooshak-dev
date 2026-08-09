@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -20,7 +21,7 @@ export interface ISupplier {
   createdAt: string;
   activeDiscounts: [];
 }
-export function SupplierCardGrid({
+export async function SupplierCardGrid({
   supplier,
   productId,
   locale,
@@ -29,6 +30,7 @@ export function SupplierCardGrid({
   productId: number;
   locale: string;
 }) {
+  const t = await getTranslations();
   return (
     <div className="group relative bg-white hover:shadow-xl p-6 border border-gray-100 hover:border-gray-200 rounded-2xl transition-all duration-300">
       {/* بخش بالای کارت - هدر */}
@@ -53,7 +55,7 @@ export function SupplierCardGrid({
               : "bg-red-50 text-red-700 border border-red-200"
           }`}
         >
-          {supplier.inventory > 0 ? "موجود" : "ناموجود"}
+          {supplier.inventory > 0 ? t('common.inStock') : t('common.outOfStock')}
         </div>
       </div>
 
@@ -76,11 +78,11 @@ export function SupplierCardGrid({
       {/* قیمت و دکمه خرید */}
       <div className="flex justify-between items-center mt-auto pt-4 border-gray-100 border-t">
         <div className="flex flex-col">
-          <span className="text-gray-500 text-xs">قیمت</span>
+          <span className="text-gray-500 text-xs">{t('common.price')}</span>
           <span className="font-bold text-gray-800 text-lg">
             {supplier.finalPrice.toLocaleString("fa-IR")}
           </span>
-          <span className="text-gray-400 text-xs">تومان</span>
+          <span className="text-gray-400 text-xs">{t('common.currency')}</span>
         </div>
 
         <ProductCTA id={supplier.id}  productId={productId} />
@@ -89,7 +91,7 @@ export function SupplierCardGrid({
       {/* تخفیف در صورت وجود */}
       {supplier.activeDiscounts?.length > 0 && (
         <div className="top-4 right-4 absolute bg-gradient-to-r from-red-500 to-pink-500 shadow-lg px-3 py-1 rounded-full font-medium text-white text-xs">
-          تخفیف ویژه
+          {t('common.specialDiscount')}
         </div>
       )}
     </div>

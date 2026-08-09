@@ -21,7 +21,7 @@ export default function OrderDetails({
   if (!selectedOrderId)
     return (
       <div className="mt-40 text-gray-400 text-center">
-        یک سفارش انتخاب کنید
+        {t("order.selectOrder")}
       </div>
     );
 
@@ -34,10 +34,10 @@ export default function OrderDetails({
         </div>
       ) : (
         <div className="space-y-6 h-[calc(100dvh-350px)]">
-          <h2 className="font-semibold text-xl">جزئیات سفارش</h2>
+          <h2 className="font-semibold text-xl">{t("order.orderDetails")}</h2>
           <div className="bg-zinc-800 p-4 border border-gray-700 rounded-lg">
             <div className="flex justify-between">
-              <span>وضعیت:</span>
+              <span>{t("order.status")}</span>
               {order?.status !== undefined && (
                 <span>{t(OrderStatusText[order.status])}</span>
               )}
@@ -59,7 +59,7 @@ export default function OrderDetails({
                 <div className="flex flex-col flex-1 justify-between">
                   <div className="text-sm">{item.product.name}</div>
                   <div className="text-gray-400 text-xs">
-                    {item.quantity} عدد
+                    {t("common.quantityCount", { count: item.quantity })}
                   </div>
                   <div className="text-gray-400 text-xs">
                     {item.product.description}
@@ -68,7 +68,7 @@ export default function OrderDetails({
 
                 <div className="text-right">
                   <div className="font-semibold text-sm">
-                    {item.unitPrice} تومان
+                    {item.unitPrice} {t("common.currency")}
                   </div>
                 </div>
               </div>
@@ -78,21 +78,31 @@ export default function OrderDetails({
           {/* Summary */}
           <div className="bg-zinc-800 p-4 border border-gray-700 rounded-lg">
             <div className="flex justify-between mb-1 text-sm">
-              <span>جمع سفارش</span>
-              <span>{order?.totalPrice} تومان</span>
+              <span>{t("order.orderTotal")}</span>
+              <span>
+                {order?.totalPrice} {t("common.currency")}
+              </span>
             </div>
             <div className="flex justify-between mb-1 text-gray-400 text-sm">
-              <span>هزینه ارسال</span>
-              <span>{order?.shippingMethod.cost} تومان</span>
+              <span>{t("order.shippingCost")}</span>
+              <span>
+                {order?.shippingMethod.cost} {t("common.currency")}
+              </span>
             </div>
             <div className="flex justify-between mb-1 text-green-400 text-sm">
-              <span>تخفیف</span>
-              <span>{order?.discountPrice} تومان</span>
+              <span>{t("order.discount")}</span>
+              <span>
+                {order?.discountPrice} {t("common.currency")}
+              </span>
             </div>
 
             <div className="flex justify-between mt-4 font-bold text-lg">
-              <span>مبلغ نهایی</span>
-              <span>{(order?.totalPrice!+order?.shippingMethod?.cost!)-order?.discountPrice!} تومان</span>
+              <span>{t("order.finalAmount")}</span>
+              <span>
+                {(order?.totalPrice! + order?.shippingMethod?.cost!) -
+                  order?.discountPrice!}{" "}
+                {t("common.currency")}
+              </span>
             </div>
           </div>
         </div>

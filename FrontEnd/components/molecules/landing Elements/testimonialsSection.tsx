@@ -10,6 +10,7 @@ const ITEM_KEYS = ['1', '2', '3'] as const;
 
 const TestimonialsSection: React.FC = () => {
   const t = useTranslations('testimonials');
+  const tCommon = useTranslations('common');
 
   return (
     <section className="bg-gray-50 py-16">
@@ -34,7 +35,7 @@ const TestimonialsSection: React.FC = () => {
 
               <div
                 className="flex items-center gap-1 mb-2 text-yellow-500"
-                aria-label="۵ از ۵"
+                aria-label={tCommon('fiveOfFive')}
               >
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span key={i} aria-hidden>

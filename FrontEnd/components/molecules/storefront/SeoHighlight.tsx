@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 type Props = {
@@ -6,13 +7,15 @@ type Props = {
   locale: string;
 };
 
-export default function SeoHighlight({ title, description, locale }: Props) {
+export default async function SeoHighlight({ title, description, locale }: Props) {
   if (!title && !description) return null;
+
+  const t = await getTranslations('storefront');
 
   return (
     <aside className="mb-6 rounded-2xl border border-amber-300/20 bg-gradient-to-l from-amber-500/10 to-transparent px-4 py-3">
       <p className="mb-1 text-xs font-medium uppercase tracking-wide text-amber-200/80">
-        {locale === 'fa' ? 'خلاصه سئو' : 'SEO summary'}
+        {t('seoSummary')}
       </p>
       {title ? <h2 className="text-base font-semibold text-white">{title}</h2> : null}
       {description ? (

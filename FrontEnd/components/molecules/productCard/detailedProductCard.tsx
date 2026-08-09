@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -13,6 +14,7 @@ export function DetailedProductCard({
   product,
   locale,
 }: IDetailedProductCardProps) {
+  const t = useTranslations('common');
   const [isHovered, setIsHovered] = useState(false);
   // محاسبه تخفیف
   const hasDiscount =
@@ -32,34 +34,24 @@ export function DetailedProductCard({
   // تصویر محصول
   const imageSrc = product.mainImage || product.imageUrl;
 
-  // متون بر اساس زبان
-  const texts = {
-    addToCart: locale === "fa" ? "افزودن به سبد" : "Add to Cart",
-    view: locale === "fa" ? "مشاهده" : "View",
-    toman: locale === "fa" ? "تومان" : "Toman",
-    outOfStock: locale === "fa" ? "ناموجود" : "Out of Stock",
-    lowStock: locale === "fa" ? "در حد محدود" : "Low Stock",
-    discount: locale === "fa" ? "٪ تخفیف" : "% Off",
-  };
-
   return (
     <div className="group relative bg-white shadow-sm hover:shadow-2xl border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300">
       {/* تخفیف */}
       {hasDiscount && (
         <div className="top-3 left-3 z-10 absolute bg-red-500 px-2 py-1 rounded-full font-bold text-white text-xs">
-          {discountPercentage}% {texts.discount}
+          {discountPercentage}% {t('percentOff')}
         </div>
       )}
 
       {/* وضعیت موجودی */}
       {isOutOfStock && (
         <div className="top-3 right-3 z-10 absolute bg-gray-500 px-2 py-1 rounded-full font-medium text-white text-xs">
-          {texts.outOfStock}
+          {t('outOfStock')}
         </div>
       )}
       {isLowStock && !isOutOfStock && (
         <div className="top-3 right-3 z-10 absolute bg-amber-500 px-2 py-1 rounded-full font-medium text-white text-xs">
-          {texts.lowStock}
+          {t('lowStockShort')}
         </div>
       )}
 
@@ -136,7 +128,7 @@ export function DetailedProductCard({
             </span>
 
             {/* واحد پول */}
-            <span className="text-gray-500 text-sm">{texts.toman}</span>
+            <span className="text-gray-500 text-sm">{t('currency')}</span>
           </div>
 
           {/* رتبه‌بندی (اختیاری) */}
@@ -166,7 +158,7 @@ export function DetailedProductCard({
             href={`/${locale}/products/${product.slug || product.id}`}
             className="flex-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-white text-center transition-colors"
           >
-            {texts.view}
+            {t('view')}
           </Link>
 
           <button
@@ -181,7 +173,7 @@ export function DetailedProductCard({
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            {texts.addToCart}
+            {t('addToCart')}
           </button>
         </div>
       </div>

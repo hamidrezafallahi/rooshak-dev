@@ -1,6 +1,11 @@
+"use client";
+
 import React from 'react';
 
+import { useTranslations } from 'next-intl';
+
 function InvoiceList() {
+  const t = useTranslations();
   const invoice = {
     invoiceNumber: 12,
     customerName: "ali",
@@ -25,10 +30,10 @@ function InvoiceList() {
       <div className="flex justify-between items-start pb-3 border-zinc-800 border-b">
         <div>
           <div className="font-semibold text-sm">
-            فاکتور #{invoice.invoiceNumber}
+            {t("checkout.invoiceNumber", { number: invoice.invoiceNumber })}
           </div>
           <div className="mt-1 text-gray-400 text-xs">
-            مشتری: {invoice.customerName}
+            {t("checkout.customer", { name: invoice.customerName })}
           </div>
         </div>
 
@@ -58,12 +63,12 @@ function InvoiceList() {
       {/* ================= Totals ================= */}
       <div className="space-y-2 pt-3 border-zinc-800 border-t text-sm">
         <div className="flex justify-between text-gray-400">
-          <span>جمع کل</span>
+          <span>{t("checkout.grandTotal")}</span>
           <span>{10000}</span>
         </div>
 
         <div className="flex justify-between font-semibold text-primary">
-          <span>قابل پرداخت</span>
+          <span>{t("checkout.payable")}</span>
           <span>{100000}</span>
         </div>
       </div>

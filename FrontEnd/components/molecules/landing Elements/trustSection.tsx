@@ -23,6 +23,7 @@ const REVIEW_KEYS = ['1', '2', '3'] as const;
 
 const TrustSection: React.FC = () => {
   const t = useTranslations('trust');
+  const tCommon = useTranslations('common');
 
   return (
     <section className="bg-white py-16 text-center">
@@ -60,7 +61,7 @@ const TrustSection: React.FC = () => {
               </div>
               <div className="ms-3">
                 <h3 className="font-semibold">{t(`reviews.${id}.name`)}</h3>
-                <div className="flex text-yellow-500" aria-label="۵ از ۵">
+                <div className="flex text-yellow-500" aria-label={tCommon('fiveOfFive')}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} aria-hidden>
                       <StarIcon />

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 interface CaptchaProps {
   onValidate: (isValid: boolean) => void;
   invalid?: boolean;
@@ -15,6 +17,7 @@ const generateCode = () => {
 };
 
 export const Captcha = ({ onValidate, invalid }: CaptchaProps) => {
+  const t = useTranslations();
   const [code, setCode] = useState("");
   const [input, setInput] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,7 +107,7 @@ export const Captcha = ({ onValidate, invalid }: CaptchaProps) => {
       <input
         value={input}
         onChange={handleChange}
-        placeholder="کد بالا را وارد کنید"
+        placeholder={t("captcha.placeholder")}
         className={`
     mt-2 p-3 border rounded-xl outline-none w-full text-center placeholder:text-gray-gray8
     ${invalid ? "border-red-700" : "border-gray-300"}
@@ -117,7 +120,7 @@ export const Captcha = ({ onValidate, invalid }: CaptchaProps) => {
           onClick={refresh}
           className="text-blue-button text-sm"
         >
-          دریافت کد جدید
+          {t("captcha.refresh")}
         </button>
       </div>
     </div>

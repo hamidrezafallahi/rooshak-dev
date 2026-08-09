@@ -58,7 +58,7 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
   const handleSubmitComment = async () => {
     const comment = textAreaRef.current?.value.trim();
     if (comment?.length === 0) {
-      showErrorToast("لطفا نظر خود را وارد کنید");
+      showErrorToast(t('product.pleaseEnterComment'));
       textAreaRef.current?.focus();
       return;
     } else {
@@ -91,7 +91,7 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
           <Textarea
             ref={textAreaRef}
             className="p-3 border rounded-xl w-full text-sm resize-none"
-            placeholder="نظر خود را بنویسید..."
+            placeholder={t('product.writeCommentPlaceholder')}
           />
           <Button
             onClick={handleSubmitComment}

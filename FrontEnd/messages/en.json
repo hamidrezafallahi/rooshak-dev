@@ -1,150 +1,150 @@
 {
-  "brand":{
-    "name":"Rooshak",
-    "icon":"icon"
+  "brand": {
+    "name": "Rooshak",
+    "icon": "icon"
   },
-  "blog":{
-    "author":"Author",
-    "tableOfContents":"Table of Contents",
-    "introduction":"Introduction",
-    "content":"Content",
-    "conclusion":"Conclusion",
-    "share":"Share",
-    "createdAt":"Created at",
-    "updatedAt":"Updated at",
-    "title":"Crystal blog",
-    "subtitle":"Guides for buying, caring for, and styling crystal tableware",
-    "empty":"No articles found",
-    "emptyHint":"New posts will appear here soon.",
-    "landingTitle":"Read from the Rooshak blog",
-    "landingSubtitle":"Practical guides on buying and caring for crystal tableware",
-    "viewAll":"View all articles",
-    "readMore":"Read more"
+  "blog": {
+    "author": "Author",
+    "tableOfContents": "Table of Contents",
+    "introduction": "Introduction",
+    "content": "Content",
+    "conclusion": "Conclusion",
+    "share": "Share",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "title": "Crystal blog",
+    "subtitle": "Guides for buying, caring for, and styling crystal tableware",
+    "empty": "No articles found",
+    "emptyHint": "New posts will appear here soon.",
+    "landingTitle": "Read from the Rooshak blog",
+    "landingSubtitle": "Practical guides on buying and caring for crystal tableware",
+    "viewAll": "View all articles",
+    "readMore": "Read more"
   },
-  "header":{
-    "home":"Home",
-    "products":"Products",
-    "categories":"Categories",
-    "brands":"Brands",
-    "suppliers":"Suppliers",
-    "tags":"Tags",
-    "discounts":"Discounts",
-    "blogs":"Blog",
-    "landing page":"Back to home",
-    "register":"Sign up / Log in",
-    "shopping cart":"Shopping cart",
-    "theme":"Change theme",
-    "lang":"Change language",
-    "mainNav":"Main navigation",
-    "openMenu":"Open menu",
-    "closeMenu":"Close menu"
+  "header": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "brands": "Brands",
+    "suppliers": "Suppliers",
+    "tags": "Tags",
+    "discounts": "Discounts",
+    "blogs": "Blog",
+    "landing page": "Back to home",
+    "register": "Sign up / Log in",
+    "shopping cart": "Shopping cart",
+    "theme": "Change theme",
+    "lang": "Change language",
+    "mainNav": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
-  "footer":{
-    "tagline":"Rooshak — specialist crystal tableware. Authentic pieces, careful packing, and reliable delivery.",
-    "copyright":"© {year} {brand}. All rights reserved.",
-    "columns":{
-      "shop":"Shop",
-      "discover":"Discover",
-      "account":"Account"
+  "footer": {
+    "tagline": "Rooshak — specialist crystal tableware. Authentic pieces, careful packing, and reliable delivery.",
+    "copyright": "© {year} {brand}. All rights reserved.",
+    "columns": {
+      "shop": "Shop",
+      "discover": "Discover",
+      "account": "Account"
     },
-    "links":{
-      "products":"Products",
-      "categories":"Categories",
-      "brands":"Brands",
-      "discounts":"Discounts",
-      "blog":"Blog",
-      "suppliers":"Suppliers",
-      "tags":"Tags",
-      "sitemap":"Sitemap",
-      "register":"Sign in / Register",
-      "cart":"Cart",
-      "orders":"Orders"
+    "links": {
+      "products": "Products",
+      "categories": "Categories",
+      "brands": "Brands",
+      "discounts": "Discounts",
+      "blog": "Blog",
+      "suppliers": "Suppliers",
+      "tags": "Tags",
+      "sitemap": "Sitemap",
+      "register": "Sign in / Register",
+      "cart": "Cart",
+      "orders": "Orders"
     }
   },
-  "seo":{
-    "homeTitle":"Rooshak | Premium Crystal Tableware Store",
-    "homeDescription":"Shop authentic crystal dishes, glassware, serving sets, and decorative crystal from trusted brands at Rooshak Shop with transparent pricing and secure shipping.",
-    "homeKeywords":"crystal dishes,crystal glassware,crystal serving set,authentic crystal,Rooshak,rooshakshop"
+  "seo": {
+    "homeTitle": "Rooshak | Premium Crystal Tableware Store",
+    "homeDescription": "Shop authentic crystal dishes, glassware, serving sets, and decorative crystal from trusted brands at Rooshak Shop with transparent pricing and secure shipping.",
+    "homeKeywords": "crystal dishes,crystal glassware,crystal serving set,authentic crystal,Rooshak,rooshakshop"
   },
-  "htmlSitemap":{
-    "title":"Sitemap",
-    "description":"Browse all Persian and English pages of Rooshak Shop including products, blogs, brands, categories, and suppliers.",
-    "mainPages":"Main pages",
-    "products":"Products",
-    "blogs":"Blog posts",
-    "brands":"Brands",
-    "categories":"Categories",
-    "suppliers":"Suppliers",
-    "tags":"Tags",
-    "languages":"Language versions",
-    "persian":"Persian version",
-    "english":"English version",
-    "xmlHint":"XML sitemap for search engines:",
-    "empty":"Nothing to show yet.",
-    "brandPrefix":"Brand",
-    "categoryPrefix":"Category",
-    "supplierPrefix":"Supplier",
-    "tagPrefix":"Tag"
+  "htmlSitemap": {
+    "title": "Sitemap",
+    "description": "Browse all Persian and English pages of Rooshak Shop including products, blogs, brands, categories, and suppliers.",
+    "mainPages": "Main pages",
+    "products": "Products",
+    "blogs": "Blog posts",
+    "brands": "Brands",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "tags": "Tags",
+    "languages": "Language versions",
+    "persian": "Persian version",
+    "english": "English version",
+    "xmlHint": "XML sitemap for search engines:",
+    "empty": "Nothing to show yet.",
+    "brandPrefix": "Brand",
+    "categoryPrefix": "Category",
+    "supplierPrefix": "Supplier",
+    "tagPrefix": "Tag"
   },
-  "store":{
-    "error":"Error",
-    "fetchError":"Failed to load data",
-    "serverError":"There was a problem connecting to the server. Please try again.",
-    "viewBrand":"View brand",
-    "showingCount":"Showing {count} items",
-    "ofTotal":"of {total}",
-    "pageSuffix":" — Page {page}",
-    "notFound":"Not found",
-    "notFoundHint":"The requested item does not exist or was removed.",
-    "loadError":"Loading error",
-    "loadErrorHint":"Something went wrong while loading this page.",
-    "backHome":"Back to home"
+  "store": {
+    "error": "Error",
+    "fetchError": "Failed to load data",
+    "serverError": "There was a problem connecting to the server. Please try again.",
+    "viewBrand": "View brand",
+    "showingCount": "Showing {count} items",
+    "ofTotal": "of {total}",
+    "pageSuffix": " — Page {page}",
+    "notFound": "Not found",
+    "notFoundHint": "The requested item does not exist or was removed.",
+    "loadError": "Loading error",
+    "loadErrorHint": "Something went wrong while loading this page.",
+    "backHome": "Back to home"
   },
-  "productsPage":{
-    "title":"Crystal tableware",
-    "description":"Browse authentic crystal dishes, serving sets, glassware, and décor with premium quality",
-    "empty":"No products found",
-    "emptyHint":"There are currently no products to display.",
-    "loadError":"Failed to load products"
+  "productsPage": {
+    "title": "Crystal tableware",
+    "description": "Browse authentic crystal dishes, serving sets, glassware, and décor with premium quality",
+    "empty": "No products found",
+    "emptyHint": "There are currently no products to display.",
+    "loadError": "Failed to load products"
   },
-  "categoriesPage":{
-    "title":"Categories",
-    "description":"Explore crystal, serving, and décor categories",
-    "empty":"No categories found",
-    "emptyHint":"No categories have been published yet."
+  "categoriesPage": {
+    "title": "Categories",
+    "description": "Explore crystal, serving, and décor categories",
+    "empty": "No categories found",
+    "emptyHint": "No categories have been published yet."
   },
-  "brandsPage":{
-    "title":"Crystal brands",
-    "description":"Discover trusted crystal tableware brands",
-    "empty":"No brands found",
-    "emptyHint":"No brands are available yet."
+  "brandsPage": {
+    "title": "Crystal brands",
+    "description": "Discover trusted crystal tableware brands",
+    "empty": "No brands found",
+    "emptyHint": "No brands are available yet."
   },
-  "tagsPage":{
-    "title":"Tags",
-    "description":"Browse crystal products by tag and use-case",
-    "empty":"No tags found",
-    "emptyHint":"No tags have been published yet."
+  "tagsPage": {
+    "title": "Tags",
+    "description": "Browse crystal products by tag and use-case",
+    "empty": "No tags found",
+    "emptyHint": "No tags have been published yet."
   },
-  "suppliersPage":{
-    "title":"Suppliers",
-    "description":"Meet Rooshak’s trusted crystal suppliers",
-    "empty":"No suppliers found",
-    "emptyHint":"No suppliers are available yet."
+  "suppliersPage": {
+    "title": "Suppliers",
+    "description": "Meet Rooshak’s trusted crystal suppliers",
+    "empty": "No suppliers found",
+    "emptyHint": "No suppliers are available yet."
   },
-  "discountsPage":{
-    "title":"Crystal offers",
-    "description":"Special offers on crystal tableware",
-    "empty":"No discounts found",
-    "emptyHint":"There are no active offers right now.",
-    "comingSoon":"Special offers will appear here soon."
+  "discountsPage": {
+    "title": "Crystal offers",
+    "description": "Special offers on crystal tableware",
+    "empty": "No discounts found",
+    "emptyHint": "There are no active offers right now.",
+    "comingSoon": "Special offers will appear here soon."
   },
-  "registerPage":{
-    "metaTitle":"Sign in / Register",
-    "metaDescription":"Sign in to your account or create a new one."
+  "registerPage": {
+    "metaTitle": "Sign in / Register",
+    "metaDescription": "Sign in to your account or create a new one."
   },
-  "cartPage":{
-    "metaTitle":"Shopping cart",
-    "metaDescription":"Review cart items and continue to checkout."
+  "cartPage": {
+    "metaTitle": "Shopping cart",
+    "metaDescription": "Review cart items and continue to checkout."
   },
   "title": {
     "notification": "Notifications"
@@ -236,24 +236,23 @@
       }
     }
   },
-
   "general": {
     "changePassWord": "Change password",
     "save": "Save",
     "saving": "Saving...",
-    "new":"New",
-    "list":"List",
-    "default":"Default",
-    "delete":"Delete",
-    "edit":"Edit",
-    "apply":"Apply",
-    "reset":"Reset",
-    "search":"Search...",
-    "actions":"Actions",
-    "back":"Back",
-    "loading":"Loading...",
-    "paymentMethod":"Payment method",
-    "loginFirst":"Log in first"
+    "new": "New",
+    "list": "List",
+    "default": "Default",
+    "delete": "Delete",
+    "edit": "Edit",
+    "apply": "Apply",
+    "reset": "Reset",
+    "search": "Search...",
+    "actions": "Actions",
+    "back": "Back",
+    "loading": "Loading...",
+    "paymentMethod": "Payment method",
+    "loginFirst": "Log in first"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -372,115 +371,109 @@
     }
   },
   "register": {
-    "enter":"Enter",
+    "enter": "Enter",
     "enterEmail": "Enter your email below to login to your account",
-    "email":"Email",
-    "emailPlaceHolder":"m@example.com",
-    "password":"Password",
-    "forgotPassword":"Forgot your password?",
-    "signUp":"Sign up",
-    "dotHaveAnyAccount":"Don't have an account?",
-    "startSignUp":"Enter your email below to Sign up",
-    "emailRequired":"Email is required",
-    "invalidEmail":"Invalid email format",
-    "phoneRequired":"Phone number is required",
-    "invalidPhone":"Invalid phone format (09xxxxxxxxx)",
-    "passwordRequired":"Password is required",
-    "passwordMinLength":"At least 8 characters",
-    "fullNameRequired":"Full name is required",
-    "fullName":"Full name",
-    "userDescription":"User description",
-    "phoneNumber":"Phone number",
-    "phoneNumberPlaceholder":"09*********",
-    "register":"Register",
-    "havingAccount":"I have an account",
-    "rememberMe":"Remember me",
-    "userImage":"User image",
-    "success":"Registered successfully",
-    "failed":"Register failed"
+    "email": "Email",
+    "emailPlaceHolder": "m@example.com",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "signUp": "Sign up",
+    "dotHaveAnyAccount": "Don't have an account?",
+    "startSignUp": "Enter your email below to Sign up",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Invalid email format",
+    "phoneRequired": "Phone number is required",
+    "invalidPhone": "Invalid phone format (09xxxxxxxxx)",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "At least 8 characters",
+    "fullNameRequired": "Full name is required",
+    "fullName": "Full name",
+    "userDescription": "User description",
+    "phoneNumber": "Phone number",
+    "phoneNumberPlaceholder": "09*********",
+    "register": "Register",
+    "havingAccount": "I have an account",
+    "rememberMe": "Remember me",
+    "userImage": "User image",
+    "success": "Registered successfully",
+    "failed": "Register failed",
+    "minTwoChars": "Enter at least 2 characters",
+    "minTwoCharsShort": "At least 2 characters",
+    "registerError": "Registration error",
+    "connectionError": "Connection error"
   },
- "shoppingCart":{
-    "header":{
-    "yourCart":"Your cart",
-    "items":"Items",
-    "reviewBeforeCheckout":"Review your items before checkout",
-    "totalDiscount":"Total discount",
-    "shipping":"Shipping",
-    "total":"Total",
-    "freeShippingOver":"Free shipping on orders over $200",
-    "checkout":"Checkout",
-    "viewCart":"View Cart"
+  "shoppingCart": {
+    "header": {
+      "yourCart": "Your cart",
+      "items": "Items",
+      "reviewBeforeCheckout": "Review your items before checkout",
+      "totalDiscount": "Total discount",
+      "shipping": "Shipping",
+      "total": "Total",
+      "freeShippingOver": "Free shipping on orders over $200",
+      "checkout": "Checkout",
+      "viewCart": "View Cart"
     },
-    "ShoppingCart":"Shopping Cart",
-    "ItemsInYourCart":"Items in your cart",
-    "days":"days",
-    "standardShipping":"Standard Shipping",
-    "shippingMethod":"Shipping Method",
-    "reviewYourCartDetailsAndShippingInformation":"Review your cart details and shipping information",
-    "shoppingCartSummary":"Shopping cart summary",
-    "promoCode":"Promo Code",
-    "promoCodePlaceHolder":"Enter promo code",
-    "subTotal":"Subtotal",
-    "shipping":"Shipping",
-    "total":"Total",
-    "freeReturns":"Free returns within 30 days",
-    "securePayment":"Secure payment",
-    "fastDelivery":"Fast delivery",
-    "placeOrder":"Place order",
-    "chooseAddress":"Choose an address",
-    "emptyCart":"Empty cart",
-    "promoCodeSubmit":"promo code has been submitted",
-        "discountCodeAmount":"Discount code amount",
-            "totalDiscount":"Total discount"
-
-
-
-
-
+    "ShoppingCart": "Shopping Cart",
+    "ItemsInYourCart": "Items in your cart",
+    "days": "days",
+    "standardShipping": "Standard Shipping",
+    "shippingMethod": "Shipping Method",
+    "reviewYourCartDetailsAndShippingInformation": "Review your cart details and shipping information",
+    "shoppingCartSummary": "Shopping cart summary",
+    "promoCode": "Promo Code",
+    "promoCodePlaceHolder": "Enter promo code",
+    "subTotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "freeReturns": "Free returns within 30 days",
+    "securePayment": "Secure payment",
+    "fastDelivery": "Fast delivery",
+    "placeOrder": "Place order",
+    "chooseAddress": "Choose an address",
+    "emptyCart": "Empty cart",
+    "promoCodeSubmit": "promo code has been submitted",
+    "discountCodeAmount": "Discount code amount",
+    "totalDiscount": "Total discount"
   },
-   "address":{
-     "addresses":"Addresses",
-     "addFirstAddress":"Add first address",
-     "addNewAddress":"Add new address",
-     "name":"Name",
-     "phoneNumber":"Phone number",
-     "state":"State",
-     "city":"City",
-     "fullAddress":"Full address",
-     "postalCode":"Postal code",
-     "saveAddress":"Save address",
-     "cancel":"Cancel",
-     "chooseAsDefault":"Choose as default",
-     "editAddress":"Edit address"
-
-
-
-
+  "address": {
+    "addresses": "Addresses",
+    "addFirstAddress": "Add first address",
+    "addNewAddress": "Add new address",
+    "name": "Name",
+    "phoneNumber": "Phone number",
+    "state": "State",
+    "city": "City",
+    "fullAddress": "Full address",
+    "postalCode": "Postal code",
+    "saveAddress": "Save address",
+    "cancel": "Cancel",
+    "chooseAsDefault": "Choose as default",
+    "editAddress": "Edit address"
   },
-  "checkout":{
-        "proceedToCheckout":"Proceed to Checkout",
-            "title":"Checkout",
-                "landing page":"go to landing page"
-
-
+  "checkout": {
+    "proceedToCheckout": "Proceed to Checkout",
+    "title": "Checkout",
+    "landing page": "go to landing page",
+    "invoiceNumber": "Invoice #{number}",
+    "customer": "Customer: {name}",
+    "grandTotal": "Grand total",
+    "payable": "Payable"
   },
   "payment": {
     "verifying": "Verifying payment...",
     "waiting": "Please wait a moment",
     "redirect": "Redirecting to the payment gateway...",
-
     "paymentFailed": "Payment Failed",
     "payment_issue": "There was an issue processing your payment",
     "what_happened": "What happened?",
     "error_code": "Error code",
     "payment_error": "Payment Error",
-
     "insufficient_funds": "Insufficient funds",
     "card_declined": "Card was declined",
     "expired_card": "Card has expired",
     "network_error": "Network error",
     "timeout": "Payment timed out",
-
     "solutions_title": "Suggested Solutions",
     "retry_title": "Retry Payment",
     "retry_desc": "Make sure your card information is correct.",
@@ -488,17 +481,14 @@
     "alternative_desc": "You can try a different payment method.",
     "support_title": "Contact Support",
     "support_desc": "If the problem persists, contact our support team.",
-
     "order_title": "Your Order",
     "order_number": "Order Number",
     "failed_status": "Payment Failed",
     "order_notice": "Your order is temporarily reserved. Please complete payment within 24 hours.",
-
     "retry_button": "Retry Payment",
     "back_to_checkout": "Back to Checkout",
     "view_cart": "View Cart",
     "back_home": "Back to Home",
-
     "final_confirm_title": "Final Order Confirmation",
     "final_confirm_desc": "Please review and confirm your order details",
     "shipping_address": "Shipping Address",
@@ -521,23 +511,165 @@
     "delivered": "Delivered",
     "cancelled": "Cancelled"
   },
-  "comments":{
-    "yourComment":"Your comment",
-    "yourRate":"Your rate"
+  "comments": {
+    "yourComment": "Your comment",
+    "yourRate": "Your rate"
   },
-  "product":{
-    "width":"Width",
-    "height":"Height",
-    "depth":"Depth",
-    "weight":"Weight"
+  "product": {
+    "width": "Width",
+    "height": "Height",
+    "depth": "Depth",
+    "weight": "Weight",
+    "suppliersTitle": "Suppliers for this product",
+    "suppliersCount": "{count} suppliers",
+    "userReviews": "Customer reviews",
+    "productDetails": "Product details",
+    "description": "Description",
+    "specs": "Specifications",
+    "noSpecs": "No specifications have been registered for this product.",
+    "noComments": "No reviews have been submitted for this product yet.",
+    "writeCommentPlaceholder": "Write your review...",
+    "submitComment": "Submit review",
+    "pleaseWriteComment": "Please write your review",
+    "pleaseEnterComment": "Please enter your comment",
+    "brandProducts": "Brand products",
+    "brandSuppliers": "Brand suppliers",
+    "brandCategories": "Categories",
+    "tagProducts": "Tagged products"
   },
-  "category":{
-    "subCategories":"Sub categories",
-    "noSubCategory":"There is no sub category",
-    "noCategorySupplier":"There is no category supplier",
-    "goToParent":"Go to parent"
+  "category": {
+    "subCategories": "Sub categories",
+    "noSubCategory": "There is no sub category",
+    "noCategorySupplier": "There is no category supplier",
+    "goToParent": "Go to parent"
   },
-  "common":{
-    "loading":"Loading"
+  "common": {
+    "loading": "Loading",
+    "view": "View",
+    "add": "Add",
+    "previous": "Previous",
+    "next": "Next",
+    "price": "Price",
+    "currency": "Toman",
+    "rial": "Rial",
+    "tomanShort": "T",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "lowStock": "Low stock ({count})",
+    "lowStockShort": "Low stock",
+    "percentOff": "% Off",
+    "specialDiscount": "Special offer",
+    "addToCart": "Add to cart",
+    "wishlist": "Wishlist",
+    "reviewsCount": "{count} reviews",
+    "votesCount": "{count} votes",
+    "quantityCount": "{count} pcs",
+    "viewBrand": "View brand",
+    "viewBrandArrow": "View brand →",
+    "viewAllProducts": "View all products",
+    "noProductsFound": "No products found",
+    "primary": "Primary",
+    "ratingAria": "Rating {value} of {max}",
+    "fiveOfFive": "5 of 5",
+    "pleaseSelect": "Please select...",
+    "saveFailed": "Save failed. Please try again.",
+    "noOptionsFound": "No options found",
+    "underDevelopment": "This section is under development",
+    "scrollPrev": "Scroll previous",
+    "scrollNext": "Scroll next",
+    "addToCartAria": "Add {name} to cart",
+    "priceColon": "Price: {price}",
+    "supplier": "Supplier",
+    "roleLabel": "Role: {role}",
+    "viewSupplier": "View supplier →",
+    "supplierNotFound": "Supplier not found"
+  },
+  "landing": {
+    "brandsTitle": "Brands",
+    "brandsSubtitle": "Available brands",
+    "viewAllBrands": "View all brands",
+    "categoriesTitle": "Categories",
+    "viewAllCategories": "View all categories",
+    "specialOfferTitle": "Today's special offer",
+    "specialOfferDesc": "These discounted products are available only until the end of today.",
+    "noOffers": "No offers available",
+    "selectedProducts": "Featured products",
+    "bestSellers": "Best sellers",
+    "newest": "Newest",
+    "discounters": "On sale",
+    "slideDetailsAria": "View slide {index} details",
+    "goToSlideAria": "Go to slide {index}",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide"
+  },
+  "order": {
+    "myOrders": "My orders",
+    "selectOrder": "Select an order",
+    "orderDetails": "Order details",
+    "status": "Status:",
+    "orderNumber": "Order number: {id}",
+    "itemsSummary": "{count} items • Total {total} {currency}",
+    "date": "Date: {date}",
+    "orderTotal": "Order total",
+    "shippingCost": "Shipping cost",
+    "discount": "Discount",
+    "finalAmount": "Final amount"
+  },
+  "captcha": {
+    "placeholder": "Enter the code above",
+    "refresh": "Get a new code"
+  },
+  "uploader": {
+    "placeholder": "Drag and drop or click to select an image",
+    "previousNotFound": "Previous image not found; please upload again"
+  },
+  "countdown": {
+    "expired": "The discount has ended",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
+  },
+  "promotion": {
+    "yaldaBanner": "Yalda night special offer! Only until tonight!"
+  },
+  "storefront": {
+    "faqTitle": "FAQ",
+    "relatedLinks": "Related links",
+    "seoSummary": "SEO summary"
+  },
+  "navbar": {
+    "loginRegister": "Login / Sign up",
+    "systemTraining": "System training",
+    "aboutUs": "About us",
+    "customers": "Customers",
+    "products": "Products"
+  },
+  "animatedLanding": {
+    "brandName": "Arian System",
+    "software": "Software"
+  },
+  "paymentSuccess": {
+    "title": "Payment Successful!",
+    "subtitle": "Your order was placed successfully. Purchase details are below.",
+    "thankYou": "Thank You For Your Purchase!",
+    "thankYouDesc": "Your order {orderId} has been placed. A confirmation email has been sent to you.",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "transactionId": "Transaction ID",
+    "amountPaid": "Amount Paid",
+    "nextSteps": "Next Steps",
+    "processing": "Order Processing",
+    "processingDesc": "Your order is being prepared and will ship soon.",
+    "trackOrder": "Track Your Order",
+    "trackOrderDesc": "You can track your order from your account panel.",
+    "actions": "Actions",
+    "printReceipt": "Print Receipt",
+    "downloadInvoice": "Download Invoice",
+    "viewOrders": "View Orders",
+    "backHome": "Back to Home",
+    "needHelp": "Need Help?",
+    "needHelpDesc": "Our support team is available 24/7 to answer your questions.",
+    "contactSupport": "Contact Support →"
   }
 }

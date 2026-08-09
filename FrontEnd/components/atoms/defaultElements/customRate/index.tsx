@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import { StarFantasyIcon } from '@components/atoms/iconComponents';
 import { cn } from '@lib/utils';
 
@@ -23,6 +25,7 @@ export const Rate: React.FC<RateProps> = ({
   showValue = false,
   className,
 }) => {
+  const t = useTranslations();
   const [hoverValue, setHoverValue] = useState<number | null>(null);
 
   const activeValue = hoverValue ?? value;
@@ -52,7 +55,7 @@ export const Rate: React.FC<RateProps> = ({
         variant="ghost"
         size="icon"
         className="hover:bg-transparent m-0 p-0 w-6 h-6"
-        aria-label={`امتیاز ${rateValue} از ${max}`}
+        aria-label={t('common.ratingAria', { value: rateValue, max })}
         onMouseEnter={() => setHoverValue(rateValue)}
         onMouseLeave={() => setHoverValue(null)}
         onClick={() => onChange?.(rateValue)}
@@ -66,7 +69,7 @@ export const Rate: React.FC<RateProps> = ({
     <div
       className={cn('flex flex-row-reverse items-center gap-1', className)}
       role={mode === 'display' ? 'img' : 'group'}
-      aria-label={`امتیاز ${value} از ${max}`}
+      aria-label={t('common.ratingAria', { value, max })}
     >
       {stars}
 

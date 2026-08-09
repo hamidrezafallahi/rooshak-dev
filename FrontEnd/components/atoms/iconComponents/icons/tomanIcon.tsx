@@ -1,6 +1,11 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 import type { IIconConfig } from '../type';
 
 export const TomanIcon = ({ config }: { config?: IIconConfig }) => {
+  const t = useTranslations();
   const size = config?.size ?? 26;
   const strokeWidth = config?.strokeWidth ?? 1;
   const stroke = config?.stroke ?? "currentColor";
@@ -49,7 +54,7 @@ export const TomanIcon = ({ config }: { config?: IIconConfig }) => {
         fontFamily={"iranSansLight"}
         // style={{fontStretch:"expanded",fontFamily:"serif"}}
       >
-        تومان
+        {t('common.currency')}
       </text>
     </svg>
   );

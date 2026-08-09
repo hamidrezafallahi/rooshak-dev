@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 type ProductPriceProps = {
   price?: number | null;
   finalPrice?: number | null;
@@ -11,7 +13,7 @@ function formatMoney(value: number, locale: string) {
   return new Intl.NumberFormat(locale === 'fa' ? 'fa-IR' : 'en-US').format(value);
 }
 
-export default function ProductPrice({
+export default async function ProductPrice({
   price,
   finalPrice,
   currency = 'IRR',
@@ -21,19 +23,17 @@ export default function ProductPrice({
 }: ProductPriceProps) {
   if (price == null && finalPrice == null) return null;
 
+  const t = await getTranslations();
   const base = price ?? finalPrice ?? 0;
   const final = finalPrice ?? price ?? 0;
   const hasDiscount = final > 0 && base > 0 && final < base;
-  const unit = locale === 'fa' ? 'تومان' : currency === 'IRR' ? 'Toman' : currency;
+  const unit =
+    currency === 'IRR' ? t('common.currency') : currency;
   const stockLabel =
     inStock === false
-      ? locale === 'fa'
-        ? 'ناموجود'
-        : 'Out of stock'
+      ? t('common.outOfStock')
       : inventory != null && inventory > 0 && inventory <= 10
-        ? locale === 'fa'
-          ? `موجودی محدود (${inventory})`
-          : `Low stock (${inventory})`
+        ? t('common.lowStock', { count: inventory })
         : null;
 
   return (

@@ -3,7 +3,10 @@ import {
   useRef,
 } from 'react';
 
-import { useLocale } from 'next-intl';
+import {
+  useLocale,
+  useTranslations,
+} from 'next-intl';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 
@@ -80,6 +83,7 @@ export default function SupplierProductsCarousel({
 function ProductCard({ product }: { product: IDetailedProductOffer }) {
   const isAuthenticated = Boolean(getCookie("candySession"));
   const locale = useLocale();
+  const t = useTranslations();
   const [addToShoppingCart] = useGetConditionallyMutation();
   const dispatch = useDispatch();
   const handleAddToCart = async (product: IDetailedProductOffer) => {
@@ -147,7 +151,7 @@ dispatch(addToCart({
               href={`/${locale}/products/${product.productSlug || product.slug || product.productId}`}
               className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs"
             >
-              مشاهده
+              {t('common.view')}
             </Link>
             <button
               onClick={() => {
@@ -155,7 +159,7 @@ dispatch(addToCart({
               }}
               className="bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-lg text-white text-xs"
             >
-              افزودن
+              {t('common.add')}
             </button>
           </div>
         </div>

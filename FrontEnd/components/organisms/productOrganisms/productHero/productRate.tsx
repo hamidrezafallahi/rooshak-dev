@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { Rate } from '@components/atoms/defaultElements/customRate';
 import { serverApiBaseUrl } from '@lib/api';
 import { SimpleResponse } from '@models/base';
@@ -11,6 +13,7 @@ type Props = {
 };
 
 export default async function ProductRate({ id, average, count }: Props) {
+  const t = await getTranslations();
   let resolvedAverage = average;
   let resolvedCount = count;
 
@@ -28,7 +31,7 @@ export default async function ProductRate({ id, average, count }: Props) {
     <div className="flex items-center gap-2">
       <Rate value={resolvedAverage ?? 0} />
       <span className="text-gray-200 text-sm">
-        ({resolvedCount ?? 0} نظر)
+        ({t('common.reviewsCount', { count: resolvedCount ?? 0 })})
       </span>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import { toMediaUrl } from '@utils/toMediaUrl';
@@ -13,13 +13,14 @@ interface IProps {
 }
 export default async  function LandingCategory(props: IProps) {
   const { categories } = props;
-  const locale = await getLocale()
+  const locale = await getLocale();
+  const t = await getTranslations('landing');
   return (
     <section id="categories" className="flex flex-col gap-4 mx-auto px-4 py-10 w-full max-w-7xl">
        <div className="flex justify-between items-center gap-3">
-         <h2 className="font-semibold text-2xl sm:text-3xl">دسته‌بندی‌ها</h2>
+         <h2 className="font-semibold text-2xl sm:text-3xl">{t('categoriesTitle')}</h2>
          <Link href={`/${locale}/categories`} className="block text-sm text-end underline">
-                  مشاهده همه دسته بندی ها
+                  {t('viewAllCategories')}
          </Link>
        </div>
         <div className="hidden-show-scrollbar sm:hidden flex gap-4 pb-2 overflow-x-auto">

@@ -1,14 +1,23 @@
+"use client";
 import React from 'react';
+
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@components/atoms/defaultElements/customButton';
 
 function Navbar() {
-  const menuItems = ["آموزش سیستم", "درباره ما", "مشتریان", "محصولات"];
+  const t = useTranslations('navbar');
+  const menuItems = [
+    t('systemTraining'),
+    t('aboutUs'),
+    t('customers'),
+    t('products'),
+  ];
 
   return (
     <header>
       <Button  className="top-16 left-16 z-10 fixed">
-        ورود/ ثبت نام
+        {t('loginRegister')}
       </Button>
       <nav className="top-10 z-10 fixed flex justify-center px-6 w-full mix-blend-difference">
         <div className="flex justify-between px-10 rounded-2xl w-full h-24 text-white">

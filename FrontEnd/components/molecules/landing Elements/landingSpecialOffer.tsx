@@ -1,6 +1,8 @@
 // app/components/landing/LandingSpecialOffer.tsx
 import React from 'react';
 
+import { getTranslations } from 'next-intl/server';
+
 import { getAll } from '@lib/getAll';
 import { SpecialOffer } from '@models/specialOffer';
 
@@ -9,6 +11,7 @@ import SpecialOfferCarouselClient from './SpecialOfferCarouselClient';
 export const dynamic = "force-dynamic";
 
 export default async  function LandingSpecialOffer() {
+  const t = await getTranslations('landing');
   const spacialOffers = await getAll<SpecialOffer>("SpecialOffers/landing");
   return (
     <section className="mx-auto px-4 py-16 w-full max-w-7xl">
@@ -21,10 +24,10 @@ export default async  function LandingSpecialOffer() {
       >
         <div className="flex-1 min-w-0">
           <h2 className="mb-3 font-extrabold text-3xl sm:text-4xl">
-            پیشنهاد ویژه امروز
+            {t('specialOfferTitle')}
           </h2>
           <p className="mb-6 max-w-md text-sm sm:text-base text-center text-white">
-            فقط تا پایان امروز می‌توانید این محصولات را با تخفیف ویژه تهیه کنید.
+            {t('specialOfferDesc')}
           </p>
 
 

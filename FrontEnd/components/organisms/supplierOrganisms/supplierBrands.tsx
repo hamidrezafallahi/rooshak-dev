@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import {
+  getLocale,
+  getTranslations,
+} from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
@@ -9,6 +12,7 @@ import { IBrand } from '@models/brand';
 export async function SupplierBrands(props: { brands: IBrand[] }) {
   const { brands } = props;
   const locale = await getLocale();
+  const t = await getTranslations();
 
   // حذف برندهای تکراری
   const uniqueBrands = Array.from(new Map(brands.map((b) => [b.id, b])).values());
@@ -41,7 +45,7 @@ export async function SupplierBrands(props: { brands: IBrand[] }) {
               </p>
             )}
             <span className="mt-3 text-gray-100 text-xs uppercase tracking-wider">
-              مشاهده برند
+              {t('common.viewBrand')}
             </span>
             </div>
             </div>

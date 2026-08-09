@@ -1,6 +1,8 @@
+'use client';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 
+import { useTranslations } from 'next-intl';
 import { useRenderPosition } from 'react-persian-range-picker';
 
 import { cn } from '@/lib/utils';
@@ -20,7 +22,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   (
     {
       className,
-      placeholder = "لطفا انتخاب کنید...",
+      placeholder,
       dropdownClassName,
       maxHeight = "200px",
       options,
@@ -31,6 +33,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     },
     ref,
   ) => {
+    const t = useTranslations();
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(value);
     const buttonRef = React.useRef<HTMLElement>(null);
@@ -55,7 +58,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
       },
       [onPageChange],
     );
-    const displayText = selectedOption?.label || placeholder;
+    const displayText =
+      selectedOption?.label || placeholder || t('common.pleaseSelect');
 
     return (
       <div

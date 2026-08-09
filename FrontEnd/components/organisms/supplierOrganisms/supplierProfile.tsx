@@ -1,11 +1,14 @@
 import React from 'react';
 
+import { getTranslations } from 'next-intl/server';
+
 import MediaImage from '@components/atoms/MediaImage';
 import { Rate } from '@components/atoms/defaultElements/customRate';
 import { IUser } from '@models/user';
 
 export async function SupplierProfile({ ...props }: { user: IUser }) {
   const { user } = props;
+  const t = await getTranslations();
   return (
     <div className="group relative shadow-sm rounded-2xl w-fit h-44 md:h-52 overflow-hidden">
       <MediaImage
@@ -22,7 +25,7 @@ export async function SupplierProfile({ ...props }: { user: IUser }) {
           <div className="flex justify-center items-center">
             <Rate value={user.averageRate} />
             <h3 className="font-semibold text-white text-xs">
-              {user.rateCount} رای
+              {t('common.votesCount', { count: user.rateCount })}
             </h3>
           </div>
         </div>

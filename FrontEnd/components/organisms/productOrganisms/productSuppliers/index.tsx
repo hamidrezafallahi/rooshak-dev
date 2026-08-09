@@ -1,4 +1,7 @@
-import { getLocale } from 'next-intl/server';
+import {
+  getLocale,
+  getTranslations,
+} from 'next-intl/server';
 
 import { serverApiBaseUrl } from '@lib/api';
 
@@ -20,7 +23,8 @@ export async function ProductSupplierExtended({
   );
   const result = await response.json();
   const suppliers = result?.data || [];
-const locale = await getLocale()
+  const locale = await getLocale();
+  const t = await getTranslations();
   if (suppliers.length === 0) return null;
  
   return (
@@ -30,11 +34,11 @@ const locale = await getLocale()
         <div className="flex items-center gap-2">
           <div className="bg-primary rounded-full w-1 h-7"></div>
           <h3 className="font-bold text-gray-800 text-xl">
-            تأمین‌کنندگان این محصول
+            {t('product.suppliersTitle')}
           </h3>
         </div>
         <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-600 text-sm">
-          {suppliers.length} تأمین‌کننده
+          {t('product.suppliersCount', { count: suppliers.length })}
         </span>
       </div>
 

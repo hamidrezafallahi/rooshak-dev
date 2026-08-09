@@ -49,7 +49,7 @@ const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const handleSubmitComment = async () => {
     const comment = textAreaRef.current?.value.trim();
     if (comment?.length === 0) {
-      showErrorToast("لطفا نظر خود را بنویسید");
+      showErrorToast(t('product.pleaseWriteComment'));
       textAreaRef.current?.focus();
       return;
     } else {
@@ -81,14 +81,14 @@ const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
           <textarea
             ref={textAreaRef}
             className="p-3 border rounded-xl w-full text-sm resize-none"
-            placeholder="نظر خود را بنویسید..."
+            placeholder={t('product.writeCommentPlaceholder')}
           />
           <button
             onClick={handleSubmitComment}
             disabled={isLoading}
             className="bg-primary mt-2 px-6 py-2 rounded-xl text-white"
           >
-            {isLoading ? <SpinnerIcon /> : <span> ثبت نظر</span>}
+            {isLoading ? <SpinnerIcon /> : <span>{t('product.submitComment')}</span>}
           </button>
         </>
       ) : (

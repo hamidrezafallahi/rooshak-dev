@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { getTranslations } from 'next-intl/server';
+
 import { serverApiBaseUrl } from '@lib/api';
 import { IDetailedProductOffer } from '@models/product';
 
@@ -9,6 +11,7 @@ export async function SupplierProducts(props: {
   id: number;
 }) {
   const { id } = props;
+  const t = await getTranslations();
 
   try {
     const response = await fetch(
@@ -19,7 +22,7 @@ export async function SupplierProducts(props: {
     );
 
     if (!response.ok) {
-      return <div>محصولی پیدا نشد</div>;
+      return <div>{t('common.noProductsFound')}</div>;
     }
 
     const res = await response.json();
@@ -33,7 +36,7 @@ export async function SupplierProducts(props: {
           : [];
 
     if (items.length === 0) {
-      return <div>محصولی پیدا نشد</div>;
+      return <div>{t('common.noProductsFound')}</div>;
     }
 
     return (
@@ -42,6 +45,6 @@ export async function SupplierProducts(props: {
       </div>
     );
   } catch {
-    return <div>محصولی پیدا نشد</div>;
+    return <div>{t('common.noProductsFound')}</div>;
   }
 }

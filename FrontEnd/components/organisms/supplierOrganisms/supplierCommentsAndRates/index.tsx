@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { getTranslations } from 'next-intl/server';
+
 import MediaImage from '@components/atoms/MediaImage';
 import { StarIcon } from '@components/atoms/iconComponents';
 import { serverApiBaseUrl } from '@lib/api';
@@ -15,10 +17,11 @@ export async function SupplierCommentsAndRates(props: {
 }) {
   const { params } = props;
   const slug = await params.slug;
+  const t = await getTranslations();
 
   const response = await fetch(
     `${serverApiBaseUrl}/Comments/${EnumTargetType.Supplier}/${slug}`,{next: { revalidate: 36 }});
-  if (!response.ok) return <div>تأمین‌کننده پیدا نشد</div>;
+  if (!response.ok) return <div>{t('common.supplierNotFound')}</div>;
 
   const { data }: { data: IComment[] } = await response.json();
   return (
