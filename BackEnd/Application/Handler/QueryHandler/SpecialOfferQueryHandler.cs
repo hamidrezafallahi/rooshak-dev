@@ -155,6 +155,8 @@ public class GetSpecialOffersQueryHandler(
             var productDto = new ProductByDetailForSpecialsDto
             {
                 Id = offer.Product.Id,
+                ProductId = offer.Product.Id,
+                ProductOfferId = offer.Id,
                 Name = offer.Product.Name,
                 Description = offer.Product.Description ?? "",
                 Price = basePrice,

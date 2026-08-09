@@ -2,6 +2,8 @@ export interface SpecialOffer {
   id: number;
   product: {
     id: number;
+    productId?: number;
+    productOfferId: number;
     name: string;
     description: string;
     price: number;

@@ -5,6 +5,8 @@ import React, {
   useRef,
 } from 'react';
 
+import { useDispatch } from 'react-redux';
+
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -12,6 +14,12 @@ import {
 } from '@components/atoms/iconComponents';
 import MediaImage from '@components/atoms/MediaImage';
 import { SpecialOffer } from '@models/specialOffer';
+import { useGetConditionallyMutation } from '@services/base';
+import {
+  addToCart,
+  synchronousCart,
+} from '@slice/shoppingCartSlice';
+import { getCookie } from '@utils/core';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
 import CountdownDisplayClient from '../countdownDisplayClient';
@@ -31,6 +39,10 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
   const GAP = 12;
   const step = CARD_W + GAP;
   const items = spacialOffers ?? [];
+  const isAuthenticated = Boolean(getCookie("candySession"));
+  const [itemMutate] = useGetConditionallyMutation();
+  const dispatch = useDispatch();
+
   const handlePrev = () => {
     const el = containerRef.current;
     if (!el) return;
@@ -43,8 +55,36 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
     el.scrollBy({ left: step, behavior: "smooth" });
   };
 
-  const handleAdd = (offer: SpecialOffer) => {
-    console.log("Add to cart:", offer.product.id);
+  const handleAdd = async (offer: SpecialOffer) => {
+    const id = offer.product.id;
+    const productOfferId = offer.product.productOfferId;
+
+    if (isAuthenticated) {
+      const syncCartResponse = await itemMutate({
+        url: '/CartItems',
+        body: { ProductId: id, ProductOfferId: productOfferId, Quantity: 1 },
+      }).unwrap();
+      if (syncCartResponse.isSuccess) {
+        dispatch(synchronousCart(syncCartResponse.data));
+      }
+    } else {
+      dispatch(
+        addToCart({
+          product: {
+            id,
+            productOfferId,
+            name: offer.product.name,
+            description: offer.product.description,
+            price: offer.product.price,
+            discountAmount: offer.product.discountAmount,
+            discountIsPercent: offer.product.discountIsPercent,
+            finalPrice: offer.product.finalPrice,
+            quantity: 1,
+            mainImage: offer.product.mainImage,
+          },
+        }),
+      );
+    }
   };
 
   useEffect(() => {

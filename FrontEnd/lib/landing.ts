@@ -18,8 +18,7 @@ export async function getSlides<T>(): Promise<T[]> {
     `${serverApiBaseUrl}/Landing/slide`,
     'getSlides URL',
   );
-
-  try {
+   try {
     const url = `${serverApiBaseUrl}/Landing/slide`;
  
     const res = await fetch(url, { cache: 'no-store' });
