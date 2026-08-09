@@ -10,10 +10,22 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "BannerDescrioption",
-                table: "Slides",
-                newName: "BannerDescription");
+            // Idempotent: prod may already have BannerDescription while this migration is still pending.
+            migrationBuilder.Sql(
+                """
+                DO $$
+                BEGIN
+                    IF EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'Slides'
+                          AND column_name = 'BannerDescrioption'
+                    ) THEN
+                        ALTER TABLE "Slides" RENAME COLUMN "BannerDescrioption" TO "BannerDescription";
+                    END IF;
+                END $$;
+                """);
 
             migrationBuilder.UpdateData(
                 table: "EntityConfigs",
