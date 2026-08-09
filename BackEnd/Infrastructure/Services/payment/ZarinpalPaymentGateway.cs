@@ -75,7 +75,7 @@ namespace Infrastructure.Services.payment
 
             var result = await response.Content.ReadFromJsonAsync<ZarinpalVerifyResponse>();
 
-            if (result?.data?.code == 100)
+            if (result?.data?.code == 100 || result?.data?.code == 101)
             {
                 return new PaymentVerifyResult
                 {

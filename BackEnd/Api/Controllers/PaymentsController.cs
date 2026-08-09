@@ -58,7 +58,18 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("request")]
+        [Authorize]
         public async Task<ActionResult<PaymentStartDto>> StartPayment([FromBody] RequestPaymentCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (!result.IsSuccess && result.Error == "Unauthorized")
+                return Unauthorized(result);
+            return Ok(result);
+        }
+
+        [HttpPost("verify")]
+        [Authorize]
+        public async Task<ActionResult<PaymentVerifyResponseDto>> VerifyPayment([FromBody] VerifyPaymentCommand command)
         {
             var result = await _mediator.Send(command);
             if (!result.IsSuccess && result.Error == "Unauthorized")

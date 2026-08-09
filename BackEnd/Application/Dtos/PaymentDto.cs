@@ -16,8 +16,18 @@ namespace Application.Dtos
     }
     public class PaymentStartDto
     {
-        public string PaymentUrl { get; set; }
+        public string PaymentUrl { get; set; } = string.Empty;
     }
+
+    public class PaymentVerifyResponseDto
+    {
+        public bool IsSuccess { get; set; }
+        public int OrderId { get; set; }
+        public string TransactionId { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+
     public class PaymentRequestResult
     {
         public bool IsSuccess { get; set; }

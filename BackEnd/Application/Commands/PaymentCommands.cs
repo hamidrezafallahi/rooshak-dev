@@ -16,6 +16,14 @@ namespace Application.Commands
         public int OrderId { get; set; }
 
     }
+
+    public class VerifyPaymentCommand : IRequest<ServiceResult<PaymentVerifyResponseDto>>
+    {
+        public string Authority { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public int? OrderId { get; set; }
+    }
+
     public class MarkPaymentAsPaidCommand : IRequest<ServiceResult<IdDto>>
     {
         public int PaymentId { get; set; }

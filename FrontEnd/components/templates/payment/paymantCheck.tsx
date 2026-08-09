@@ -1,98 +1,102 @@
-// components/payment/PaymentRedirect.tsx
-"use client";
+'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { useTranslations } from 'next-intl';
-import {
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
-import { shallowEqual } from 'react-redux';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 
-import { useAppSelector } from '@store/index';
+import { useGetConditionallyMutation } from '@services/base';
+import { IBaseQueryResponse } from '@services/base/type';
+import { resetShoppingCart } from '@slice/shoppingCartSlice';
+
+interface PaymentVerifyData {
+  isSuccess: boolean;
+  orderId: number;
+  transactionId: string;
+  amount: number;
+  errorMessage?: string;
+}
 
 export default function PaymentCheck() {
-        const { ShoppingCart } = useAppSelector(
-      (state) => ({
-        ShoppingCart: state.withPersist.ShoppingCart,
-      }),
-      shallowEqual
-    );
+  const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
-  const t = useTranslations()
-//   useEffect(() => {
-//     const verifyPayment = async () => {
-//       const authority = searchParams.get('Authority');
-//       const status = searchParams.get('Status');
+  const dispatch = useDispatch();
+  const [verifyPayment] = useGetConditionallyMutation();
+  const started = useRef(false);
 
-//       try {
-//         // فراخوانی API برای تأیید پرداخت
-//         const response = await fetch('/api/verify-payment', {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify({
-//             authority,
-//             status,
-//             gateway: paymentGateway,
-//           }),
-//         });
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
 
-//         const data = await response.json();
+    const verify = async () => {
+      const authority =
+        searchParams.get('Authority') ?? searchParams.get('authority');
+      const gatewayStatus =
+        searchParams.get('Status') ?? searchParams.get('status') ?? '';
+      const orderIdParam =
+        searchParams.get('orderId') ?? searchParams.get('OrderId');
 
-//         if (data.success) {
-//           // ریدایرکت به صفحه موفقیت
-//           router.push(
-//             `/${locale}/payment/success?` +
-//             `orderId=${data.orderId}&` +
-//             `transactionId=${data.transactionId}&` +
-//             `amount=${data.amount}`
-//           );
-//         } else {
-//           // ریدایرکت به صفحه شکست
-//           router.push(
-//             `/${locale}/payment/failed?` +
-//             `errorCode=${data.errorCode}&` +
-//             `errorMessage=${encodeURIComponent(data.errorMessage)}&` +
-//             `orderId=${data.orderId}`
-//           );
-//         }
-//       } catch (error) {
-//         console.error('Payment verification error:', error);
-//         router.push(
-//           `/${locale}/payment/failed?` +
-//           `errorCode=verification_error&` +
-//           `errorMessage=${encodeURIComponent('خطا در تأیید پرداخت')}`
-//         );
-//       }
-//     };
+      if (!authority) {
+        router.replace(
+          `/${locale}/payment?status=failed&errorCode=missing_authority&errorMessage=${encodeURIComponent(
+            t('payment.payment_error')
+          )}`
+        );
+        return;
+      }
 
-//     verifyPayment();
-//   }, []);
+      try {
+        const res: IBaseQueryResponse<PaymentVerifyData> = await verifyPayment({
+          url: '/Payments/verify',
+          method: 'POST',
+          body: {
+            authority,
+            status: gatewayStatus,
+            orderId: orderIdParam ? Number(orderIdParam) : undefined,
+          },
+        }).unwrap();
 
-  // نمایش اسپینر در حین تأیید پرداخت
-  if (status === 'loading') {
-    return (
-      <div className="flex justify-center items-center bg-black text-white">
-        <div className="text-center">
-          <div className="mx-auto mb-4 border-primary border-t-2 border-b-2 rounded-full w-16 h-16 animate-spin"></div>
-          <p className="text-lg">
-            {t("payment.verifying")}
-          </p>
-          <p className="mt-2 text-gray-400 text-sm">
-            {t("payment.waiting")}
-          </p>
-          <p className="mt-2 text-gray-400 text-sm">
-            {ShoppingCart?.paymentMethod?.title}
-          </p>
-        </div>
+        if (res.isSuccess && res.data?.isSuccess) {
+          dispatch(resetShoppingCart());
+          router.replace(
+            `/${locale}/payment?status=success&orderId=${res.data.orderId}&transactionId=${encodeURIComponent(
+              res.data.transactionId ?? ''
+            )}&amount=${res.data.amount ?? 0}`
+          );
+          return;
+        }
+
+        const orderId = res.data?.orderId ?? '';
+        const errorMessage =
+          res.data?.errorMessage ?? res.error ?? t('payment.paymentFailed');
+
+        router.replace(
+          `/${locale}/payment?status=failed&errorCode=verify_failed&orderId=${orderId}&errorMessage=${encodeURIComponent(
+            errorMessage
+          )}`
+        );
+      } catch (err: any) {
+        router.replace(
+          `/${locale}/payment?status=failed&errorCode=verification_error&errorMessage=${encodeURIComponent(
+            err?.data?.error ?? err?.message ?? t('payment.payment_error')
+          )}`
+        );
+      }
+    };
+
+    void verify();
+  }, [dispatch, locale, router, searchParams, t, verifyPayment]);
+
+  return (
+    <div className="flex justify-center items-center bg-black min-h-screen text-white">
+      <div className="text-center">
+        <div className="mx-auto mb-4 border-primary border-t-2 border-b-2 rounded-full w-16 h-16 animate-spin"></div>
+        <p className="text-lg">{t('payment.verifying')}</p>
+        <p className="mt-2 text-gray-400 text-sm">{t('payment.waiting')}</p>
       </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 }
