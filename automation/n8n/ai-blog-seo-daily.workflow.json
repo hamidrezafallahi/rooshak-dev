@@ -107,7 +107,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "={{ $('Store Token').item.json.apiBase }}/Blogs/getslugs",
+        "url": "={{ $('Store Token').item.json.apiBase }}/Blogs/getslugs?includeInactive=true",
         "options": {}
       },
       "id": "get-slugs",
@@ -115,8 +115,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1100,
-        180
+        880,
+        300
       ]
     },
     {
@@ -148,13 +148,13 @@
       "typeVersion": 4.2,
       "position": [
         1100,
-        420
+        300
       ],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "const token = $('Store Token').item.json.accessToken;\nconst apiBase = $('Store Token').item.json.apiBase;\nconst slugPayload = $('Get Existing Slugs').item.json;\nconst slugList = slugPayload?.data || slugPayload || [];\nconst existingSlugs = new Set(\n  (Array.isArray(slugList) ? slugList : [])\n    .map(x => (x.slug || '').toLowerCase())\n    .filter(Boolean)\n);\nconst fallbackKeywords = [\n  'ظروف کریستال پذیرایی',\n  'ظروف دکوری کریستال',\n  'خرید ظروف کریستال',\n  'نگهداری ظروف کریستال',\n  'تفاوت کریستال و شیشه',\n  'هدیه ظروف کریستال',\n  'چیدمان میز کریستال',\n  'ظروف کریستال عروس',\n  'قیمت ظروف کریستال',\n  'شستشوی ظروف کریستال'\n];\nlet keywords = fallbackKeywords;\ntry {\n  const suggest = $('Keyword Suggest').item.json;\n  if (Array.isArray(suggest?.[1]) && suggest[1].length) {\n    keywords = suggest[1].slice(0, 15);\n  }\n} catch (e) {}\nconst pick = keywords.find(k => !existingSlugs.has(String(k).toLowerCase().replace(/\\s+/g, '-'))) || keywords[0];\nconst slug = String(pick).toLowerCase().replace(/\\s+/g, '-').replace(/[^\\u0600-\\u06FFa-z0-9-]/gi, '');\nreturn [{\n  json: {\n    token,\n    apiBase,\n    candidateKeywords: keywords,\n    selectedKeyword: pick,\n    selectedTopic: pick,\n    slug,\n    existingSlugCount: existingSlugs.size\n  }\n}];"
+        "jsCode": "const token = $('Store Token').item.json.accessToken;\nconst apiBase = $('Store Token').item.json.apiBase;\nconst slugPayload = $('Get Existing Slugs').item.json;\nconst slugList = slugPayload?.data || slugPayload || [];\nconst existingSlugs = new Set(\n  (Array.isArray(slugList) ? slugList : [])\n    .map((x) => String(x.slug || x.Slug || '').trim().toLowerCase())\n    .filter(Boolean)\n);\n\nconst toSlug = (value) =>\n  String(value || '')\n    .trim()\n    .toLowerCase()\n    .replace(/\\s+/g, '-')\n    .replace(/[^\\u0600-\\u06FFa-z0-9-]/gi, '')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n\nconst fallbackKeywords = [\n  'ظروف کریستال پذیرایی',\n  'ظروف دکوری کریستال',\n  'خرید ظروف کریستال',\n  'نگهداری ظروف کریستال',\n  'تفاوت کریستال و شیشه',\n  'هدیه ظروف کریستال',\n  'چیدمان میز کریستال',\n  'ظروف کریستال عروس',\n  'قیمت ظروف کریستال',\n  'شستشوی ظروف کریستال'\n];\n\nlet keywords = fallbackKeywords.slice();\ntry {\n  const seedRaw = $('Config').item.json.seedTopics;\n  const parsed = typeof seedRaw === 'string' ? JSON.parse(seedRaw) : seedRaw;\n  if (Array.isArray(parsed) && parsed.length) {\n    keywords = [...parsed.map(String), ...fallbackKeywords];\n  }\n} catch (e) {}\n\ntry {\n  const suggest = $('Keyword Suggest').item.json;\n  if (Array.isArray(suggest?.[1]) && suggest[1].length) {\n    keywords = [...suggest[1].map(String).slice(0, 15), ...keywords];\n  }\n} catch (e) {}\n\n// de-dupe while preserving order\nconst seenKw = new Set();\nkeywords = keywords.filter((k) => {\n  const key = String(k).trim();\n  if (!key || seenKw.has(key)) return false;\n  seenKw.add(key);\n  return true;\n});\n\nconst free = [];\nfor (const k of keywords) {\n  const slug = toSlug(k);\n  if (slug && !existingSlugs.has(slug)) free.push({ keyword: k, slug });\n}\n\nlet pick;\nlet slug;\nif (free.length) {\n  // rotate by day so consecutive runs are less likely to stick to index 0\n  const idx = (new Date().getDate() + existingSlugs.size) % free.length;\n  pick = free[idx].keyword;\n  slug = free[idx].slug;\n} else {\n  // all base topics taken → append numeric / date suffix\n  outer: for (const k of keywords) {\n    const base = toSlug(k) || 'blog';\n    for (let n = 2; n <= 99; n++) {\n      const candidate = `${base}-${n}`;\n      if (!existingSlugs.has(candidate)) {\n        pick = k;\n        slug = candidate;\n        break outer;\n      }\n    }\n  }\n  if (!slug) {\n    pick = keywords[0] || 'ظروف کریستال';\n    slug = `${toSlug(pick) || 'blog'}-${Date.now().toString(36)}`;\n  }\n}\n\nif (existingSlugs.has(slug)) {\n  throw new Error(`Could not allocate a unique slug (last try: ${slug}). existingSlugCount=${existingSlugs.size}`);\n}\n\nreturn [{\n  json: {\n    token,\n    apiBase,\n    candidateKeywords: keywords,\n    selectedKeyword: pick,\n    selectedTopic: pick,\n    slug,\n    existingSlugCount: existingSlugs.size,\n    freeTopicCount: free.length\n  }\n}];"
       },
       "id": "select-topic",
       "name": "Select Topic",
@@ -168,12 +168,23 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.LLM_API_URL || 'https://api.groq.com/openai/v1/chat/completions' }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $env.LLM_API_URL || 'https://openrouter.ai/api/v1/chat/completions' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.OPENROUTER_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'llama-3.3-70b-versatile' }}\",\n  \"temperature\": 0.85,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"تو نویسندهی باتجربهی فروشگاه ظروف کریستال و دکوری هستی که برای مشتری ایرانی مینویسی. خروجی فقط JSON معتبر با کلیدهای: titleFa, introFa, contentFa, conclusionFa, excerptFa, metaDescriptionFa, metaKeywordsFa, titleEn, introEn, contentEn, conclusionEn, excerptEn, metaDescriptionEn, metaKeywordsEn, slug.\\n\\nسبک نوشتار (خیلی مهم):\\n- مثل یک فروشنده/مشاور واقعی بنویس؛ لحن محاورهای مودبانه، نه مقالهی رباتیک.\\n- از کلیشههای هوش مصنوعی پرهیز کن: در دنیای امروز، در نتیجه، به طور کلی، ضروری است، بهتر است بدانید، جامع، بینظیر، تحولآفرین، در این مقاله میخواهیم.\\n- جملهها طول متغیر داشته باشند؛ گاهی کوتاه و کاربردی.\\n- تجربهی عملی بده (شستشو، نگهداری، هدیه، چیدمان میز) نه تعریفهای عمومی.\\n- کلیدواژه را طبیعی و کم جا بده؛ stuffing ممنوع.\\n- فارسی اصلی و قوی باشد؛ انگلیسی خلاصهتر ولی طبیعی.\\n\\nساختار اجباری:\\n- contentFa و contentEn بهصورت HTML با H2/H3\\n- حداقل یک لینک داخلی به /categories/ یا /products/\\n- بخش FAQ دقیقا با <h2>سوالات متداول</h2> و ۵ تا ۸ سؤال با <h3> و پاسخ <p>\\n- metaDescriptionFa بین ۷۰ تا ۱۶۰ کاراکتر\\n- excerpt حداکثر ۱۶۰ کاراکتر\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"کلمه کلیدی اصلی: {{ $('Select Topic').item.json.selectedKeyword }}. اسلاگ پیشنهادی: {{ $('Select Topic').item.json.slug }}. مخاطب: خریداران ایرانی ظروف کریستال و دکوری.\\nحداقل‌ها را رعایت کن: introFa >= 100 کاراکتر، contentFa متن خالص >= 700 کاراکتر، conclusionFa >= 80 کاراکتر، metaDescriptionFa بین 70 تا 160 کاراکتر، و حتما FAQ با عنوان سوالات متداول.\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.85,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"تو نویسندهی باتجربهی فروشگاه ظروف کریستال و دکوری هستی که برای مشتری ایرانی مینویسی. خروجی فقط JSON معتبر با کلیدهای: titleFa, introFa, contentFa, conclusionFa, excerptFa, metaDescriptionFa, metaKeywordsFa, titleEn, introEn, contentEn, conclusionEn, excerptEn, metaDescriptionEn, metaKeywordsEn, slug.\\n\\nسبک نوشتار (خیلی مهم):\\n- مثل یک فروشنده/مشاور واقعی بنویس؛ لحن محاورهای مودبانه، نه مقالهی رباتیک.\\n- از کلیشههای هوش مصنوعی پرهیز کن: در دنیای امروز، در نتیجه، به طور کلی، ضروری است، بهتر است بدانید، جامع، بینظیر، تحولآفرین، در این مقاله میخواهیم.\\n- جملهها طول متغیر داشته باشند؛ گاهی کوتاه و کاربردی.\\n- تجربهی عملی بده (شستشو، نگهداری، هدیه، چیدمان میز) نه تعریفهای عمومی.\\n- کلیدواژه را طبیعی و کم جا بده؛ stuffing ممنوع.\\n- فارسی اصلی و قوی باشد؛ انگلیسی خلاصهتر ولی طبیعی.\\n\\nساختار اجباری:\\n- contentFa و contentEn بهصورت HTML با H2/H3\\n- حداقل یک لینک داخلی به /categories/ یا /products/\\n- بخش FAQ دقیقا با <h2>سوالات متداول</h2> و ۵ تا ۸ سؤال با <h3> و پاسخ <p>\\n- metaDescriptionFa بین ۷۰ تا ۱۶۰ کاراکتر\\n- excerpt حداکثر ۱۶۰ کاراکتر\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"کلمه کلیدی اصلی: {{ $('Select Topic').item.json.selectedKeyword }}. اسلاگ پیشنهادی: {{ $('Select Topic').item.json.slug }}. مخاطب: خریداران ایرانی ظروف کریستال و دکوری.\\nحداقل‌ها را رعایت کن: introFa >= 100 کاراکتر، contentFa متن خالص >= 700 کاراکتر، conclusionFa >= 80 کاراکتر، metaDescriptionFa بین 70 تا 160 کاراکتر، و حتما FAQ با عنوان سوالات متداول.\"\n    }\n  ]\n}",
         "options": {}
       },
       "id": "llm-generate",
@@ -184,11 +195,11 @@
         1760,
         300
       ],
-      "notes": "Default = Groq free OpenAI-compatible API. Credential Authorization: Bearer <GROQ_API_KEY or OPENAI_API_KEY>"
+      "notes": "Uses OPENROUTER_API_KEY from container env (Header: Authorization Bearer ...). No n8n credential required."
     },
     {
       "parameters": {
-        "jsCode": "const raw = $('Generate Article (LLM)').item.json;\nconst content = raw.choices?.[0]?.message?.content || '{}';\nlet article;\ntry { article = JSON.parse(content); } catch { throw new Error('LLM did not return valid JSON'); }\nconst ctx = $('Select Topic').item.json;\nconst keyword = ctx.selectedKeyword || 'ظروف کریستال';\n\nconst stripHtml = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\\s+/g, ' ').trim();\nconst ensureMeta = (s, fallback) => {\n  let t = String(s || fallback || '').trim();\n  if (t.length < 70) {\n    t = `${t} راهنمای کاربردی خرید، نگهداری و چیدمان ${keyword} برای خانه و پذیرایی.`.replace(/\\s+/g, ' ').trim();\n  }\n  if (t.length > 160) t = t.slice(0, 157).trim() + '...';\n  if (t.length < 70) t = (t + ' راهنمای کامل ظروف کریستال و دکوری برای خرید هوشمند.').slice(0, 160);\n  return t;\n};\nconst ensureContent = (html) => {\n  let c = String(html || '').trim();\n  if (!/href\\s*=\\s*[\"'][^\"']*\\/(products|categories|blog)\\//i.test(c)) {\n    c = `<p>برای دیدن گزینه‌های مرتبط، به <a href=\"/categories/\">دسته‌بندی ظروف</a> سر بزنید.</p>` + c;\n  }\n  if (!/<h2[^>]*>\\s*(سوالات متداول|پرسش‌های متداول|faq)/i.test(c)) {\n    c += `<h2>سوالات متداول</h2>\n<h3>${keyword} برای چه استفاده‌ای مناسب است؟</h3>\n<p>بیشتر برای پذیرایی، دکوراسیون میز و هدیه کاربرد دارد و اگر درست نگهداری شود ظاهر شفاف خود را حفظ می‌کند.</p>\n<h3>چطور ${keyword} را بشوییم؟</h3>\n<p>شستشوی دستی با اسفنج نرم و شوینده ملایم معمولاً ایمن‌تر است؛ از ضربه‌های ناگهانی و شوک دمایی شدید پرهیز کنید.</p>\n<h3>موقع خرید به چه نکاتی توجه کنیم؟</h3>\n<p>شفافیت، ضخامت بدنه، ایستایی پایه و هماهنگی با بقیه ظروف روی میز از مهم‌ترین معیارها هستند.</p>\n<h3>آیا برای هدیه مناسب است؟</h3>\n<p>بله، مخصوصاً اگر بسته‌بندی محکم و ظاهر شکیل داشته باشد و با سلیقه میزبان هماهنگ باشد.</p>\n<h3>چطور براقیت آن حفظ شود؟</h3>\n<p>بعد از شستشو با پارچه نرم خشک کنید و از اسکاچ زبر یا مواد بسیار اسیدی دوری کنید.</p>`;\n  }\n  let guard = 0;\n  while (stripHtml(c).length < 520 && guard < 8) {\n    c += `<p>در انتخاب ${keyword} بهتر است به کاربرد واقعی میز، فضای پذیرایی و راحتی نگهداری فکر کنید. مدل‌های ساده‌تر معمولاً همه‌کاره‌ترند و با سرویس‌های مختلف بهتر ست می‌شوند.</p>`;\n    guard += 1;\n  }\n  return c;\n};\n\nconst introFa = article.introFa || `اگر به دنبال ${keyword} هستید، این راهنما کمک می‌کند انتخاب کاربردی‌تری داشته باشید و بعد از خرید هم بهتر از آن نگهداری کنید.`;\nconst conclusionFa = article.conclusionFa || `در نهایت، ${keyword} وقتی ارزش خرید دارد که هم با فضای خانه هماهنگ باشد و هم نگهداری‌اش برای شما سخت نباشد.`;\nconst contentFa = ensureContent(article.contentFa);\nconst metaDescriptionFa = ensureMeta(article.metaDescriptionFa, introFa);\nconst excerptFa = ensureMeta(article.excerptFa || metaDescriptionFa, metaDescriptionFa).slice(0, 160);\n\nconst normalized = {\n  ...article,\n  titleFa: article.titleFa || keyword,\n  introFa,\n  contentFa,\n  conclusionFa,\n  excerptFa,\n  metaDescriptionFa,\n  metaKeywordsFa: article.metaKeywordsFa || `${keyword}, ظروف کریستال, ظروف دکوری, خرید ظروف`,\n  titleEn: article.titleEn || keyword,\n  introEn: article.introEn || introFa,\n  contentEn: ensureContent(article.contentEn || contentFa),\n  conclusionEn: article.conclusionEn || conclusionFa,\n  excerptEn: ensureMeta(article.excerptEn || article.metaDescriptionEn || excerptFa, excerptFa).slice(0, 160),\n  metaDescriptionEn: ensureMeta(article.metaDescriptionEn || metaDescriptionFa, metaDescriptionFa),\n  metaKeywordsEn: article.metaKeywordsEn || article.metaKeywordsFa || keyword,\n  slug: article.slug || ctx.slug,\n  primaryKeyword: keyword,\n};\n\nreturn [{\n  json: {\n    ...ctx,\n    article: normalized,\n  }\n}];"
+        "jsCode": "const raw = $('Generate Article (LLM)').item.json;\nconst content = raw.choices?.[0]?.message?.content || '{}';\nlet article;\ntry { article = JSON.parse(content); } catch { throw new Error('LLM did not return valid JSON'); }\nconst ctx = $('Select Topic').item.json;\nconst keyword = ctx.selectedKeyword || 'ظروف کریستال';\n\nconst stripHtml = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\\s+/g, ' ').trim();\nconst ensureMeta = (s, fallback) => {\n  let t = String(s || fallback || '').trim();\n  if (t.length < 70) {\n    t = `${t} راهنمای کاربردی خرید، نگهداری و چیدمان ${keyword} برای خانه و پذیرایی.`.replace(/\\s+/g, ' ').trim();\n  }\n  if (t.length > 160) t = t.slice(0, 157).trim() + '...';\n  if (t.length < 70) t = (t + ' راهنمای کامل ظروف کریستال و دکوری برای خرید هوشمند.').slice(0, 160);\n  return t;\n};\nconst ensureContent = (html) => {\n  let c = String(html || '').trim();\n  if (!/href\\s*=\\s*[\"'][^\"']*\\/(products|categories|blog)\\//i.test(c)) {\n    c = `<p>برای دیدن گزینه‌های مرتبط، به <a href=\"/categories/\">دسته‌بندی ظروف</a> سر بزنید.</p>` + c;\n  }\n  if (!/<h2[^>]*>\\s*(سوالات متداول|پرسش‌های متداول|faq)/i.test(c)) {\n    c += `<h2>سوالات متداول</h2>\n<h3>${keyword} برای چه استفاده‌ای مناسب است؟</h3>\n<p>بیشتر برای پذیرایی، دکوراسیون میز و هدیه کاربرد دارد و اگر درست نگهداری شود ظاهر شفاف خود را حفظ می‌کند.</p>\n<h3>چطور ${keyword} را بشوییم؟</h3>\n<p>شستشوی دستی با اسفنج نرم و شوینده ملایم معمولاً ایمن‌تر است؛ از ضربه‌های ناگهانی و شوک دمایی شدید پرهیز کنید.</p>\n<h3>موقع خرید به چه نکاتی توجه کنیم؟</h3>\n<p>شفافیت، ضخامت بدنه، ایستایی پایه و هماهنگی با بقیه ظروف روی میز از مهم‌ترین معیارها هستند.</p>\n<h3>آیا برای هدیه مناسب است؟</h3>\n<p>بله، مخصوصاً اگر بسته‌بندی محکم و ظاهر شکیل داشته باشد و با سلیقه میزبان هماهنگ باشد.</p>\n<h3>چطور براقیت آن حفظ شود؟</h3>\n<p>بعد از شستشو با پارچه نرم خشک کنید و از اسکاچ زبر یا مواد بسیار اسیدی دوری کنید.</p>`;\n  }\n  let guard = 0;\n  while (stripHtml(c).length < 520 && guard < 8) {\n    c += `<p>در انتخاب ${keyword} بهتر است به کاربرد واقعی میز، فضای پذیرایی و راحتی نگهداری فکر کنید. مدل‌های ساده‌تر معمولاً همه‌کاره‌ترند و با سرویس‌های مختلف بهتر ست می‌شوند.</p>`;\n    guard += 1;\n  }\n  return c;\n};\n\nconst introFa = article.introFa || `اگر به دنبال ${keyword} هستید، این راهنما کمک می‌کند انتخاب کاربردی‌تری داشته باشید و بعد از خرید هم بهتر از آن نگهداری کنید.`;\nconst conclusionFa = article.conclusionFa || `در نهایت، ${keyword} وقتی ارزش خرید دارد که هم با فضای خانه هماهنگ باشد و هم نگهداری‌اش برای شما سخت نباشد.`;\nconst contentFa = ensureContent(article.contentFa);\nconst metaDescriptionFa = ensureMeta(article.metaDescriptionFa, introFa);\nconst excerptFa = ensureMeta(article.excerptFa || metaDescriptionFa, metaDescriptionFa).slice(0, 160);\n\nconst normalized = {\n  ...article,\n  titleFa: article.titleFa || keyword,\n  introFa,\n  contentFa,\n  conclusionFa,\n  excerptFa,\n  metaDescriptionFa,\n  metaKeywordsFa: article.metaKeywordsFa || `${keyword}, ظروف کریستال, ظروف دکوری, خرید ظروف`,\n  titleEn: article.titleEn || keyword,\n  introEn: article.introEn || introFa,\n  contentEn: ensureContent(article.contentEn || contentFa),\n  conclusionEn: article.conclusionEn || conclusionFa,\n  excerptEn: ensureMeta(article.excerptEn || article.metaDescriptionEn || excerptFa, excerptFa).slice(0, 160),\n  metaDescriptionEn: ensureMeta(article.metaDescriptionEn || metaDescriptionFa, metaDescriptionFa),\n  metaKeywordsEn: article.metaKeywordsEn || article.metaKeywordsFa || keyword,\n  slug: ctx.slug || article.slug,\n  primaryKeyword: keyword,\n};\n\nreturn [{\n  json: {\n    ...ctx,\n    article: normalized,\n  }\n}];"
       },
       "id": "parse-article",
       "name": "Parse Article JSON",
@@ -249,12 +260,23 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.LLM_API_URL || 'https://api.groq.com/openai/v1/chat/completions' }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $env.LLM_API_URL || 'https://openrouter.ai/api/v1/chat/completions' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.OPENROUTER_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'llama-3.3-70b-versatile' }}\",\n  \"temperature\": 0.4,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a visual researcher for an Iranian crystal / decorative tableware shop blog. Return ONLY valid JSON with keys: imageSearchQuery (English, 4-8 words, concrete scene for Unsplash/stock photo search), imageTags (array of 3-5 English single-word tags, no Persian), imageAltFa (short Persian alt), imageAltEn (short English alt).\\nRules:\\n- Query must match the ARTICLE topic visually (e.g. crystal glasses on dining table, crystal vase with flowers, washing crystal glassware).\\n- Prefer real product scenes: dining table, hospitality, gift, home decor, close-up crystal.\\n- Ban irrelevant topics: perfume, cars, people portraits, abstract AI art, food unless tableware is the focus.\\n- Never use Persian inside imageSearchQuery or imageTags.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Keyword: {{ $('Parse Article JSON').item.json.selectedKeyword }}\\nTitleFa: {{ $('Parse Article JSON').item.json.article.titleFa }}\\nTitleEn: {{ $('Parse Article JSON').item.json.article.titleEn }}\\nExcerptFa: {{ $('Parse Article JSON').item.json.article.excerptFa }}\\nPick the best stock-photo search for this article thumbnail.\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.4,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a visual researcher for an Iranian crystal / decorative tableware shop blog. Return ONLY valid JSON with keys: imageSearchQuery (English, 4-8 words, concrete scene for Unsplash/stock photo search), imageTags (array of 3-5 English single-word tags, no Persian), imageAltFa (short Persian alt), imageAltEn (short English alt).\\nRules:\\n- Query must match the ARTICLE topic visually (e.g. crystal glasses on dining table, crystal vase with flowers, washing crystal glassware).\\n- Prefer real product scenes: dining table, hospitality, gift, home decor, close-up crystal.\\n- Ban irrelevant topics: perfume, cars, people portraits, abstract AI art, food unless tableware is the focus.\\n- Never use Persian inside imageSearchQuery or imageTags.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Keyword: {{ $('Parse Article JSON').item.json.selectedKeyword }}\\nTitleFa: {{ $('Parse Article JSON').item.json.article.titleFa }}\\nTitleEn: {{ $('Parse Article JSON').item.json.article.titleEn }}\\nExcerptFa: {{ $('Parse Article JSON').item.json.article.excerptFa }}\\nPick the best stock-photo search for this article thumbnail.\"\n    }\n  ]\n}",
         "options": {}
       },
       "id": "llm-image",
@@ -265,7 +287,7 @@
         2540,
         200
       ],
-      "notes": "LLM chooses English stock-photo query/tags matching the article topic. Reuse same Header Auth credential as Generate Article."
+      "notes": "LLM chooses English stock-photo query/tags. Uses OPENROUTER_API_KEY from env (same as Generate Article)."
     },
     {
       "parameters": {

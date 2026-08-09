@@ -9,7 +9,7 @@ No `ContentJob` table — run history lives in n8n Executions; published content
 ### 1) Start stack
 
 ```bash
-# from repo root — put GROQ_API_KEY in .env (free)
+# from repo root — put OPENROUTER_API_KEY in .env (free)
 docker compose -f docker-compose.dev.yml up -d
 ```
 
@@ -29,20 +29,21 @@ Flow:
 
 `Cron → Login → Slugs → Keywords → Topic → LLM article → Validate → Thumbnail (LLM) → Create Draft Blog`
 
-### 3) Wire LLM credential (free default: Groq)
+### 3) LLM auth (OpenRouter via env)
 
-On **Generate Article (LLM)** and **Suggest Thumbnail (LLM)**:
+No n8n credential UI setup needed. Put `OPENROUTER_API_KEY` in root `.env`, then recreate n8n:
 
-1. Header Auth credential
-2. Name: `Authorization`
-3. Value: `Bearer <your-groq-key>`
+```bash
+docker compose -f docker-compose.dev.yml up -d --force-recreate n8n
+```
 
-Free key: https://console.groq.com → API Keys
+The HTTP Request nodes send `Authorization: Bearer <OPENROUTER_API_KEY>` from container env.
 
 Defaults in root `.env`:
 
-- `LLM_API_URL=https://api.groq.com/openai/v1/chat/completions`
-- `LLM_MODEL=llama-3.3-70b-versatile`
+- `LLM_API_URL=https://openrouter.ai/api/v1/chat/completions`
+- `LLM_MODEL=nvidia/nemotron-3-nano-30b-a3b:free`
+- `OPENROUTER_API_KEY=sk-or-v1-...`
 
 ### 4) Manual run
 
@@ -62,7 +63,7 @@ Defaults in root `.env`:
 
 | # | Item | Required? | Where |
 |---|---|---|---|
-| 1 | LLM key | Yes | `GROQ_API_KEY` in `.env` + Header Auth in n8n |
+| 1 | LLM key | Yes | `OPENROUTER_API_KEY` in `.env` (recreate n8n after change) |
 | 2 | Import workflow | Yes | n8n UI |
 | 3 | Bot account | Auto | `CONTENT_BOT_*` / `ContentAutomation__*` in `.env` |
 | 4 | Unsplash | Optional | `UNSPLASH_ACCESS_KEY` in `.env` |
@@ -81,6 +82,8 @@ Each service loads root `.env` via compose `env_file`.
 7. Suggest + download thumbnail
 8. `POST /api/Blogs` as draft (`IsDraft=true`, `Source=ai-pipeline`)
 9. Human activates in admin
+
+> Tip: topic selection uses `GET /api/Blogs/getslugs?includeInactive=true` so inactive drafts are not reused as the same slug.
 
 ## Quality gates
 

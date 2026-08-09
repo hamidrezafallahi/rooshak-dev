@@ -18,6 +18,8 @@ export async function getAll<T>(
   if (filter !== undefined) params.append("q", String(filter));
   if (onlyActives !== undefined) params.append("onlyActives", String(onlyActives));
   const url = `${serverApiBaseUrl}/${entity}?${params.toString()}`;
+  console.log("getAll url getAll url getAll url getAll url getAll url getAll url getAll url")
+  console.log(url)
   try {
     const res = await fetch(url, { cache: "no-store", next: { tags: [entity] } });
     const text = await res.text();
