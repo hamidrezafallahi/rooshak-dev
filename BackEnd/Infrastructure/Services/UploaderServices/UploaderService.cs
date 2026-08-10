@@ -6,11 +6,18 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Services.Services.Uploader
 {
     public class UploaderService : IUploaderService
     {
+        /// <summary>
+        /// Long-edge cap so storefront cards/sliders (~380–412 CSS px @2x) don't
+        /// download ~1000px originals. Avoids needing Next.js /_next/image.
+        /// </summary>
+        private const int MaxLongEdgePx = 960;
+
         private static readonly HashSet<string> SupportedTypes = new(StringComparer.OrdinalIgnoreCase)
         {
             "jpg", "jpeg", "png", "webp"
@@ -39,7 +46,7 @@ namespace Services.Services.Uploader
             UploadAsync(request, ".webp", async (image, stream) =>
                 await image.SaveAsync(stream, new WebpEncoder
                 {
-                    Quality = 70,
+                    Quality = 65,
                     FileFormat = WebpFileFormatType.Lossy,
                 }));
 
@@ -99,6 +106,18 @@ namespace Services.Services.Uploader
             });
         }
 
+        private static void ConstrainLongEdge(Image image)
+        {
+            if (image.Width <= MaxLongEdgePx && image.Height <= MaxLongEdgePx)
+                return;
+
+            image.Mutate(ctx => ctx.Resize(new ResizeOptions
+            {
+                Mode = ResizeMode.Max,
+                Size = new Size(MaxLongEdgePx, MaxLongEdgePx),
+            }));
+        }
+
         private async Task<string?> UploadAsync(
             UploadDTO request,
             string extension,
@@ -133,6 +152,7 @@ namespace Services.Services.Uploader
                 FileAccess.Write,
                 FileShare.None))
             {
+                ConstrainLongEdge(image);
                 await saveAsync(image, output);
             }
 
