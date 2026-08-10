@@ -7,8 +7,9 @@
  *   /_next/image?url=uploads%2F...  →  "url" parameter is invalid
  *
  * Always expose a root-absolute path for <img> / next/image.
- * Prefer MediaImage for /uploads/* — it rewrites to an absolute URL so the
- * Next optimizer can fetch from nginx/backend (uploads are not on the FE disk).
+ * For /uploads/* prefer MediaImage (unoptimized) so nginx serves the file directly;
+ * the Next optimizer cannot read the uploads volume inside the frontend container
+ * without a slow fetch hop that hurts landing LCP.
  *
  * Folder map: see utils/uploadPaths.ts (mirrors Backend UploadPaths).
  */

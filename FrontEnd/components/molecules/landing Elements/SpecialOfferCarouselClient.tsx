@@ -195,7 +195,6 @@ function CompactOfferCard({
           alt={offer.product.name}
           fill
           className="object-cover"
-          priority
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 412px"
         />
         {offer.product.discountId > 0 && (

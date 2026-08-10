@@ -27,8 +27,7 @@ export default async function CategoryCard({ category }: { category: ICategory})
         fill
         className="w-full h-full object-cover group-hover:scale-105 transition-transform transform"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-        loading={id < 5 ? "eager" : "lazy"}
-        priority={id < 5}
+        loading="lazy"
       />
       <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/40 to-transparent p-4">
         <div>

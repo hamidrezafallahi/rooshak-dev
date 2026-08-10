@@ -50,9 +50,9 @@ export async function SimpleProductCard({
                   <MediaImage
                     alt={s.fullName}
                     src={s.image}
-                    priority
                     fill
-                    loading={"eager"}
+                    sizes="40px"
+                    loading="lazy"
                     className='p-[3px] rounded-full'
                   />
                 </Link>
