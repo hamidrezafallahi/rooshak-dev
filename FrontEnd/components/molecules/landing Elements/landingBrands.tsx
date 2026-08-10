@@ -8,8 +8,6 @@ import { IBrand } from '@models/brand';
 
 import BrandCard from '../brandCard';
 
-export const dynamic = "force-dynamic";
-
 export default async function LandingBrands( ) {
     const locale = await getLocale();
     const t = await getTranslations('landing');

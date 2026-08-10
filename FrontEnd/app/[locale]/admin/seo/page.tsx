@@ -22,6 +22,7 @@ export default async function SeoDashboardPage() {
     page: 1,
     pageSize: 1,
     byConfig: false,
+    revalidate: false,
   });
 
   const totalSeoRules = seoRules?.data?.totalCount ?? 0;

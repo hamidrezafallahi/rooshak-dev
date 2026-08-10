@@ -21,7 +21,7 @@ export async function getSlides<T>(): Promise<T[]> {
    try {
     const url = `${serverApiBaseUrl}/Landing/slide`;
  
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch(url, { next: { revalidate: 60, tags: ['Landing/slide'] } });
 
     if (!res.ok) {
       logger.error('getSlides HTTP error', {
@@ -58,8 +58,7 @@ export async function getLandingProducts(
 
   try {
     const res = await fetch(url, {
-      cache: 'no-store',
-      next: { tags: ['Products/landings'] },
+      next: { revalidate: 60, tags: ['Products/landings'] },
     });
     if (!res.ok) {
       console.error(`getLandingProducts failed: ${res.status} ${url}`);

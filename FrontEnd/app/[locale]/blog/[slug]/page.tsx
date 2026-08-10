@@ -15,20 +15,52 @@ import { absoluteUrl, buildPageMetadata } from '@lib/seo';
 import { SimpleResponse } from '@models/base';
 import { IBlog } from '@models/Blog';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
+
+
+
+
+// ===== 1. تولید مسیرهای استاتیک =====
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${serverApiBaseUrl}/Blogs/getslugs`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) return [];
+    const response: SimpleResponse<{ slug: string }[]> = await res.json();
+    if (!response.isSuccess) return [];
+    return (response.data || [])
+      .filter((item) => Boolean(item.slug))
+      .map((item) => ({ slug: item.slug }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
+}
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
 
   try {
     const res = await fetch(`${serverApiBaseUrl}/Blogs/${slug}`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
+    if (!res.ok) {
+      return buildPageMetadata({
+        locale,
+        path: `blog/${slug}`,
+        title: tStore('notFound'),
+        description: tStore('notFoundHint'),
+        noIndex: true,
+      });
+    }
+
     const response: SimpleResponse<IBlog> = await res.json();
 
     if (!response.isSuccess || !response.data) {

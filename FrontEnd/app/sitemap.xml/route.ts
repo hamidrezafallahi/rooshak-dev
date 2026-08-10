@@ -3,7 +3,6 @@ import { absoluteUrl, DEFAULT_LOCALE, LOCALES } from '@lib/seo';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
 export const revalidate = 3600;
-export const dynamic = 'force-dynamic';
 
 type ChangeFreq =
   | 'always'

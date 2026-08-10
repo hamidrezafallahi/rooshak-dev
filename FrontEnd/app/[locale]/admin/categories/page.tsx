@@ -28,6 +28,7 @@ export default async function Page({
     pageSize,
     byConfig: true,
     onlyActives: false,
+    revalidate: false,
   });
 
   const res = await getFormConfigByEntityName('categories');

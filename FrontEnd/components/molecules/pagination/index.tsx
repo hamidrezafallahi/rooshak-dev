@@ -1,6 +1,7 @@
 'use client';
 
 import React, {
+  Suspense,
   useEffect,
   useMemo,
   useState,
@@ -30,7 +31,16 @@ interface PaginationProps {
   pageSizeOptions?: number[];
 }
 
-const CustomPagination: React.FC<PaginationProps> = ({
+function PaginationFallback({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`h-12 w-48 animate-pulse rounded-xl border border-[var(--store-border)] bg-[var(--store-surface-muted)] ${className}`}
+      aria-hidden
+    />
+  );
+}
+
+const CustomPaginationInner: React.FC<PaginationProps> = ({
   className = '',
   current = 1,
   total,
@@ -209,5 +219,11 @@ const CustomPagination: React.FC<PaginationProps> = ({
     </nav>
   );
 };
+
+const CustomPagination: React.FC<PaginationProps> = (props) => (
+  <Suspense fallback={<PaginationFallback className={props.className} />}>
+    <CustomPaginationInner {...props} />
+  </Suspense>
+);
 
 export default CustomPagination;

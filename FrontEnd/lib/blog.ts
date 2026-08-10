@@ -16,7 +16,7 @@ export async function getBlogBySlug({ params }: { params: { slug: string } }) {
   );
 
   try {
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch(url, { next: { revalidate: 60, tags: ['blogs'] } });
     if (!res.ok) {
       logger.error('getBlogBySlug HTTP error', {
         scope: 'blog',

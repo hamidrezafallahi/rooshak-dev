@@ -6,11 +6,11 @@ import PageHeader from '@components/molecules/storefront/PageHeader';
 import { serverApiBaseUrl } from '@lib/api';
 import { buildPageMetadata } from '@lib/seo';
 
+export const revalidate = 60;
+
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
-
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -53,7 +53,7 @@ export default async function Page({ params }: Props) {
   const tStore = await getTranslations({ locale, namespace: 'store' });
 
   const response = await fetch(`${serverApiBaseUrl}/discounts/${slug}`, {
-    cache: 'no-store',
+    next: { revalidate: 60 },
   });
 
   if (response.status === 404) {

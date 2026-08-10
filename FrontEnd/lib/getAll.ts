@@ -9,7 +9,22 @@ import { serverApiBaseUrl } from './api';
 
 export async function getAll<T>(
   entity: string,
-  { page, pageSize, byConfig, filter, onlyActives }: { page?: number; pageSize?: number; byConfig?: boolean, onlyActives?: boolean, filter?: string } = {}
+  {
+    page,
+    pageSize,
+    byConfig,
+    filter,
+    onlyActives,
+    /** Storefront ISR default 60s; pass `false` for admin (always fresh). */
+    revalidate = 60,
+  }: {
+    page?: number;
+    pageSize?: number;
+    byConfig?: boolean;
+    onlyActives?: boolean;
+    filter?: string;
+    revalidate?: number | false;
+  } = {}
 ): Promise<PagedResponse<T>> {
   const params = new URLSearchParams();
   if (page !== undefined) params.append("page", String(page));
@@ -19,7 +34,12 @@ export async function getAll<T>(
   if (onlyActives !== undefined) params.append("onlyActives", String(onlyActives));
   const url = `${serverApiBaseUrl}/${entity}?${params.toString()}`;
   try {
-    const res = await fetch(url, { cache: "no-store", next: { tags: [entity] } });
+    const res = await fetch(
+      url,
+      revalidate === false
+        ? { cache: 'no-store', next: { tags: [entity] } }
+        : { next: { revalidate, tags: [entity] } },
+    );
 
     const text = await res.text();
 

@@ -25,6 +25,7 @@ export default async function Page({
     byConfig: true,
     onlyActives: false,
     filter,
+    revalidate: false,
   });
 
   return (

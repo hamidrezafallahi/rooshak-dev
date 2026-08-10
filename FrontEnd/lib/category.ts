@@ -22,9 +22,13 @@ export async function getCategories(
   const url = `${serverApiBaseUrl}/Categories?${params.toString()}`;
   try {
     const res = await fetch(url, {
-      cache: "no-store",
+      next: { revalidate: 60, tags: ['categories'] },
     });
-    const data: PagedResponse<ICategory> = await res.json()
+    if (!res.ok) {
+      console.error('getCategories HTTP error', { url, status: res.status });
+      return undefined;
+    }
+    const data: PagedResponse<ICategory> = await res.json();
     return data;
 
   } catch (error) {

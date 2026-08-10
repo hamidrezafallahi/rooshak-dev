@@ -8,8 +8,6 @@ import { SpecialOffer } from '@models/specialOffer';
 
 import SpecialOfferCarouselClient from './SpecialOfferCarouselClient';
 
-export const dynamic = "force-dynamic";
-
 export default async  function LandingSpecialOffer() {
   const t = await getTranslations('landing');
   const spacialOffers = await getAll<SpecialOffer>("SpecialOffers/landing");

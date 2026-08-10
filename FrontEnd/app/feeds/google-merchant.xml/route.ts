@@ -3,7 +3,6 @@ import { absoluteUrl } from '@lib/seo';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
 export const revalidate = 3600;
-export const dynamic = 'force-dynamic';
 
 function xmlEscape(value: string): string {
   return value

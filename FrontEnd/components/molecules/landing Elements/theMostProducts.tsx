@@ -4,8 +4,6 @@ import { getLandingProductsByTabs } from '@lib/landing';
 
 import TheMostProductsClient from './theMostProductsClient';
 
-export const dynamic = 'force-dynamic';
-
 export default async function TheMostProducts() {
   const { bestSeller, theNewest, discounters } = await getLandingProductsByTabs();
 

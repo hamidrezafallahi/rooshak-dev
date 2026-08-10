@@ -19,7 +19,8 @@ import { getCategories } from '@lib/category';
 import { getSlides } from '@lib/landing';
 import { absoluteUrl, buildPageMetadata } from '@lib/seo';
 
-export const dynamic = 'force-dynamic';
+/** ISR: homepage cacheable; regenerate every 60s. */
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{ locale: string }>;
