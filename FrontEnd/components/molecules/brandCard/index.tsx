@@ -19,9 +19,9 @@ export default function BrandCard({brand}:{brand:IBrand}) {
                 <MediaImage
                   src={brand.logoFile}
                   alt={brand.name}
-                  width={400}
-                  height={400}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform transform"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform transform"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   loading="lazy"
                 />
               </div>

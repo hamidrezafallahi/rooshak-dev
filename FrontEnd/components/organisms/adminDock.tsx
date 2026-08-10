@@ -1,8 +1,13 @@
+'use client';
+
 import { jwtDecode } from 'jwt-decode';
-import { getLocale, getTranslations } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import {
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 
 import {
   DiscountIcon,
@@ -29,6 +34,14 @@ type DockItem = {
   emphasize?: boolean;
 };
 
+function readCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`),
+  );
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
 function readRole(token: string | undefined): string | null {
   if (!token) return null;
 
@@ -41,14 +54,22 @@ function readRole(token: string | undefined): string | null {
   }
 }
 
-export default async function AdminDock() {
-  const cookieStore = await cookies();
-  const role = readRole(cookieStore.get('candyAccess')?.value);
+/**
+ * Client-only: reading auth cookies in an RSC would force Cache-Control: no-store
+ * on every public page that renders the dock (breaks bfcache / ISR).
+ */
+export default function AdminDock() {
+  const locale = useLocale();
+  const t = useTranslations('admin');
+  const [visible, setVisible] = useState(false);
 
-  if (!role || !VISIBLE_ROLES.has(role)) return null;
+  useEffect(() => {
+    const role = readRole(readCookie('candyAccess'));
+    setVisible(Boolean(role && VISIBLE_ROLES.has(role)));
+  }, []);
 
-  const locale = await getLocale();
-  const t = await getTranslations('admin');
+  if (!visible) return null;
+
   const iconProps = { size: 18, strokeWidth: 1.75 } as const;
 
   const items: DockItem[] = [

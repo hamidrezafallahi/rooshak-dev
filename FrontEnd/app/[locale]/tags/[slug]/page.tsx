@@ -5,7 +5,9 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import TagTemplate from '@components/templates/tagTemplate';
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
+import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
 import { ITag } from '@models/tag';
 
@@ -13,15 +15,27 @@ type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
+export async function generateStaticParams() {
+  return fetchStaticSlugParams('Tags/getslugs', 'Tags/getids');
+}
+
+async function fetchTag(slug: string): Promise<ITag | null> {
+  const result = await safeFetchJson<SimpleResponse<ITag>>(
+    `${serverApiBaseUrl}/Tags/${slug}`,
+    { next: { revalidate: 36 } },
+  );
+
+  if (!result.ok || !result.data?.data) return null;
+  if (result.data.isSuccess === false) return null;
+  return result.data.data;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
+  const tag = await fetchTag(slug);
 
-  const response = await fetch(`${serverApiBaseUrl}/Tags/${slug}`, {
-    next: { revalidate: 36 },
-  });
-
-  if (response.status === 404) {
+  if (!tag) {
     return buildPageMetadata({
       locale,
       path: `tags/${slug}`,
@@ -31,38 +45,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
   }
 
-  const res: SimpleResponse<ITag> = await response.json();
-  if (!res.isSuccess) {
-    return buildPageMetadata({
-      locale,
-      path: `tags/${slug}`,
-      title: tStore('notFound'),
-      description: tStore('notFoundHint'),
-      noIndex: true,
-    });
-  }
-
-  const canonical = res.data.slug || String(res.data.id);
+  const canonical = tag.slug || String(tag.id);
   return buildPageMetadata({
     locale,
     path: `tags/${canonical}`,
-    title: res.data.name,
-    description: res.data.name,
+    title: tag.name,
+    description: tag.name,
   });
 }
 
 export default async function Page({ params }: Props) {
   const { slug, locale } = await params;
-  const response = await fetch(`${serverApiBaseUrl}/Tags/${slug}`, {
-    next: { revalidate: 36 },
-  });
-  const tagResponse: SimpleResponse<ITag> = await response.json();
+  const tag = await fetchTag(slug);
 
-  if (!tagResponse.isSuccess) {
+  if (!tag) {
     notFound();
   }
 
-  const tag = tagResponse.data;
   if (tag.slug && tag.slug !== slug && /^\d+$/.test(slug)) {
     permanentRedirect(`/${locale}/tags/${tag.slug}`);
   }

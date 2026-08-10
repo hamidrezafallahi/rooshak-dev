@@ -19,6 +19,17 @@ namespace Application.Queries
 
     }
 
+    public class GetAllDiscountsIdQuery : IRequest<ServiceResult<IEnumerable<IdDto>>>
+    {
+    }
+
+    /// <summary>
+    /// Discounts have no SEO slug column; Slug is the stringified Id for storefront routes.
+    /// </summary>
+    public class GetAllDiscountsSlugsQuery : IRequest<ServiceResult<IEnumerable<SlugDto>>>
+    {
+    }
+
     public class IsDiscountValidQuery : IRequest<ServiceResult<ValidDiscountDto?>>
     {
         public int DiscountId { get; set; }

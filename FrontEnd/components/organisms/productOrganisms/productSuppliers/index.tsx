@@ -4,6 +4,8 @@ import {
 } from 'next-intl/server';
 
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
+import { SimpleResponse } from '@models/base';
 
 import {
   ISupplier,
@@ -15,21 +17,20 @@ export async function ProductSupplierExtended({
 }: {
   productId: string | number;
 }) {
-  const response = await fetch(
+  const result = await safeFetchJson<SimpleResponse<ISupplier[]>>(
     `${serverApiBaseUrl}/productOffers/by-product/${productId}`,
-    {
-      next: { revalidate: 36 },
-    },
+    { next: { revalidate: 36 } },
   );
-  const result = await response.json();
-  const suppliers = result?.data || [];
+  const suppliers =
+    result.ok && result.data?.isSuccess !== false
+      ? result.data?.data || []
+      : [];
   const locale = await getLocale();
   const t = await getTranslations();
   if (suppliers.length === 0) return null;
- 
+
   return (
     <section className="mt-16">
-      {/* هدر بخش با دیزاین بهتر */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <div className="bg-primary rounded-full w-1 h-7"></div>
@@ -42,7 +43,6 @@ export async function ProductSupplierExtended({
         </span>
       </div>
 
-      {/* گرید کارت‌های تأمین‌کنندگان */}
       <div className="gap-5 grid grid-cols-1 lg:grid-cols-4">
         {suppliers.map((supplier: ISupplier, index: number) => (
           <SupplierCardGrid

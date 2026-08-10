@@ -27,14 +27,25 @@ public class DiscountsController : BaseController
 
         return Ok(result);
     }
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DiscountDto>> GetById(int id)
+
+    [HttpGet("getids")]
+    public async Task<ActionResult<IEnumerable<IdDto>>> GetAllDiscountIds()
     {
-        var result = await _mediator.Send(new GetDiscountByIdQuery { Id = id });
+        var result = await _mediator.Send(new GetAllDiscountsIdQuery());
         if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
 
         return Ok(result);
     }
+
+    [HttpGet("getslugs")]
+    public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllDiscountSlugs()
+    {
+        var result = await _mediator.Send(new GetAllDiscountsSlugsQuery());
+        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+
+        return Ok(result);
+    }
+
     [HttpGet("selectOption")]
     public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4selectOption([FromQuery] GetDiscounts4selectOptionQuery query)
     {
@@ -44,14 +55,20 @@ public class DiscountsController : BaseController
         return Ok(result);
     }
 
-
-
-
     // GET: api/discounts/active
     [HttpGet("active")]
     public async Task<ActionResult<IEnumerable<DiscountDto>>> GetActive()
     {
         var result = await _mediator.Send(new GetActiveDiscountsQuery());
+        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<DiscountDto>> GetById(int id)
+    {
+        var result = await _mediator.Send(new GetDiscountByIdQuery { Id = id });
         if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
 
         return Ok(result);

@@ -44,7 +44,8 @@ export default async function LandingHero() {
               className="object-cover hover:scale-105 transition-transform duration-700"
               priority
               fetchPriority="high"
-              sizes="(max-width: 768px) 280px, 380px"
+              quality={70}
+              sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 380px"
             />
           </div>
           <div

@@ -12,6 +12,7 @@ import { getBlogBySlug } from '@lib/blog';
 import { extractFaqFromHtml } from '@lib/blogFaq';
 import { serverApiBaseUrl } from '@lib/api';
 import { absoluteUrl, buildPageMetadata } from '@lib/seo';
+import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
 import { IBlog } from '@models/Blog';
 
@@ -21,27 +22,9 @@ type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
-
-
-
-
 // ===== 1. تولید مسیرهای استاتیک =====
 export async function generateStaticParams() {
-  try {
-    const res = await fetch(`${serverApiBaseUrl}/Blogs/getslugs`, {
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) return [];
-    const response: SimpleResponse<{ slug: string }[]> = await res.json();
-    if (!response.isSuccess) return [];
-    return (response.data || [])
-      .filter((item) => Boolean(item.slug))
-      .map((item) => ({ slug: item.slug }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
+  return fetchStaticSlugParams('Blogs/getslugs');
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;

@@ -6,7 +6,10 @@ export default createMiddleware({
   defaultLocale: 'fa',
   // Always require /fa/... or /en/... — no unprefixed store routes
   localePrefix: 'always',
-  localeDetection: true,
+  // Locale is in the URL; skip Accept-Language negotiation + NEXT_LOCALE cookie.
+  // Set-Cookie on HTML responses forces Cache-Control: no-store and blocks bfcache.
+  localeDetection: false,
+  localeCookie: false,
 });
 
 export const config = {

@@ -149,7 +149,7 @@ export async function GET() {
       fetchRecordsWithFallback('categories/getslugs', 'categories/getids'),
       fetchRecordsWithFallback('users/getslugs', 'productOffers/suppliersIds'),
       fetchRecordsWithFallback('tags/getslugs', 'tags/getids'),
-      fetchRecords('discounts/active'),
+      fetchRecordsWithFallback('discounts/getslugs', 'discounts/active'),
     ]);
 
   const staticPaths: SitemapEntry[] = [

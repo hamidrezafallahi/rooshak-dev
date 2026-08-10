@@ -12,6 +12,8 @@ public class  DiscountQueryHandler(IDiscountRepository _repo, IEntityConfigRepos
     IRequestHandler<GetDiscountByIdQuery, ServiceResult<DiscountDto>>,
     IRequestHandler<GetDiscounts4selectOptionQuery, ServiceResult<ListDto<SelectOptionDto>>>,
     IRequestHandler<GetActiveDiscountsQuery, ServiceResult<IEnumerable<DiscountDto>>>,
+    IRequestHandler<GetAllDiscountsIdQuery, ServiceResult<IEnumerable<IdDto>>>,
+    IRequestHandler<GetAllDiscountsSlugsQuery, ServiceResult<IEnumerable<SlugDto>>>,
     IRequestHandler<GetDiscountByProductOfferIdQuery, ServiceResult<Discount?>>,
     IRequestHandler<IsDiscountValidQuery, ServiceResult<ValidDiscountDto?>>
 {
@@ -147,6 +149,40 @@ public class  DiscountQueryHandler(IDiscountRepository _repo, IEntityConfigRepos
 
             return ServiceResult<IEnumerable<DiscountDto>>.Ok(dtoList);
         }
+
+    public async Task<ServiceResult<IEnumerable<IdDto>>> Handle(GetAllDiscountsIdQuery request, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        var ids = await _repo.Query(d =>
+                !d.IsDeleted &&
+                d.IsActive &&
+                d.StartDate <= now &&
+                d.EndDate >= now)
+            .Select(d => new IdDto { Id = d.Id })
+            .ToListAsync(cancellationToken);
+
+        return ServiceResult<IEnumerable<IdDto>>.Ok(ids);
+    }
+
+    public async Task<ServiceResult<IEnumerable<SlugDto>>> Handle(GetAllDiscountsSlugsQuery request, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        var slugs = await _repo.Query(d =>
+                !d.IsDeleted &&
+                d.IsActive &&
+                d.StartDate <= now &&
+                d.EndDate >= now)
+            .Select(d => new SlugDto
+            {
+                Id = d.Id,
+                // Route key for /discounts/[slug] is the numeric id.
+                Slug = d.Id.ToString(),
+                UpdatedAt = d.UpdatedAt ?? d.CreatedAt,
+            })
+            .ToListAsync(cancellationToken);
+
+        return ServiceResult<IEnumerable<SlugDto>>.Ok(slugs);
+    }
     public async Task<ServiceResult<Discount?>> Handle(GetDiscountByProductOfferIdQuery request, CancellationToken cancellationToken)
         {
             var discount = await _repo.GetDiscountByProductOfferIdAsync(request.ProductId);

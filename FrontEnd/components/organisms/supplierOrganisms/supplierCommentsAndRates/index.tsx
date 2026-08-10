@@ -5,6 +5,8 @@ import { getTranslations } from 'next-intl/server';
 import MediaImage from '@components/atoms/MediaImage';
 import { StarIcon } from '@components/atoms/iconComponents';
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
+import { SimpleResponse } from '@models/base';
 import {
   EnumTargetType,
   IComment,
@@ -19,11 +21,16 @@ export async function SupplierCommentsAndRates(props: {
   const slug = await params.slug;
   const t = await getTranslations();
 
-  const response = await fetch(
-    `${serverApiBaseUrl}/Comments/${EnumTargetType.Supplier}/${slug}`,{next: { revalidate: 36 }});
-  if (!response.ok) return <div>{t('common.supplierNotFound')}</div>;
+  const result = await safeFetchJson<SimpleResponse<IComment[]>>(
+    `${serverApiBaseUrl}/Comments/${EnumTargetType.Supplier}/${slug}`,
+    { next: { revalidate: 36 } },
+  );
 
-  const { data }: { data: IComment[] } = await response.json();
+  if (!result.ok || result.data?.isSuccess === false) {
+    return <div>{t('common.supplierNotFound')}</div>;
+  }
+
+  const data = result.data?.data || [];
   return (
     <>
       <div className="gap-6 grid sm:grid-cols-3 mb-16">
@@ -43,7 +50,7 @@ export async function SupplierCommentsAndRates(props: {
               <div className="mr-3">
                 <h4 className="font-semibold">{comment.userFullName}</h4>
                 <div className="flex text-yellow-500">
-                  {Array.from({ length:comment.userRate}).map((_, i) => (
+                  {Array.from({ length: comment.userRate }).map((_, i) => (
                     <StarIcon key={i} />
                   ))}
                 </div>
@@ -52,13 +59,13 @@ export async function SupplierCommentsAndRates(props: {
             <p className="text-gray-600 text-sm leading-relaxed">
               {comment.content}
             </p>
-              <time className="text-gray-400 text-xs">
-            {new Date(comment.createdAt).toLocaleDateString()}
-          </time>
+            <time className="text-gray-400 text-xs">
+              {new Date(comment.createdAt).toLocaleDateString()}
+            </time>
           </div>
         ))}
       </div>
-      <CommentAndRate TargetType={EnumTargetType.Supplier} TargetId={slug}/>
+      <CommentAndRate TargetType={EnumTargetType.Supplier} TargetId={slug} />
     </>
   );
 }

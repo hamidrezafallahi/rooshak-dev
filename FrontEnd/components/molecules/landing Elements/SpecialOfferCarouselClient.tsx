@@ -29,32 +29,32 @@ interface Props {
   spacialOffers: SpecialOffer[];
 }
 
+const CARD_W = 200;
+const GAP = 12;
+const STEP = CARD_W + GAP;
+
 export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
   const t = useTranslations();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const leftBtnRef = useRef<HTMLButtonElement | null>(null);
-  const rightBtnRef = useRef<HTMLButtonElement | null>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
-  const CARD_W = 200;
-  const GAP = 12;
-  const step = CARD_W + GAP;
+  const containerLeft = useRef(0);
   const items = spacialOffers ?? [];
   const isAuthenticated = Boolean(getCookie("candySession"));
   const [itemMutate] = useGetConditionallyMutation();
   const dispatch = useDispatch();
 
+  // Avoid scrollWidth/clientWidth reads during hydration (forced reflow / LCP).
+  // Fixed card width: 2+ cards overflow typical mobile viewports.
+  const showNav = items.length >= 2;
+
   const handlePrev = () => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.scrollBy({ left: -step, behavior: "smooth" });
+    containerRef.current?.scrollBy({ left: -STEP, behavior: "smooth" });
   };
 
   const handleNext = () => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.scrollBy({ left: step, behavior: "smooth" });
+    containerRef.current?.scrollBy({ left: STEP, behavior: "smooth" });
   };
 
   const handleAdd = async (offer: SpecialOffer) => {
@@ -93,31 +93,16 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
     const el = containerRef.current;
     if (!el) return;
 
-    // --- بررسی اسکرول‌پذیر بودن ---
-    const checkScrollable = () => {
-      const hasScroll = el.scrollWidth > el.clientWidth + 2;
-      const displayValue = hasScroll ? "flex" : "none";
-      if (leftBtnRef.current) leftBtnRef.current.style.display = displayValue;
-      if (rightBtnRef.current) rightBtnRef.current.style.display = displayValue;
-    };
-
-    checkScrollable();
-    window.addEventListener("resize", checkScrollable);
-
-    // --- هندل drag-to-scroll ---
     const onMouseDown = (e: MouseEvent) => {
       isDragging.current = true;
-      startX.current = e.pageX - el.offsetLeft;
+      // Cache geometry once per drag — don't re-read offsetLeft on every move.
+      containerLeft.current = el.getBoundingClientRect().left;
+      startX.current = e.pageX - containerLeft.current;
       scrollLeft.current = el.scrollLeft;
-      document.body.style.userSelect = "none"; // جلوگیری از انتخاب متن
+      document.body.style.userSelect = "none";
     };
 
-    const onMouseLeave = () => {
-      isDragging.current = false;
-      document.body.style.userSelect = "";
-    };
-
-    const onMouseUp = () => {
+    const endDrag = () => {
       isDragging.current = false;
       document.body.style.userSelect = "";
     };
@@ -125,21 +110,19 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX.current) * 1; // سرعت اسکرول، هرچی بیشتر، سریع‌تر
-      el.scrollLeft = scrollLeft.current - walk;
+      const x = e.pageX - containerLeft.current;
+      el.scrollLeft = scrollLeft.current - (x - startX.current);
     };
 
     el.addEventListener("mousedown", onMouseDown);
-    el.addEventListener("mouseleave", onMouseLeave);
-    el.addEventListener("mouseup", onMouseUp);
+    el.addEventListener("mouseleave", endDrag);
+    el.addEventListener("mouseup", endDrag);
     el.addEventListener("mousemove", onMouseMove);
 
     return () => {
-      window.removeEventListener("resize", checkScrollable);
       el.removeEventListener("mousedown", onMouseDown);
-      el.removeEventListener("mouseleave", onMouseLeave);
-      el.removeEventListener("mouseup", onMouseUp);
+      el.removeEventListener("mouseleave", endDrag);
+      el.removeEventListener("mouseup", endDrag);
       el.removeEventListener("mousemove", onMouseMove);
     };
   }, []);
@@ -154,25 +137,27 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
 
   return (
     <div className="relative w-full h-full">
-      <button
-        ref={leftBtnRef}
-        onClick={handlePrev}
-        aria-label={t('common.previous')}
-        style={{ display: "none" }}
-        className="top-1/2 left-1 z-30 absolute justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
-      >
-        <ChevronLeftIcon config={{ size: 14 }} />
-      </button>
+      {showNav ? (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label={t('common.previous')}
+            className="top-1/2 left-1 z-30 absolute flex justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
+          >
+            <ChevronLeftIcon config={{ size: 14 }} />
+          </button>
 
-      <button
-        ref={rightBtnRef}
-        onClick={handleNext}
-        aria-label={t('common.next')}
-        style={{ display: "none" }}
-        className="top-1/2 right-1 z-30 absolute justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
-      >
-        <ChevronRightIcon config={{ size: 14 }} />
-      </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label={t('common.next')}
+            className="top-1/2 right-1 z-30 absolute flex justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
+          >
+            <ChevronRightIcon config={{ size: 14 }} />
+          </button>
+        </>
+      ) : null}
 
       <div
         ref={containerRef}
@@ -210,8 +195,8 @@ function CompactOfferCard({
           alt={offer.product.name}
           fill
           className="object-cover"
-          priority  
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 412px"
         />
         {offer.product.discountId > 0 && (
           <div className="top-2 absolute bg-yellow-400 px-2 py-1 rounded text-rose-700 text-xs end-2">
@@ -232,6 +217,7 @@ function CompactOfferCard({
             {t('common.priceColon', { price: offer.product.finalPrice })}
           </div>
           <button
+            type="button"
             onClick={onAdd}
             className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 px-2 py-1 rounded text-white text-xs"
           >

@@ -24,9 +24,9 @@ export default async function CategoryCard({ category }: { category: ICategory})
       <MediaImage
         src={categoryCover}
         alt={locale == "fa" ? persianName : englishName}
-        width={400}
-        height={400}
+        fill
         className="w-full h-full object-cover group-hover:scale-105 transition-transform transform"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
         loading={id < 5 ? "eager" : "lazy"}
         priority={id < 5}
       />

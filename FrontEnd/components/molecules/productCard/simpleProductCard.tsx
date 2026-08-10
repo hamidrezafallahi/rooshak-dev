@@ -4,7 +4,6 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
-import { toMediaUrl } from '@utils/toMediaUrl';
 
 import { ISimpleProduct } from './type';
 
@@ -21,10 +20,12 @@ export async function SimpleProductCard({
       className="flex-shrink-0 bg-white shadow-sm hover:shadow-lg mx-auto rounded-2xl w-full overflow-hidden transition-shadow"
     >
       <div className="relative w-full h-56 overflow-hidden">
-        <img
-          src={toMediaUrl(product.mainImage)}
+        <MediaImage
+          src={product.mainImage}
           alt={product.name}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          sizes="(max-width: 640px) 100vw, 280px"
         />
       </div>
       <div className="p-4">

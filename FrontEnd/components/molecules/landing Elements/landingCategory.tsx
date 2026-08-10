@@ -3,7 +3,7 @@ import React from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
-import { toMediaUrl } from '@utils/toMediaUrl';
+import MediaImage from '@components/atoms/MediaImage';
 import { ICategory } from '@models/category';
 
 import CategoryCard from '../categoryCart';
@@ -31,11 +31,13 @@ export default async  function LandingCategory(props: IProps) {
               aria-label={cat.persianName || cat.englishName}
               className="group relative flex-shrink-0 bg-white shadow-sm hover:shadow-lg rounded-2xl min-w-[70%] sm:min-w-0 overflow-hidden transition-shadow"
             >
-              <div className="w-full h-44 overflow-hidden">
-                <img
-                  src={toMediaUrl(cat.categoryCover)}
+              <div className="relative w-full h-44 overflow-hidden">
+                <MediaImage
+                  src={cat.categoryCover}
                   alt={cat.persianName || cat.englishName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform transform"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform transform"
+                  sizes="70vw"
                   loading="lazy"
                 />
               </div>
@@ -57,4 +59,3 @@ export default async  function LandingCategory(props: IProps) {
     </section>
   );
 }
-

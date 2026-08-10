@@ -7,7 +7,10 @@ import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs'
 import FaqSection, { parseFaqJson } from '@components/molecules/storefront/FaqSection';
 import CategoryTemplate from '@components/templates/categoryTemplate';
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
+import { fetchStaticSlugParams } from '@lib/staticParams';
+import { SimpleResponse } from '@models/base';
 import type { ICategory } from '@models/category';
 
 export const dynamicParams = true;
@@ -16,21 +19,19 @@ type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
+export async function generateStaticParams() {
+  return fetchStaticSlugParams('Categories/getslugs', 'Categories/getids');
+}
+
 async function fetchCategory(slug: string): Promise<ICategory | null> {
-  try {
-    const response = await fetch(`${serverApiBaseUrl}/Categories/${slug}`, {
-      next: { revalidate: 36 },
-    });
+  const result = await safeFetchJson<SimpleResponse<ICategory>>(
+    `${serverApiBaseUrl}/Categories/${slug}`,
+    { next: { revalidate: 36 } },
+  );
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const result = await response.json();
-    return (result?.data ?? null) as ICategory | null;
-  } catch {
-    return null;
-  }
+  if (!result.ok || !result.data?.data) return null;
+  if (result.data.isSuccess === false) return null;
+  return result.data.data;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

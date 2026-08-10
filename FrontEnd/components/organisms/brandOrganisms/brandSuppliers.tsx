@@ -8,18 +8,17 @@ import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { IUser } from '@models/user';
 
 export async function BrandSuppliers({ id }: { id: number }) {
-  const response = await fetch(
+  const result = await safeFetchJson<SimpleResponse<IUser[]>>(
     `${serverApiBaseUrl}/Brands/getProductsSuppliersByBrandId/${id}`,
-    {
-      cache: "no-store",
-    },
+    { next: { revalidate: 36 } },
   );
-  const suppliersResponse: SimpleResponse<IUser[]> = await response.json();
-  const suppliers: IUser[] = suppliersResponse.data;
+  const suppliers: IUser[] =
+    result.ok && result.data?.isSuccess !== false ? result.data?.data || [] : [];
   const locale = await getLocale();
   const t = await getTranslations();
 

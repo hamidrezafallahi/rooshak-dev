@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { Rate } from '@components/atoms/defaultElements/customRate';
 import { serverApiBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { EnumTargetType } from '@models/comment';
 import { IRate } from '@models/rate';
@@ -18,13 +19,18 @@ export default async function ProductRate({ id, average, count }: Props) {
   let resolvedCount = count;
 
   if (resolvedAverage == null || resolvedCount == null) {
-    const response = await fetch(
+    const result = await safeFetchJson<SimpleResponse<IRate>>(
       `${serverApiBaseUrl}/Rates/average?targetType=${EnumTargetType.Product}&targetId=${id}`,
       { next: { revalidate: 36 } },
     );
-    const rate: SimpleResponse<IRate> = await response.json();
-    resolvedAverage = rate.data?.average ?? 0;
-    resolvedCount = rate.data?.count ?? 0;
+    resolvedAverage =
+      result.ok && result.data?.isSuccess !== false
+        ? result.data?.data?.average ?? 0
+        : 0;
+    resolvedCount =
+      result.ok && result.data?.isSuccess !== false
+        ? result.data?.data?.count ?? 0
+        : 0;
   }
 
   return (

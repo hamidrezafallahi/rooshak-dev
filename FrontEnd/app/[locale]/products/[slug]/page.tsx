@@ -14,10 +14,18 @@ import RelatedSeoLinks from '@components/molecules/storefront/RelatedSeoLinks';
 import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import { serverApiBaseUrl, siteBaseUrl } from '@lib/api';
+import { safeFetchJson } from '@lib/safeFetch';
 import { absoluteUrl, buildPageMetadata } from '@lib/seo';
+import { fetchStaticSlugParams } from '@lib/staticParams';
+import { SimpleResponse } from '@models/base';
+import { IDetailedProduct } from '@models/product';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
 export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return fetchStaticSlugParams('Products/getslugs', 'Products/getids');
+}
 
 function toAbsoluteImage(url?: string | null) {
   if (!url) return undefined;
@@ -26,11 +34,28 @@ function toAbsoluteImage(url?: string | null) {
   return mediaPath ? `${siteBaseUrl}${mediaPath}` : undefined;
 }
 
-async function fetchProduct(slug: string) {
-  const response = await fetch(`${serverApiBaseUrl}/Products/${slug}`, {
+async function fetchProduct(
+  slug: string,
+): Promise<{ status: number; product: IDetailedProduct | null }> {
+  const result = await safeFetchJson<
+    SimpleResponse<IDetailedProduct> | IDetailedProduct
+  >(`${serverApiBaseUrl}/Products/${slug}`, {
     next: { revalidate: 36 },
   });
-  return response;
+
+  if (!result.ok) {
+    return { status: result.status || 500, product: null };
+  }
+
+  const envelope = result.data as SimpleResponse<IDetailedProduct>;
+  if (envelope && typeof envelope === 'object' && 'data' in envelope) {
+    if (envelope.isSuccess === false) {
+      return { status: 404, product: null };
+    }
+    return { status: 200, product: envelope.data || null };
+  }
+
+  return { status: 200, product: (result.data as IDetailedProduct) || null };
 }
 
 export async function generateMetadata({
@@ -40,46 +65,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug, locale = 'fa' } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
+  const { status, product } = await fetchProduct(slug);
 
-  try {
-    const response = await fetchProduct(slug);
-    if (response.status === 404) {
-      return buildPageMetadata({
-        locale,
-        path: `products/${slug}`,
-        title: tStore('notFound'),
-        description: tStore('notFoundHint'),
-        noIndex: true,
-      });
-    }
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const product = result.data || result;
-    const canonicalSlug = product?.slug || slug;
-    const seoTitle =
-      (locale === 'fa' ? product?.seoTitleFa : product?.seoTitleEn) ||
-      product?.name ||
-      product?.title ||
-      (locale === 'fa' ? 'محصول' : 'Product');
-    const description =
-      (locale === 'fa' ? product?.metaDescriptionFa : product?.metaDescriptionEn) ||
-      product?.description ||
-      '';
-    const image =
-      product?.imageUrls?.[0] || product?.mainImage || product?.imageUrl || product?.image;
-
+  if (!product || status === 404) {
     return buildPageMetadata({
       locale,
-      path: `products/${canonicalSlug}`,
-      title: seoTitle,
-      description,
-      images: [image],
+      path: `products/${slug}`,
+      title: tStore('notFound'),
+      description: tStore('notFoundHint'),
+      noIndex: true,
     });
-  } catch {
+  }
+
+  if (status >= 400) {
     return buildPageMetadata({
       locale,
       path: `products/${slug}`,
@@ -88,6 +86,25 @@ export async function generateMetadata({
       noIndex: true,
     });
   }
+
+  const canonicalSlug = product.slug || slug;
+  const seoTitle =
+    (locale === 'fa' ? product.seoTitleFa : product.seoTitleEn) ||
+    product.name ||
+    (locale === 'fa' ? 'محصول' : 'Product');
+  const description =
+    (locale === 'fa' ? product.metaDescriptionFa : product.metaDescriptionEn) ||
+    product.description ||
+    '';
+  const image = product.imageUrls?.[0] || product.mainImage;
+
+  return buildPageMetadata({
+    locale,
+    path: `products/${canonicalSlug}`,
+    title: seoTitle,
+    description,
+    images: [image],
+  });
 }
 
 export default async function ProductPage({
@@ -97,22 +114,9 @@ export default async function ProductPage({
 }) {
   const { slug, locale } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
+  const { status, product } = await fetchProduct(slug);
 
-  let response: Response;
-  try {
-    response = await fetchProduct(slug);
-  } catch {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('loadError')}</h1>
-          <p className="store-empty-desc">{tStore('loadErrorHint')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (response.status === 404) {
+  if (!product && status === 404) {
     return (
       <div className="store-page">
         <div className="store-empty">
@@ -126,7 +130,7 @@ export default async function ProductPage({
     );
   }
 
-  if (!response.ok) {
+  if (!product) {
     return (
       <div className="store-page">
         <div className="store-empty">
@@ -137,11 +141,8 @@ export default async function ProductPage({
     );
   }
 
-  const result = await response.json();
-  const product = result.data || result;
-
   // Legacy numeric URLs → permanent SEO slug (must not be inside a broad try/catch).
-  if (product?.slug && product.slug !== slug && /^\d+$/.test(slug)) {
+  if (product.slug && product.slug !== slug && /^\d+$/.test(slug)) {
     permanentRedirect(`/${locale}/products/${product.slug}`);
   }
 
@@ -152,9 +153,9 @@ export default async function ProductPage({
     (locale === 'fa' ? product.metaDescriptionFa : product.metaDescriptionEn) ||
     null;
   const categoryKey = product.categorySlug || product.categoryId;
-  const images = (product?.imageUrls?.length
+  const images = (product.imageUrls?.length
     ? product.imageUrls
-    : [product?.mainImage || product?.imageUrl || product?.image]
+    : [product.mainImage]
   )
     .map((img: string) => toAbsoluteImage(img))
     .filter(Boolean) as string[];
@@ -167,11 +168,11 @@ export default async function ProductPage({
   const productLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: product.name || product.title,
+    name: product.name,
     description: product.description,
     image: images.length ? images : undefined,
     url: productUrl,
-    sku: String(product.sku || product.id),
+    sku: String(product.id),
     category: product.categoryName || undefined,
     brand: product.brandName
       ? { '@type': 'Brand', name: product.brandName }
@@ -189,7 +190,7 @@ export default async function ProductPage({
     };
   }
 
-  if (product.rateCount > 0 && product.averageRate > 0) {
+  if ((product.rateCount ?? 0) > 0 && (product.averageRate ?? 0) > 0) {
     productLd.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue: product.averageRate,
@@ -218,7 +219,7 @@ export default async function ProductPage({
                 },
               ]
             : []),
-          { name: product.name || product.title || productsLabel },
+          { name: product.name || productsLabel },
         ]}
       />
       <SeoHighlight locale={locale} title={seoTitle} description={seoDescription} />
