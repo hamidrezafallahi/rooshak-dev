@@ -1,106 +1,142 @@
-# AI Blog SEO Automation (n8n + OnlineShop API)
+# SEO Automation Pack (n8n + OnlineShop SeoOps API)
 
-Hybrid pipeline: **n8n orchestrates**, your **ASP.NET API** stores blogs as inactive drafts for human review.
+Hybrid model for this shop:
 
-No `ContentJob` table — run history lives in n8n Executions; published content lives in `Blogs`.
+- **n8n** orchestrates schedules, LLM reasoning, and alerts
+- **ASP.NET `SeoOps` API** reads inventory / probes public SEO URLs
+- **Human gate** before publish, meta apply, or content refresh
 
-## Local test (recommended)
+This is intentional. Full auto-publish SEO is not the goal.
 
-### 1) Start stack
+## What’s included
+
+| Workflow file | Schedule (Asia/Tehran) | Job | Human gate |
+|---|---|---|---|
+| `ai-blog-seo-daily.workflow.json` | Daily 08:00 | Generate blog draft | Activate in admin |
+| `seo-site-health-daily.workflow.json` | Daily 07:00 | Probe sitemap/robots/home/blog/API | Alert only |
+| `seo-weekly-digest.workflow.json` | Mon 09:00 | Inventory + LLM priorities | Review digest |
+| `seo-meta-optimizer-weekly.workflow.json` | Tue 10:00 | Weak title/meta suggestions | Apply manually |
+| `seo-internal-links-weekly.workflow.json` | Wed 11:00 | Internal link suggestions | Edit content manually |
+| `seo-content-refresh-weekly.workflow.json` | Thu 12:00 | Refresh briefs for stale blogs | Edit + republish manually |
+
+## Architecture
+
+```text
+Cron (n8n)
+  → Login as ContentEditor bot
+  → SeoOps / Blogs API
+  → optional LLM summarize/suggest
+  → optional SEO_ALERT_WEBHOOK_URL (Slack/Discord/custom)
+  → YOU review in Admin / n8n Executions
+```
+
+## Local setup
+
+### 1) Env
+
+Copy from `.env.example` and set at least:
 
 ```bash
-# from repo root — put OPENROUTER_API_KEY in .env (free)
+LLM_API_KEY=...                 # or OPENROUTER_API_KEY / GROQ_API_KEY
+LLM_API_URL=https://api.groq.com/openai/v1/chat/completions
+LLM_MODEL=llama-3.3-70b-versatile
+
+CONTENT_BOT_EMAIL=content-bot@onlineshop.local
+CONTENT_BOT_PASSWORD=ContentBot@123
+API_BASE_URL=http://backend:8080/api
+
+# Reachable FROM the backend container (for SeoOps health probes)
+SeoOps__SitePublicUrl=http://nginx
+SeoOps__ApiPublicUrl=http://backend:8080
+
+# Optional alert sink (Slack incoming webhook / Discord / any JSON {text})
+SEO_ALERT_WEBHOOK_URL=
+SEO_STALE_DAYS=90
+```
+
+### 2) Start stack
+
+```bash
 docker compose -f docker-compose.dev.yml up -d
+# after C# SeoOps changes:
+docker compose -f docker-compose.dev.yml up -d --build backend
 ```
 
 Open:
 
 - Site: `http://localhost`
 - API: `http://localhost:8080`
-- n8n UI: `http://localhost:5678`
+- n8n: `http://localhost:5678`
 
-### 2) Import workflow
+### 3) Import all workflows
 
-1. Open `http://localhost:5678`
-2. **Workflows → Import from File**
-3. Select `automation/n8n/ai-blog-seo-daily.workflow.json`
+In n8n → **Workflows → Import from File**, import every `*.workflow.json` in this folder.
 
-Flow:
+Then open each workflow and click **Test workflow** once.
 
-`Cron → Login → Slugs → Keywords → Topic → LLM article → Validate → Thumbnail (LLM) → Create Draft Blog`
+Activate only after a successful manual run.
 
-### 3) LLM auth (OpenRouter via env)
+## Backend API used by automations
 
-No n8n credential UI setup needed. Put `OPENROUTER_API_KEY` in root `.env`, then recreate n8n:
+All require `ContentEditor` / `Admin` / `SuperAdmin` JWT (bot account is seeded).
 
-```bash
-docker compose -f docker-compose.dev.yml up -d --force-recreate n8n
-```
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/SeoOps/health` | Probe public SEO endpoints |
+| GET | `/api/SeoOps/snapshot?staleDays=90&take=20` | Weekly inventory digest |
+| GET | `/api/SeoOps/meta-audit?take=30` | Weak title/meta blogs |
+| GET | `/api/SeoOps/refresh-candidates?staleDays=90` | Stale active blogs |
+| GET | `/api/SeoOps/internal-links/{blogId}` | Link suggestions |
+| GET | `/api/Blogs/getslugs?includeInactive=true` | Draft-safe slug de-dupe |
+| POST | `/api/Blogs/validate-content` | Quality gates for AI drafts |
+| POST | `/api/Blogs` | Create inactive draft |
 
-The HTTP Request nodes send `Authorization: Bearer <OPENROUTER_API_KEY>` from container env.
+## Recommended weekly human checklist
 
-Defaults in root `.env`:
+1. **Mon** — read Weekly Digest, pick top 3 priorities
+2. **Tue** — apply best meta suggestions in admin (or reject)
+3. **Wed** — add 2–5 internal links from suggestions
+4. **Thu** — refresh 1 stale article from briefs
+5. **Daily** — if health alert fires, fix broken SEO URL first
+6. **Daily AI blog** — review draft tone/facts → activate only if good
 
-- `LLM_API_URL=https://openrouter.ai/api/v1/chat/completions`
-- `LLM_MODEL=nvidia/nemotron-3-nano-30b-a3b:free`
-- `OPENROUTER_API_KEY=sk-or-v1-...`
+## What is intentionally NOT automated
 
-### 4) Manual run
+- Auto-publish blog/product pages
+- Mass outreach / link spam
+- Blind title overwrite without review
+- Claiming Google Search Console actions without OAuth setup
 
-1. Open the workflow → **Test workflow**
-2. Draft appears in admin blogs with `IsActive=false`
-3. Approve by activating the blog: `PUT /api/Blogs/active` `{ "id": ..., "isActive": true }`
+### Optional next upgrade (GSC)
 
-### 5) Backend service account (seeded)
+When you are ready, add Google Search Console OAuth in n8n and feed clicks/CTR into:
+
+- Weekly Digest
+- Meta Optimizer prioritization
+
+Until then, this pack already covers the highest-ROI ops loop for this codebase.
+
+## Quality / safety rules
+
+- Drafts stay `IsActive=false` until a human activates them
+- Meta/link/refresh workflows only **suggest**
+- Alerts are optional via `SEO_ALERT_WEBHOOK_URL`
+- If webhook is empty, results still appear in n8n Executions
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| Health fails on frontend URLs | Set `SeoOps__SitePublicUrl=http://nginx` (Docker network), rebuild/restart backend |
+| Login fails | Check `CONTENT_BOT_*` and that ContentEditor seed ran |
+| LLM 401 | Set `LLM_API_KEY` / `OPENROUTER_API_KEY` / `GROQ_API_KEY`, recreate n8n |
+| Duplicate blog slugs | Use `getslugs?includeInactive=true` (fixed in API) |
+| No alerts | Set `SEO_ALERT_WEBHOOK_URL` or read n8n execution output |
+
+## Bot account (seeded)
 
 | Field | Default |
 |---|---|
 | Email | `content-bot@onlineshop.local` |
 | Password | `ContentBot@123` |
 | Role | `ContentEditor` |
-
-## What you must configure
-
-| # | Item | Required? | Where |
-|---|---|---|---|
-| 1 | LLM key | Yes | `OPENROUTER_API_KEY` in `.env` (recreate n8n after change) |
-| 2 | Import workflow | Yes | n8n UI |
-| 3 | Bot account | Auto | `CONTENT_BOT_*` / `ContentAutomation__*` in `.env` |
-| 4 | Unsplash | Optional | `UNSPLASH_ACCESS_KEY` in `.env` |
-| 5 | Human review | Yes | Admin → blogs → Active switch |
-
-Each service loads root `.env` via compose `env_file`.
-
-## Daily flow
-
-1. Cron 08:00 Asia/Tehran
-2. Login as ContentEditor
-3. Avoid duplicate slugs
-4. Pick topic
-5. Generate article (LLM)
-6. `POST /api/Blogs/validate-content`
-7. Suggest + download thumbnail
-8. `POST /api/Blogs` as draft (`IsDraft=true`, `Source=ai-pipeline`)
-9. Human activates in admin
-
-> Tip: topic selection uses `GET /api/Blogs/getslugs?includeInactive=true` so inactive drafts are not reused as the same slug.
-
-## Quality gates
-
-- Unique slug
-- Min intro/content/conclusion length
-- FAQ heading
-- Meta description 70–160
-- Internal link to `/products/`, `/categories/`, or `/blog/`
-
-## FAQ HTML contract
-
-```html
-<h2>سوالات متداول</h2>
-<h3>سوال اول؟</h3>
-<p>پاسخ اول</p>
-```
-
-## Human-like writing
-
-Prompt reduces robotic tone. Still review every draft before publish.

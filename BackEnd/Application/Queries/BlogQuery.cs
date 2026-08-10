@@ -16,5 +16,11 @@ namespace Application.Queries
     {
         public string Slug { get; set; } = null!;
     }
-    public class GetAllBlogsSlugsQuery : IRequest<ServiceResult<IEnumerable<SlugDto?>>>{}
+    public class GetAllBlogsSlugsQuery : IRequest<ServiceResult<IEnumerable<SlugDto?>>>
+    {
+        /// <summary>
+        /// When true, include inactive drafts (needed by n8n slug de-duplication).
+        /// </summary>
+        public bool IncludeInactive { get; set; }
+    }
 }

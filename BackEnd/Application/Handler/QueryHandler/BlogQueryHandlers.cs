@@ -268,7 +268,11 @@ public class BlogQueryHandler(
     }
     public async Task<ServiceResult<IEnumerable<SlugDto>>> Handle(GetAllBlogsSlugsQuery request, CancellationToken cancellationToken)
     {
-        var blogsSlugs = await _repo.Query(b => b.IsActive && !b.IsDeleted)
+        var query = request.IncludeInactive
+            ? _repo.Query(b => !b.IsDeleted)
+            : _repo.Query(b => b.IsActive && !b.IsDeleted);
+
+        var blogsSlugs = await query
          .Select(p => new SlugDto
          {
              Id = p.Id,

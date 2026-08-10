@@ -27,9 +27,13 @@ public class BlogsController : BaseController
         return Ok(result);
     }
     [HttpGet("getslugs")]
-    public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllBlogsSlugs()
+    public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllBlogsSlugs(
+        [FromQuery] bool includeInactive = false)
     {
-        var result = await _mediator.Send(new GetAllBlogsSlugsQuery());
+        var result = await _mediator.Send(new GetAllBlogsSlugsQuery
+        {
+            IncludeInactive = includeInactive
+        });
         if (!result.IsSuccess && result.Error == "Unauthorized")
             return Unauthorized(result);
         return Ok(result);

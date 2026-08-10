@@ -82,6 +82,12 @@ namespace OnlineShop.Infrastructure
             services.AddScoped<IUserTagRepository, UserTagRepository>();
             services.AddScoped<ISeoSettingRepository, SeoSettingRepository>();
             services.AddScoped<IBlogContentQualityService, BlogContentQualityService>();
+            services.AddHttpClient("SeoOpsProbe", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(15);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("OnlineShop-SeoOps/1.0");
+            });
+            services.AddScoped<ISeoOpsService, SeoOpsService>();
             services.AddHttpContextAccessor();
             services.AddScoped<IDataInitializer, EntityConfigApiUrlNormalizer>();
             services.AddScoped<IDataInitializer, AdminUserInitializer>();
