@@ -192,18 +192,28 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $env.OPENROUTER_API_KEY }}"
+              "value": "=Bearer {{ $env.LLM_API_KEY || $env.OPENROUTER_API_KEY || $env.GROQ_API_KEY }}"
             },
             {
               "name": "Content-Type",
               "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "={{ $env.CONTENT_ADMIN_BASE_URL || 'http://localhost' }}"
+            },
+            {
+              "name": "X-Title",
+              "value": "OnlineShop SEO Automation"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.85,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"تو نویسندهی باتجربهی فروشگاه ظروف کریستال و دکوری هستی که برای مشتری ایرانی مینویسی. خروجی فقط JSON معتبر با کلیدهای: titleFa, introFa, contentFa, conclusionFa, excerptFa, metaDescriptionFa, metaKeywordsFa, titleEn, introEn, contentEn, conclusionEn, excerptEn, metaDescriptionEn, metaKeywordsEn, slug.\\n\\nسبک نوشتار (خیلی مهم):\\n- مثل یک فروشنده/مشاور واقعی بنویس؛ لحن محاورهای مودبانه، نه مقالهی رباتیک.\\n- از کلیشههای هوش مصنوعی پرهیز کن: در دنیای امروز، در نتیجه، به طور کلی، ضروری است، بهتر است بدانید، جامع، بینظیر، تحولآفرین، در این مقاله میخواهیم.\\n- جملهها طول متغیر داشته باشند؛ گاهی کوتاه و کاربردی.\\n- تجربهی عملی بده (شستشو، نگهداری، هدیه، چیدمان میز) نه تعریفهای عمومی.\\n- کلیدواژه را طبیعی و کم جا بده؛ stuffing ممنوع.\\n- فارسی اصلی و قوی باشد؛ انگلیسی خلاصهتر ولی طبیعی.\\n\\nساختار اجباری:\\n- contentFa و contentEn بهصورت HTML با H2/H3\\n- حداقل یک لینک داخلی به /categories/ یا /products/\\n- بخش FAQ دقیقا با <h2>سوالات متداول</h2> و ۵ تا ۸ سؤال با <h3> و پاسخ <p>\\n- metaDescriptionFa بین ۷۰ تا ۱۶۰ کاراکتر\\n- excerpt حداکثر ۱۶۰ کاراکتر\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"کلمه کلیدی اصلی: {{ $('Select Topic').item.json.selectedKeyword }}. اسلاگ اجباری ASCII (تغییر نده): {{ $('Select Topic').item.json.slug }}. مخاطب: خریداران ایرانی ظروف کریستال و دکوری.\\nحداقل‌ها را رعایت کن: introFa >= 100 کاراکتر، contentFa متن خالص >= 700 کاراکتر، conclusionFa >= 80 کاراکتر، metaDescriptionFa بین 70 تا 160 کاراکتر، و حتما FAQ با عنوان سوالات متداول. فیلد slug را دقیقا برابر اسلاگ اجباری ASCII بگذار؛ فارسی در slug ممنوع.\"\n    }\n  ]\n}",
-        "options": {}
+        "options": {
+          "timeout": 180000
+        }
       },
       "id": "llm-generate",
       "name": "Generate Article (LLM)",
@@ -213,7 +223,10 @@
         2100,
         300
       ],
-      "notes": "Uses OPENROUTER_API_KEY from container env (Header: Authorization Bearer ...). No n8n credential required."
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 4000,
+      "notes": "Timeout 180s + 3 retries. Auth: LLM_API_KEY || OPENROUTER_API_KEY || GROQ_API_KEY"
     },
     {
       "parameters": {
@@ -284,18 +297,28 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $env.OPENROUTER_API_KEY }}"
+              "value": "=Bearer {{ $env.LLM_API_KEY || $env.OPENROUTER_API_KEY || $env.GROQ_API_KEY }}"
             },
             {
               "name": "Content-Type",
               "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "={{ $env.CONTENT_ADMIN_BASE_URL || 'http://localhost' }}"
+            },
+            {
+              "name": "X-Title",
+              "value": "OnlineShop SEO Automation"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.4,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a visual researcher for an Iranian crystal / decorative tableware shop blog. Return ONLY valid JSON with keys: imageSearchQuery (English, 4-8 words, concrete scene for Unsplash/stock photo search), imageTags (array of 3-5 English single-word tags, no Persian), imageAltFa (short Persian alt), imageAltEn (short English alt).\\nRules:\\n- Query must match the ARTICLE topic visually (e.g. crystal glasses on dining table, crystal vase with flowers, washing crystal glassware).\\n- Prefer real product scenes: dining table, hospitality, gift, home decor, close-up crystal.\\n- Ban irrelevant topics: perfume, cars, people portraits, abstract AI art, food unless tableware is the focus.\\n- Never use Persian inside imageSearchQuery or imageTags.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Keyword: {{ $('Parse Article JSON').item.json.selectedKeyword }}\\nTitleFa: {{ $('Parse Article JSON').item.json.article.titleFa }}\\nTitleEn: {{ $('Parse Article JSON').item.json.article.titleEn }}\\nExcerptFa: {{ $('Parse Article JSON').item.json.article.excerptFa }}\\nPick the best stock-photo search for this article thumbnail.\"\n    }\n  ]\n}",
-        "options": {}
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "llm-image",
       "name": "Suggest Thumbnail (LLM)",
@@ -305,7 +328,10 @@
         3300,
         300
       ],
-      "notes": "LLM chooses English stock-photo query/tags. Uses OPENROUTER_API_KEY from env (same as Generate Article)."
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "notes": "Timeout 120s + 3 retries. Same auth env as Generate Article."
     },
     {
       "parameters": {
