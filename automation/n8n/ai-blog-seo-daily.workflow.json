@@ -29,13 +29,31 @@
             {
               "id": "seed",
               "name": "seedTopics",
-              "value": "={{ $env.SEED_TOPICS_JSON || '[\"ظروف کریستال\",\"ظروف دکوری\"]' }}",
+              "value": "={{ $env.SEED_TOPICS_JSON || '[\\\"ظروف کریستال\\\",\\\"ظروف دکوری\\\"]' }}",
               "type": "string"
             },
             {
               "id": "api",
               "name": "apiBase",
-              "value": "={{ $env.API_BASE_URL || 'http://localhost:8080/api' }}",
+              "value": "={{ $env.API_BASE_URL || 'http://backend:8080/api' }}",
+              "type": "string"
+            },
+            {
+              "id": "hook",
+              "name": "alertWebhook",
+              "value": "={{ $env.SEO_ALERT_WEBHOOK_URL || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "telegramToken",
+              "name": "telegramBotToken",
+              "value": "={{ $env.TELEGRAM_BOT_TOKEN || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "telegramChat",
+              "name": "telegramChatId",
+              "value": "={{ $env.TELEGRAM_CHAT_ID || '' }}",
               "type": "string"
             }
           ]
@@ -47,7 +65,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        220,
+        300,
         300
       ]
     },
@@ -65,7 +83,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        440,
+        600,
         300
       ]
     },
@@ -100,7 +118,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        660,
+        900,
         300
       ]
     },
@@ -115,7 +133,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        880,
+        1200,
         300
       ]
     },
@@ -147,21 +165,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1100,
+        1500,
         300
       ],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "const token = $('Store Token').item.json.accessToken;\nconst apiBase = $('Store Token').item.json.apiBase;\nconst slugPayload = $('Get Existing Slugs').item.json;\nconst slugList = slugPayload?.data || slugPayload || [];\nconst existingSlugs = new Set(\n  (Array.isArray(slugList) ? slugList : [])\n    .map((x) => String(x.slug || x.Slug || '').trim().toLowerCase())\n    .filter(Boolean)\n);\n\nconst toSlug = (value) =>\n  String(value || '')\n    .trim()\n    .toLowerCase()\n    .replace(/\\s+/g, '-')\n    .replace(/[^\\u0600-\\u06FFa-z0-9-]/gi, '')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n\nconst fallbackKeywords = [\n  'ظروف کریستال پذیرایی',\n  'ظروف دکوری کریستال',\n  'خرید ظروف کریستال',\n  'نگهداری ظروف کریستال',\n  'تفاوت کریستال و شیشه',\n  'هدیه ظروف کریستال',\n  'چیدمان میز کریستال',\n  'ظروف کریستال عروس',\n  'قیمت ظروف کریستال',\n  'شستشوی ظروف کریستال'\n];\n\nlet keywords = fallbackKeywords.slice();\ntry {\n  const seedRaw = $('Config').item.json.seedTopics;\n  const parsed = typeof seedRaw === 'string' ? JSON.parse(seedRaw) : seedRaw;\n  if (Array.isArray(parsed) && parsed.length) {\n    keywords = [...parsed.map(String), ...fallbackKeywords];\n  }\n} catch (e) {}\n\ntry {\n  const suggest = $('Keyword Suggest').item.json;\n  if (Array.isArray(suggest?.[1]) && suggest[1].length) {\n    keywords = [...suggest[1].map(String).slice(0, 15), ...keywords];\n  }\n} catch (e) {}\n\n// de-dupe while preserving order\nconst seenKw = new Set();\nkeywords = keywords.filter((k) => {\n  const key = String(k).trim();\n  if (!key || seenKw.has(key)) return false;\n  seenKw.add(key);\n  return true;\n});\n\nconst free = [];\nfor (const k of keywords) {\n  const slug = toSlug(k);\n  if (slug && !existingSlugs.has(slug)) free.push({ keyword: k, slug });\n}\n\nlet pick;\nlet slug;\nif (free.length) {\n  // rotate by day so consecutive runs are less likely to stick to index 0\n  const idx = (new Date().getDate() + existingSlugs.size) % free.length;\n  pick = free[idx].keyword;\n  slug = free[idx].slug;\n} else {\n  // all base topics taken → append numeric / date suffix\n  outer: for (const k of keywords) {\n    const base = toSlug(k) || 'blog';\n    for (let n = 2; n <= 99; n++) {\n      const candidate = `${base}-${n}`;\n      if (!existingSlugs.has(candidate)) {\n        pick = k;\n        slug = candidate;\n        break outer;\n      }\n    }\n  }\n  if (!slug) {\n    pick = keywords[0] || 'ظروف کریستال';\n    slug = `${toSlug(pick) || 'blog'}-${Date.now().toString(36)}`;\n  }\n}\n\nif (existingSlugs.has(slug)) {\n  throw new Error(`Could not allocate a unique slug (last try: ${slug}). existingSlugCount=${existingSlugs.size}`);\n}\n\nreturn [{\n  json: {\n    token,\n    apiBase,\n    candidateKeywords: keywords,\n    selectedKeyword: pick,\n    selectedTopic: pick,\n    slug,\n    existingSlugCount: existingSlugs.size,\n    freeTopicCount: free.length\n  }\n}];"
+        "jsCode": "const token = $('Store Token').item.json.accessToken;\nconst apiBase = $('Store Token').item.json.apiBase;\nconst slugPayload = $('Get Existing Slugs').item.json;\nconst slugList = slugPayload?.data || slugPayload || [];\nconst existingSlugs = new Set(\n  (Array.isArray(slugList) ? slugList : [])\n    .map((x) => String(x.slug || x.Slug || '').trim().toLowerCase())\n    .filter(Boolean)\n);\n\n// Persian characters in URL slugs collide and are hard to manage.\n// Map known topics to stable ASCII bases; unknown Persian topics get hashed ASCII.\nconst TOPIC_SLUGS = {\n  'ظروف کریستال': 'crystal-tableware',\n  'ظروف کریستال پذیرایی': 'crystal-hospitality-ware',\n  'ظروف دکوری': 'decorative-crystal',\n  'ظروف دکوری کریستال': 'decorative-crystal-ware',\n  'خرید ظروف کریستال': 'buy-crystal-tableware',\n  'نگهداری ظروف کریستال': 'crystal-care-guide',\n  'تفاوت کریستال و شیشه': 'crystal-vs-glass',\n  'هدیه ظروف کریستال': 'crystal-gift-guide',\n  'چیدمان میز کریستال': 'crystal-table-setting',\n  'ظروف کریستال عروس': 'bridal-crystal-set',\n  'قیمت ظروف کریستال': 'crystal-tableware-price',\n  'شستشوی ظروف کریستال': 'washing-crystal-glassware'\n};\n\nconst toAsciiSlug = (value) => {\n  const raw = String(value || '').trim();\n  if (!raw) return 'blog';\n  if (TOPIC_SLUGS[raw]) return TOPIC_SLUGS[raw];\n  let slug = raw\n    .toLowerCase()\n    .normalize('NFKD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^a-z0-9\\s-]/g, ' ')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n  if (!slug || /[\\u0600-\\u06FF]/.test(raw)) {\n    let h = 0;\n    for (let i = 0; i < raw.length; i++) h = ((h << 5) - h + raw.charCodeAt(i)) | 0;\n    slug = 'topic-' + Math.abs(h).toString(36);\n  }\n  return slug.slice(0, 80) || 'blog';\n};\n\nconst allocateUnique = (base) => {\n  const root = (base || 'blog').slice(0, 70);\n  if (!existingSlugs.has(root)) return root;\n  for (let n = 2; n <= 199; n++) {\n    const c = root + '-' + n;\n    if (!existingSlugs.has(c)) return c;\n  }\n  return root + '-' + Date.now().toString(36);\n};\n\nconst fallbackKeywords = Object.keys(TOPIC_SLUGS);\nlet keywords = fallbackKeywords.slice();\ntry {\n  const seedRaw = $('Config').item.json.seedTopics;\n  const parsed = typeof seedRaw === 'string' ? JSON.parse(seedRaw) : seedRaw;\n  if (Array.isArray(parsed) && parsed.length) keywords = [...parsed.map(String), ...fallbackKeywords];\n} catch (e) {}\ntry {\n  const suggest = $('Keyword Suggest').item.json;\n  if (Array.isArray(suggest?.[1]) && suggest[1].length) {\n    keywords = [...suggest[1].map(String).slice(0, 15), ...keywords];\n  }\n} catch (e) {}\n\nconst seenKw = new Set();\nkeywords = keywords.filter((k) => {\n  const key = String(k).trim();\n  if (!key || seenKw.has(key)) return false;\n  seenKw.add(key);\n  return true;\n});\n\nconst free = [];\nfor (const k of keywords) {\n  const base = toAsciiSlug(k);\n  if (!existingSlugs.has(base)) free.push({ keyword: k, slug: base });\n}\n\nlet pick;\nlet slug;\nif (free.length) {\n  const idx = (new Date().getDate() + existingSlugs.size) % free.length;\n  pick = free[idx].keyword;\n  slug = allocateUnique(free[idx].slug);\n} else {\n  pick = keywords[0] || 'ظروف کریستال';\n  slug = allocateUnique(toAsciiSlug(pick));\n}\n\nif (existingSlugs.has(slug)) {\n  slug = allocateUnique(slug + '-' + Date.now().toString(36).slice(-4));\n}\n\nreturn [{\n  json: {\n    token,\n    apiBase,\n    candidateKeywords: keywords,\n    selectedKeyword: pick,\n    selectedTopic: pick,\n    slug,\n    existingSlugCount: existingSlugs.size,\n    freeTopicCount: free.length\n  }\n}];"
       },
       "id": "select-topic",
       "name": "Select Topic",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1320,
+        1800,
         300
       ]
     },
@@ -184,7 +202,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.85,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"تو نویسندهی باتجربهی فروشگاه ظروف کریستال و دکوری هستی که برای مشتری ایرانی مینویسی. خروجی فقط JSON معتبر با کلیدهای: titleFa, introFa, contentFa, conclusionFa, excerptFa, metaDescriptionFa, metaKeywordsFa, titleEn, introEn, contentEn, conclusionEn, excerptEn, metaDescriptionEn, metaKeywordsEn, slug.\\n\\nسبک نوشتار (خیلی مهم):\\n- مثل یک فروشنده/مشاور واقعی بنویس؛ لحن محاورهای مودبانه، نه مقالهی رباتیک.\\n- از کلیشههای هوش مصنوعی پرهیز کن: در دنیای امروز، در نتیجه، به طور کلی، ضروری است، بهتر است بدانید، جامع، بینظیر، تحولآفرین، در این مقاله میخواهیم.\\n- جملهها طول متغیر داشته باشند؛ گاهی کوتاه و کاربردی.\\n- تجربهی عملی بده (شستشو، نگهداری، هدیه، چیدمان میز) نه تعریفهای عمومی.\\n- کلیدواژه را طبیعی و کم جا بده؛ stuffing ممنوع.\\n- فارسی اصلی و قوی باشد؛ انگلیسی خلاصهتر ولی طبیعی.\\n\\nساختار اجباری:\\n- contentFa و contentEn بهصورت HTML با H2/H3\\n- حداقل یک لینک داخلی به /categories/ یا /products/\\n- بخش FAQ دقیقا با <h2>سوالات متداول</h2> و ۵ تا ۸ سؤال با <h3> و پاسخ <p>\\n- metaDescriptionFa بین ۷۰ تا ۱۶۰ کاراکتر\\n- excerpt حداکثر ۱۶۰ کاراکتر\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"کلمه کلیدی اصلی: {{ $('Select Topic').item.json.selectedKeyword }}. اسلاگ پیشنهادی: {{ $('Select Topic').item.json.slug }}. مخاطب: خریداران ایرانی ظروف کریستال و دکوری.\\nحداقل‌ها را رعایت کن: introFa >= 100 کاراکتر، contentFa متن خالص >= 700 کاراکتر، conclusionFa >= 80 کاراکتر، metaDescriptionFa بین 70 تا 160 کاراکتر، و حتما FAQ با عنوان سوالات متداول.\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"{{ $env.LLM_MODEL || 'nvidia/nemotron-3-nano-30b-a3b:free' }}\",\n  \"temperature\": 0.85,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"تو نویسندهی باتجربهی فروشگاه ظروف کریستال و دکوری هستی که برای مشتری ایرانی مینویسی. خروجی فقط JSON معتبر با کلیدهای: titleFa, introFa, contentFa, conclusionFa, excerptFa, metaDescriptionFa, metaKeywordsFa, titleEn, introEn, contentEn, conclusionEn, excerptEn, metaDescriptionEn, metaKeywordsEn, slug.\\n\\nسبک نوشتار (خیلی مهم):\\n- مثل یک فروشنده/مشاور واقعی بنویس؛ لحن محاورهای مودبانه، نه مقالهی رباتیک.\\n- از کلیشههای هوش مصنوعی پرهیز کن: در دنیای امروز، در نتیجه، به طور کلی، ضروری است، بهتر است بدانید، جامع، بینظیر، تحولآفرین، در این مقاله میخواهیم.\\n- جملهها طول متغیر داشته باشند؛ گاهی کوتاه و کاربردی.\\n- تجربهی عملی بده (شستشو، نگهداری، هدیه، چیدمان میز) نه تعریفهای عمومی.\\n- کلیدواژه را طبیعی و کم جا بده؛ stuffing ممنوع.\\n- فارسی اصلی و قوی باشد؛ انگلیسی خلاصهتر ولی طبیعی.\\n\\nساختار اجباری:\\n- contentFa و contentEn بهصورت HTML با H2/H3\\n- حداقل یک لینک داخلی به /categories/ یا /products/\\n- بخش FAQ دقیقا با <h2>سوالات متداول</h2> و ۵ تا ۸ سؤال با <h3> و پاسخ <p>\\n- metaDescriptionFa بین ۷۰ تا ۱۶۰ کاراکتر\\n- excerpt حداکثر ۱۶۰ کاراکتر\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"کلمه کلیدی اصلی: {{ $('Select Topic').item.json.selectedKeyword }}. اسلاگ اجباری ASCII (تغییر نده): {{ $('Select Topic').item.json.slug }}. مخاطب: خریداران ایرانی ظروف کریستال و دکوری.\\nحداقل‌ها را رعایت کن: introFa >= 100 کاراکتر، contentFa متن خالص >= 700 کاراکتر، conclusionFa >= 80 کاراکتر، metaDescriptionFa بین 70 تا 160 کاراکتر، و حتما FAQ با عنوان سوالات متداول. فیلد slug را دقیقا برابر اسلاگ اجباری ASCII بگذار؛ فارسی در slug ممنوع.\"\n    }\n  ]\n}",
         "options": {}
       },
       "id": "llm-generate",
@@ -192,21 +210,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1760,
+        2100,
         300
       ],
       "notes": "Uses OPENROUTER_API_KEY from container env (Header: Authorization Bearer ...). No n8n credential required."
     },
     {
       "parameters": {
-        "jsCode": "const raw = $('Generate Article (LLM)').item.json;\nconst content = raw.choices?.[0]?.message?.content || '{}';\nlet article;\ntry { article = JSON.parse(content); } catch { throw new Error('LLM did not return valid JSON'); }\nconst ctx = $('Select Topic').item.json;\nconst keyword = ctx.selectedKeyword || 'ظروف کریستال';\n\nconst stripHtml = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\\s+/g, ' ').trim();\nconst ensureMeta = (s, fallback) => {\n  let t = String(s || fallback || '').trim();\n  if (t.length < 70) {\n    t = `${t} راهنمای کاربردی خرید، نگهداری و چیدمان ${keyword} برای خانه و پذیرایی.`.replace(/\\s+/g, ' ').trim();\n  }\n  if (t.length > 160) t = t.slice(0, 157).trim() + '...';\n  if (t.length < 70) t = (t + ' راهنمای کامل ظروف کریستال و دکوری برای خرید هوشمند.').slice(0, 160);\n  return t;\n};\nconst ensureContent = (html) => {\n  let c = String(html || '').trim();\n  if (!/href\\s*=\\s*[\"'][^\"']*\\/(products|categories|blog)\\//i.test(c)) {\n    c = `<p>برای دیدن گزینه‌های مرتبط، به <a href=\"/categories/\">دسته‌بندی ظروف</a> سر بزنید.</p>` + c;\n  }\n  if (!/<h2[^>]*>\\s*(سوالات متداول|پرسش‌های متداول|faq)/i.test(c)) {\n    c += `<h2>سوالات متداول</h2>\n<h3>${keyword} برای چه استفاده‌ای مناسب است؟</h3>\n<p>بیشتر برای پذیرایی، دکوراسیون میز و هدیه کاربرد دارد و اگر درست نگهداری شود ظاهر شفاف خود را حفظ می‌کند.</p>\n<h3>چطور ${keyword} را بشوییم؟</h3>\n<p>شستشوی دستی با اسفنج نرم و شوینده ملایم معمولاً ایمن‌تر است؛ از ضربه‌های ناگهانی و شوک دمایی شدید پرهیز کنید.</p>\n<h3>موقع خرید به چه نکاتی توجه کنیم؟</h3>\n<p>شفافیت، ضخامت بدنه، ایستایی پایه و هماهنگی با بقیه ظروف روی میز از مهم‌ترین معیارها هستند.</p>\n<h3>آیا برای هدیه مناسب است؟</h3>\n<p>بله، مخصوصاً اگر بسته‌بندی محکم و ظاهر شکیل داشته باشد و با سلیقه میزبان هماهنگ باشد.</p>\n<h3>چطور براقیت آن حفظ شود؟</h3>\n<p>بعد از شستشو با پارچه نرم خشک کنید و از اسکاچ زبر یا مواد بسیار اسیدی دوری کنید.</p>`;\n  }\n  let guard = 0;\n  while (stripHtml(c).length < 520 && guard < 8) {\n    c += `<p>در انتخاب ${keyword} بهتر است به کاربرد واقعی میز، فضای پذیرایی و راحتی نگهداری فکر کنید. مدل‌های ساده‌تر معمولاً همه‌کاره‌ترند و با سرویس‌های مختلف بهتر ست می‌شوند.</p>`;\n    guard += 1;\n  }\n  return c;\n};\n\nconst introFa = article.introFa || `اگر به دنبال ${keyword} هستید، این راهنما کمک می‌کند انتخاب کاربردی‌تری داشته باشید و بعد از خرید هم بهتر از آن نگهداری کنید.`;\nconst conclusionFa = article.conclusionFa || `در نهایت، ${keyword} وقتی ارزش خرید دارد که هم با فضای خانه هماهنگ باشد و هم نگهداری‌اش برای شما سخت نباشد.`;\nconst contentFa = ensureContent(article.contentFa);\nconst metaDescriptionFa = ensureMeta(article.metaDescriptionFa, introFa);\nconst excerptFa = ensureMeta(article.excerptFa || metaDescriptionFa, metaDescriptionFa).slice(0, 160);\n\nconst normalized = {\n  ...article,\n  titleFa: article.titleFa || keyword,\n  introFa,\n  contentFa,\n  conclusionFa,\n  excerptFa,\n  metaDescriptionFa,\n  metaKeywordsFa: article.metaKeywordsFa || `${keyword}, ظروف کریستال, ظروف دکوری, خرید ظروف`,\n  titleEn: article.titleEn || keyword,\n  introEn: article.introEn || introFa,\n  contentEn: ensureContent(article.contentEn || contentFa),\n  conclusionEn: article.conclusionEn || conclusionFa,\n  excerptEn: ensureMeta(article.excerptEn || article.metaDescriptionEn || excerptFa, excerptFa).slice(0, 160),\n  metaDescriptionEn: ensureMeta(article.metaDescriptionEn || metaDescriptionFa, metaDescriptionFa),\n  metaKeywordsEn: article.metaKeywordsEn || article.metaKeywordsFa || keyword,\n  slug: ctx.slug || article.slug,\n  primaryKeyword: keyword,\n};\n\nreturn [{\n  json: {\n    ...ctx,\n    article: normalized,\n  }\n}];"
+        "jsCode": "const raw = $('Generate Article (LLM)').item.json;\nconst content = raw.choices?.[0]?.message?.content || '{}';\nlet article;\ntry { article = JSON.parse(content); } catch { throw new Error('LLM did not return valid JSON'); }\nconst ctx = $('Select Topic').item.json;\nconst keyword = ctx.selectedKeyword || 'ظروف کریستال';\n\nconst stripHtml = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\\s+/g, ' ').trim();\nconst ensureMeta = (s, fallback) => {\n  let t = String(s || fallback || '').trim();\n  if (t.length < 70) {\n    t = `${t} راهنمای کاربردی خرید، نگهداری و چیدمان ${keyword} برای خانه و پذیرایی.`.replace(/\\s+/g, ' ').trim();\n  }\n  if (t.length > 160) t = t.slice(0, 157).trim() + '...';\n  if (t.length < 70) t = (t + ' راهنمای کامل ظروف کریستال و دکوری برای خرید هوشمند.').slice(0, 160);\n  return t;\n};\nconst ensureContent = (html) => {\n  let c = String(html || '').trim();\n  if (!/href\\s*=\\s*[\"'][^\"']*\\/(products|categories|blog)\\//i.test(c)) {\n    c = `<p>برای دیدن گزینه‌های مرتبط، به <a href=\"/categories/\">دسته‌بندی ظروف</a> سر بزنید.</p>` + c;\n  }\n  if (!/<h2[^>]*>\\s*(سوالات متداول|پرسش‌های متداول|faq)/i.test(c)) {\n    c += `<h2>سوالات متداول</h2>\n<h3>${keyword} برای چه استفاده‌ای مناسب است؟</h3>\n<p>بیشتر برای پذیرایی، دکوراسیون میز و هدیه کاربرد دارد و اگر درست نگهداری شود ظاهر شفاف خود را حفظ می‌کند.</p>\n<h3>چطور ${keyword} را بشوییم؟</h3>\n<p>شستشوی دستی با اسفنج نرم و شوینده ملایم معمولاً ایمن‌تر است؛ از ضربه‌های ناگهانی و شوک دمایی شدید پرهیز کنید.</p>\n<h3>موقع خرید به چه نکاتی توجه کنیم؟</h3>\n<p>شفافیت، ضخامت بدنه، ایستایی پایه و هماهنگی با بقیه ظروف روی میز از مهم‌ترین معیارها هستند.</p>\n<h3>آیا برای هدیه مناسب است؟</h3>\n<p>بله، مخصوصاً اگر بسته‌بندی محکم و ظاهر شکیل داشته باشد و با سلیقه میزبان هماهنگ باشد.</p>\n<h3>چطور براقیت آن حفظ شود؟</h3>\n<p>بعد از شستشو با پارچه نرم خشک کنید و از اسکاچ زبر یا مواد بسیار اسیدی دوری کنید.</p>`;\n  }\n  let guard = 0;\n  while (stripHtml(c).length < 520 && guard < 8) {\n    c += `<p>در انتخاب ${keyword} بهتر است به کاربرد واقعی میز، فضای پذیرایی و راحتی نگهداری فکر کنید. مدل‌های ساده‌تر معمولاً همه‌کاره‌ترند و با سرویس‌های مختلف بهتر ست می‌شوند.</p>`;\n    guard += 1;\n  }\n  return c;\n};\n\nconst introFa = article.introFa || `اگر به دنبال ${keyword} هستید، این راهنما کمک می‌کند انتخاب کاربردی‌تری داشته باشید و بعد از خرید هم بهتر از آن نگهداری کنید.`;\nconst conclusionFa = article.conclusionFa || `در نهایت، ${keyword} وقتی ارزش خرید دارد که هم با فضای خانه هماهنگ باشد و هم نگهداری‌اش برای شما سخت نباشد.`;\nconst contentFa = ensureContent(article.contentFa);\nconst metaDescriptionFa = ensureMeta(article.metaDescriptionFa, introFa);\nconst excerptFa = ensureMeta(article.excerptFa || metaDescriptionFa, metaDescriptionFa).slice(0, 160);\n\nconst normalized = {\n  ...article,\n  titleFa: article.titleFa || keyword,\n  introFa,\n  contentFa,\n  conclusionFa,\n  excerptFa,\n  metaDescriptionFa,\n  metaKeywordsFa: article.metaKeywordsFa || `${keyword}, ظروف کریستال, ظروف دکوری, خرید ظروف`,\n  titleEn: article.titleEn || keyword,\n  introEn: article.introEn || introFa,\n  contentEn: ensureContent(article.contentEn || contentFa),\n  conclusionEn: article.conclusionEn || conclusionFa,\n  excerptEn: ensureMeta(article.excerptEn || article.metaDescriptionEn || excerptFa, excerptFa).slice(0, 160),\n  metaDescriptionEn: ensureMeta(article.metaDescriptionEn || metaDescriptionFa, metaDescriptionFa),\n  metaKeywordsEn: article.metaKeywordsEn || article.metaKeywordsFa || keyword,\n  slug: ctx.slug /* locked unique ASCII slug */,\n  primaryKeyword: keyword,\n};\n\nreturn [{\n  json: {\n    ...ctx,\n    article: normalized,\n  }\n}];"
       },
       "id": "parse-article",
       "name": "Parse Article JSON",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1980,
+        2400,
         300
       ]
     },
@@ -233,7 +251,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2200,
+        2700,
         300
       ]
     },
@@ -253,7 +271,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        2420,
+        3000,
         300
       ]
     },
@@ -284,8 +302,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2540,
-        200
+        3300,
+        300
       ],
       "notes": "LLM chooses English stock-photo query/tags. Uses OPENROUTER_API_KEY from env (same as Generate Article)."
     },
@@ -298,8 +316,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2760,
-        200
+        3600,
+        300
       ]
     },
     {
@@ -311,8 +329,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2980,
-        200
+        3900,
+        300
       ],
       "notes": "Uses LLM query against Unsplash when UNSPLASH_ACCESS_KEY is set; otherwise English-tagged loremflickr."
     },
@@ -340,8 +358,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3200,
-        200
+        4200,
+        300
       ],
       "continueOnFail": true,
       "notes": "Downloads the LLM-selected stock image."
@@ -355,8 +373,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3420,
-        200
+        4500,
+        300
       ]
     },
     {
@@ -458,8 +476,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3640,
-        200
+        4800,
+        300
       ]
     },
     {
@@ -471,9 +489,54 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2540,
-        420
+        3300,
+        740
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const draft = $input.first().json;\nconst ctx = $('Parse Article JSON').item.json;\nconst article = ctx.article || {};\nconst id = draft.data?.id || draft.id || draft.data?.data?.id;\nconst text = [\n  '✅ AI Blog Draft Created',\n  'Keyword: ' + (ctx.selectedKeyword || ''),\n  'Slug: ' + (article.slug || ctx.slug || ''),\n  'Title: ' + (article.titleFa || ''),\n  'Id: ' + (id || 'n/a'),\n  'Action: review in admin, then activate',\n  'UTC: ' + new Date().toISOString()\n].join('\\n');\nreturn [{\n  json: {\n    text,\n    alertWebhook: $('Config').item.json.alertWebhook || '',\n    telegramBotToken: $('Config').item.json.telegramBotToken || '',\n    telegramChatId: $('Config').item.json.telegramChatId || '',\n    draft\n  }\n}];"
+      },
+      "id": "format-daily-report",
+      "name": "Format Daily Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $input.first().json;\nconst text = String(src.text || src.reportText || 'SEO workflow finished');\nconst token = String(src.telegramBotToken || $('Config').item.json.telegramBotToken || '').trim();\nconst chatId = String(src.telegramChatId || $('Config').item.json.telegramChatId || '').trim();\nconst webhook = String(src.alertWebhook || $('Config').item.json.alertWebhook || '').trim();\nconst targets = [];\nif (token && chatId) {\n  targets.push({\n    channel: 'telegram',\n    url: 'https://api.telegram.org/bot' + token + '/sendMessage',\n    body: { chat_id: chatId, text: text.slice(0, 3900), disable_web_page_preview: true }\n  });\n}\nif (webhook) {\n  targets.push({ channel: 'webhook', url: webhook, body: { text } });\n}\nif (!targets.length) {\n  return [{ json: { skippedNotify: true, text, reason: 'No TELEGRAM_BOT_TOKEN/CHAT_ID or SEO_ALERT_WEBHOOK_URL' } }];\n}\nreturn targets.map((t) => ({ json: { ...src, notify: t, text } }));"
+      },
+      "id": "build-notify-targets",
+      "name": "Build Notify Targets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5400,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.notify.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.notify.body }}",
+        "options": {}
+      },
+      "id": "send-notify",
+      "name": "Notify Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5700,
+        80
+      ],
+      "continueOnFail": true
     }
   ],
   "connections": {
@@ -654,6 +717,39 @@
         [
           {
             "node": "Create Draft Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft Blog": {
+      "main": [
+        [
+          {
+            "node": "Format Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Daily Report": {
+      "main": [
+        [
+          {
+            "node": "Build Notify Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Notify Targets": {
+      "main": [
+        [
+          {
+            "node": "Notify Report",
             "type": "main",
             "index": 0
           }

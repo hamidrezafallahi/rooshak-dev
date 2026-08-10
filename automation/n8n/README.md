@@ -26,9 +26,47 @@ Cron (n8n)
   → Login as ContentEditor bot
   → SeoOps / Blogs API
   → optional LLM summarize/suggest
-  → optional SEO_ALERT_WEBHOOK_URL (Slack/Discord/custom)
+  → report via Telegram (recommended) and/or SEO_ALERT_WEBHOOK_URL
   → YOU review in Admin / n8n Executions
 ```
+
+## Reporting (recommended)
+
+**Best for this project: Telegram bot** (better than WhatsApp for ops alerts).
+
+| Channel | Pros | Cons | Verdict |
+|---|---|---|---|
+| **Telegram bot** | Free, reliable in Iran, simple API, works from VPS | Need bot + chat id once | **Use this** |
+| Slack/Discord webhook | Nice for teams | Less common personal ops | Optional secondary |
+| WhatsApp Cloud API | Familiar UX | Meta Business setup, paid, fragile | Avoid for now |
+| Email | Universal | Noisy, slow for ops | Optional weekly only |
+
+Setup:
+
+1. Talk to `@BotFather` → create bot → copy token
+2. Send any message to your bot
+3. Open `https://api.telegram.org/bot<TOKEN>/getUpdates` → copy `chat.id`
+4. Put in `.env`:
+
+```bash
+TELEGRAM_BOT_TOKEN=123456:ABC...
+TELEGRAM_CHAT_ID=6987...
+# optional fallback / team channel
+SEO_ALERT_WEBHOOK_URL=
+```
+
+5. Recreate n8n: `docker compose -f docker-compose.dev.yml up -d --force-recreate n8n`
+
+Every workflow ends with **Build Notify Targets → Notify Report**.
+
+## Slug policy (AI blog)
+
+Persian URL slugs like `ظروف-کریستال-پذیرایی` are rejected/collide often.
+
+Workflow now:
+- maps topics to ASCII slugs (`crystal-hospitality-ware`, …)
+- allocates unique suffix (`-2`, `-3`, …)
+- **locks** that slug (LLM cannot override it)
 
 ## Local setup
 
@@ -49,7 +87,9 @@ API_BASE_URL=http://backend:8080/api
 SeoOps__SitePublicUrl=http://nginx
 SeoOps__ApiPublicUrl=http://backend:8080
 
-# Optional alert sink (Slack incoming webhook / Discord / any JSON {text})
+# Reports: Telegram (recommended) and/or generic webhook JSON { "text": "..." }
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
 SEO_ALERT_WEBHOOK_URL=
 SEO_STALE_DAYS=90
 ```

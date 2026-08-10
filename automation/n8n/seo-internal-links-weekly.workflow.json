@@ -17,7 +17,10 @@
       "name": "Wednesday 11:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -34,6 +37,18 @@
               "name": "alertWebhook",
               "value": "={{ $env.SEO_ALERT_WEBHOOK_URL || '' }}",
               "type": "string"
+            },
+            {
+              "id": "telegramToken",
+              "name": "telegramBotToken",
+              "value": "={{ $env.TELEGRAM_BOT_TOKEN || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "telegramChat",
+              "name": "telegramChatId",
+              "value": "={{ $env.TELEGRAM_CHAT_ID || '' }}",
+              "type": "string"
             }
           ]
         },
@@ -43,7 +58,10 @@
       "name": "Config",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [220, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
@@ -58,7 +76,10 @@
       "name": "Login Content Bot",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [
+        600,
+        300
+      ]
     },
     {
       "parameters": {
@@ -92,17 +113,23 @@
       "name": "Get Candidates",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const token = $('Login Content Bot').item.json.data?.accessToken\n  || $('Login Content Bot').item.json.accessToken\n  || $('Login Content Bot').item.json.data?.accessToken;\nconst apiBase = $('Config').item.json.apiBase;\nconst payload = $input.first().json;\nlet items = payload.data || payload || [];\nif (!Array.isArray(items)) items = [];\n\n// Fallback: if no stale blogs, pull a few active blogs via snapshot weak list empty → skip\nif (!items.length) {\n  return [{ json: { skip: true, text: 'Internal links: no candidate blogs this week.', alertWebhook: $('Config').item.json.alertWebhook } }];\n}\n\nconst results = [];\nfor (const item of items.slice(0, 5)) {\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `${apiBase}/SeoOps/internal-links/${item.id}`,\n      qs: { take: 5 },\n      headers: { Authorization: `Bearer ${token}` },\n      json: true,\n    });\n    const data = res.data || res;\n    results.push(data);\n  } catch (e) {\n    results.push({ blogId: item.id, blogSlug: item.slug, error: String(e.message || e) });\n  }\n}\n\nconst blocks = results.map((r) => {\n  if (r.error) return `• blog ${r.blogId}/${r.blogSlug}: ERROR ${r.error}`;\n  const links = (r.suggestions || []).map((s) => `   - [${s.score}] ${s.path} (${s.reason})`).join('\\n');\n  return [`• ${r.blogTitleFa} (/fa/blog/${r.blogSlug})`, `  existingLinks=${r.existingInternalLinkCount}`, links || '   - no suggestions'].join('\\n');\n});\n\nconst text = [\n  '🔗 Internal Link Suggestions (HUMAN GATE)',\n  'Apply manually in admin blog editor.',\n  '',\n  ...blocks\n].join('\\n');\n\nreturn [{ json: { skip: false, text, alertWebhook: $('Config').item.json.alertWebhook, results } }];"
+        "jsCode": "const token = $('Login Content Bot').item.json.data?.accessToken\n  || $('Login Content Bot').item.json.accessToken\n  || $('Login Content Bot').item.json.data?.accessToken;\nconst apiBase = $('Config').item.json.apiBase;\nconst payload = $input.first().json;\nlet items = payload.data || payload || [];\nif (!Array.isArray(items)) items = [];\n\n// Fallback: if no stale blogs, pull a few active blogs via snapshot weak list empty → skip\nif (!items.length) {\n  return [{ json: { skip: true, text: 'Internal links: no candidate blogs this week.', alertWebhook: $('Config').item.json.alertWebhook, telegramBotToken: $('Config').item.json.telegramBotToken || '', telegramChatId: $('Config').item.json.telegramChatId || '' } }];\n}\n\nconst results = [];\nfor (const item of items.slice(0, 5)) {\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `${apiBase}/SeoOps/internal-links/${item.id}`,\n      qs: { take: 5 },\n      headers: { Authorization: `Bearer ${token}` },\n      json: true,\n    });\n    const data = res.data || res;\n    results.push(data);\n  } catch (e) {\n    results.push({ blogId: item.id, blogSlug: item.slug, error: String(e.message || e) });\n  }\n}\n\nconst blocks = results.map((r) => {\n  if (r.error) return `• blog ${r.blogId}/${r.blogSlug}: ERROR ${r.error}`;\n  const links = (r.suggestions || []).map((s) => `   - [${s.score}] ${s.path} (${s.reason})`).join('\\n');\n  return [`• ${r.blogTitleFa} (/fa/blog/${r.blogSlug})`, `  existingLinks=${r.existingInternalLinkCount}`, links || '   - no suggestions'].join('\\n');\n});\n\nconst text = [\n  '🔗 Internal Link Suggestions (HUMAN GATE)',\n  'Apply manually in admin blog editor.',\n  '',\n  ...blocks\n].join('\\n');\n\nreturn [{ json: { skip: false, text, alertWebhook: $('Config').item.json.alertWebhook, telegramBotToken: $('Config').item.json.telegramBotToken || '', telegramChatId: $('Config').item.json.telegramChatId || '', results } }];"
       },
       "id": "suggest",
       "name": "Fetch Link Suggestions",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300]
+      "position": [
+        1200,
+        300
+      ]
     },
     {
       "parameters": {
@@ -119,7 +146,10 @@
       "name": "Send?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [1100, 300]
+      "position": [
+        1500,
+        300
+      ]
     },
     {
       "parameters": {
@@ -134,30 +164,127 @@
       "name": "Send Webhook",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1320, 200],
+      "position": [
+        1800,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $input.first().json;\nconst text = String(src.text || src.reportText || 'SEO workflow finished');\nconst token = String(src.telegramBotToken || $('Config').item.json.telegramBotToken || '').trim();\nconst chatId = String(src.telegramChatId || $('Config').item.json.telegramChatId || '').trim();\nconst webhook = String(src.alertWebhook || $('Config').item.json.alertWebhook || '').trim();\nconst targets = [];\nif (token && chatId) {\n  targets.push({\n    channel: 'telegram',\n    url: 'https://api.telegram.org/bot' + token + '/sendMessage',\n    body: { chat_id: chatId, text: text.slice(0, 3900), disable_web_page_preview: true }\n  });\n}\nif (webhook) {\n  targets.push({ channel: 'webhook', url: webhook, body: { text } });\n}\nif (!targets.length) {\n  return [{ json: { skippedNotify: true, text, reason: 'No TELEGRAM_BOT_TOKEN/CHAT_ID or SEO_ALERT_WEBHOOK_URL' } }];\n}\nreturn targets.map((t) => ({ json: { ...src, notify: t, text } }));"
+      },
+      "id": "build-notify-targets",
+      "name": "Build Notify Targets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.notify.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.notify.body }}",
+        "options": {}
+      },
+      "id": "send-notify",
+      "name": "Notify Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        80
+      ],
       "continueOnFail": true
     }
   ],
   "connections": {
     "Wednesday 11:00": {
-      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Config": {
-      "main": [[{ "node": "Login Content Bot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Login Content Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Login Content Bot": {
-      "main": [[{ "node": "Get Candidates", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Candidates": {
-      "main": [[{ "node": "Fetch Link Suggestions", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Fetch Link Suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Link Suggestions": {
-      "main": [[{ "node": "Send?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Send?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Notify Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Send?": {
       "main": [
-        [{ "node": "Send Webhook", "type": "main", "index": 0 }],
+        [
+          {
+            "node": "Send Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
         []
+      ]
+    },
+    "Build Notify Targets": {
+      "main": [
+        [
+          {
+            "node": "Notify Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -167,5 +294,12 @@
     "timezone": "Asia/Tehran"
   },
   "versionId": "1",
-  "tags": [{ "name": "seo" }, { "name": "internal-links" }]
+  "tags": [
+    {
+      "name": "seo"
+    },
+    {
+      "name": "internal-links"
+    }
+  ]
 }

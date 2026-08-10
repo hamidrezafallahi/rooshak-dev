@@ -17,7 +17,10 @@
       "name": "Monday 09:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -40,6 +43,18 @@
               "name": "staleDays",
               "value": "={{ $env.SEO_STALE_DAYS || '90' }}",
               "type": "string"
+            },
+            {
+              "id": "telegramToken",
+              "name": "telegramBotToken",
+              "value": "={{ $env.TELEGRAM_BOT_TOKEN || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "telegramChat",
+              "name": "telegramChatId",
+              "value": "={{ $env.TELEGRAM_CHAT_ID || '' }}",
+              "type": "string"
             }
           ]
         },
@@ -49,7 +64,10 @@
       "name": "Config",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [220, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
@@ -64,7 +82,10 @@
       "name": "Login Content Bot",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [
+        600,
+        300
+      ]
     },
     {
       "parameters": {
@@ -98,7 +119,10 @@
       "name": "Get SEO Snapshot",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
@@ -126,18 +150,24 @@
       "name": "Summarize Digest (LLM)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 300],
+      "position": [
+        1200,
+        300
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "const snapPayload = $('Get SEO Snapshot').item.json;\nconst snap = snapPayload.data || snapPayload;\nconst llm = $input.first().json;\nconst summary = llm.choices?.[0]?.message?.content\n  || 'LLM summary unavailable — use raw snapshot counts below.';\n\nconst weak = (snap.weakMetaBlogs || []).slice(0, 5).map((b) => `- ${b.path}: ${(b.issues || []).join(', ')}`);\nconst stale = (snap.refreshCandidates || []).slice(0, 5).map((b) => `- ${b.path} (${b.ageDays ?? '?'}d)`);\nconst drafts = (snap.recentInactiveDrafts || []).slice(0, 5).map((b) => `- ${b.path}`);\n\nconst text = [\n  '📊 SEO Weekly Digest',\n  `Blogs active/inactive: ${snap.activeBlogs}/${snap.inactiveBlogs}`,\n  `Products/Categories/Brands: ${snap.activeProducts}/${snap.activeCategories}/${snap.activeBrands}`,\n  `Weak meta: ${snap.weakMetaCount} | Stale blogs: ${snap.staleBlogCount}`,\n  '',\n  'AI summary:',\n  summary,\n  '',\n  'Weak meta sample:',\n  ...(weak.length ? weak : ['- none']),\n  '',\n  'Refresh candidates:',\n  ...(stale.length ? stale : ['- none']),\n  '',\n  'Inactive drafts awaiting review:',\n  ...(drafts.length ? drafts : ['- none'])\n].join('\\n');\n\nreturn [{\n  json: {\n    text,\n    alertWebhook: $('Config').item.json.alertWebhook,\n    snap\n  }\n}];"
+        "jsCode": "const snapPayload = $('Get SEO Snapshot').item.json;\nconst snap = snapPayload.data || snapPayload;\nconst llm = $input.first().json;\nconst summary = llm.choices?.[0]?.message?.content\n  || 'LLM summary unavailable — use raw snapshot counts below.';\n\nconst weak = (snap.weakMetaBlogs || []).slice(0, 5).map((b) => `- ${b.path}: ${(b.issues || []).join(', ')}`);\nconst stale = (snap.refreshCandidates || []).slice(0, 5).map((b) => `- ${b.path} (${b.ageDays ?? '?'}d)`);\nconst drafts = (snap.recentInactiveDrafts || []).slice(0, 5).map((b) => `- ${b.path}`);\n\nconst text = [\n  '📊 SEO Weekly Digest',\n  `Blogs active/inactive: ${snap.activeBlogs}/${snap.inactiveBlogs}`,\n  `Products/Categories/Brands: ${snap.activeProducts}/${snap.activeCategories}/${snap.activeBrands}`,\n  `Weak meta: ${snap.weakMetaCount} | Stale blogs: ${snap.staleBlogCount}`,\n  '',\n  'AI summary:',\n  summary,\n  '',\n  'Weak meta sample:',\n  ...(weak.length ? weak : ['- none']),\n  '',\n  'Refresh candidates:',\n  ...(stale.length ? stale : ['- none']),\n  '',\n  'Inactive drafts awaiting review:',\n  ...(drafts.length ? drafts : ['- none'])\n].join('\\n');\n\nreturn [{\n  json: {\n    text,\n    alertWebhook: $('Config').item.json.alertWebhook, telegramBotToken: $('Config').item.json.telegramBotToken || '', telegramChatId: $('Config').item.json.telegramChatId || '',\n    snap\n  }\n}];"
       },
       "id": "format",
       "name": "Format Digest",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 300]
+      "position": [
+        1500,
+        300
+      ]
     },
     {
       "parameters": {
@@ -154,7 +184,10 @@
       "name": "Has Webhook?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [1320, 300]
+      "position": [
+        1800,
+        300
+      ]
     },
     {
       "parameters": {
@@ -169,33 +202,138 @@
       "name": "Send Digest Webhook",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1540, 200],
+      "position": [
+        2100,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $input.first().json;\nconst text = String(src.text || src.reportText || 'SEO workflow finished');\nconst token = String(src.telegramBotToken || $('Config').item.json.telegramBotToken || '').trim();\nconst chatId = String(src.telegramChatId || $('Config').item.json.telegramChatId || '').trim();\nconst webhook = String(src.alertWebhook || $('Config').item.json.alertWebhook || '').trim();\nconst targets = [];\nif (token && chatId) {\n  targets.push({\n    channel: 'telegram',\n    url: 'https://api.telegram.org/bot' + token + '/sendMessage',\n    body: { chat_id: chatId, text: text.slice(0, 3900), disable_web_page_preview: true }\n  });\n}\nif (webhook) {\n  targets.push({ channel: 'webhook', url: webhook, body: { text } });\n}\nif (!targets.length) {\n  return [{ json: { skippedNotify: true, text, reason: 'No TELEGRAM_BOT_TOKEN/CHAT_ID or SEO_ALERT_WEBHOOK_URL' } }];\n}\nreturn targets.map((t) => ({ json: { ...src, notify: t, text } }));"
+      },
+      "id": "build-notify-targets",
+      "name": "Build Notify Targets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.notify.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.notify.body }}",
+        "options": {}
+      },
+      "id": "send-notify",
+      "name": "Notify Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2100,
+        80
+      ],
       "continueOnFail": true
     }
   ],
   "connections": {
     "Monday 09:00": {
-      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Config": {
-      "main": [[{ "node": "Login Content Bot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Login Content Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Login Content Bot": {
-      "main": [[{ "node": "Get SEO Snapshot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get SEO Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get SEO Snapshot": {
-      "main": [[{ "node": "Summarize Digest (LLM)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Summarize Digest (LLM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Summarize Digest (LLM)": {
-      "main": [[{ "node": "Format Digest", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Format Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format Digest": {
-      "main": [[{ "node": "Has Webhook?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Has Webhook?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Notify Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Has Webhook?": {
       "main": [
-        [{ "node": "Send Digest Webhook", "type": "main", "index": 0 }],
+        [
+          {
+            "node": "Send Digest Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
         []
+      ]
+    },
+    "Build Notify Targets": {
+      "main": [
+        [
+          {
+            "node": "Notify Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -205,5 +343,12 @@
     "timezone": "Asia/Tehran"
   },
   "versionId": "1",
-  "tags": [{ "name": "seo" }, { "name": "digest" }]
+  "tags": [
+    {
+      "name": "seo"
+    },
+    {
+      "name": "digest"
+    }
+  ]
 }

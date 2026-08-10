@@ -17,7 +17,10 @@
       "name": "Daily 07:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -34,6 +37,18 @@
               "name": "alertWebhook",
               "value": "={{ $env.SEO_ALERT_WEBHOOK_URL || '' }}",
               "type": "string"
+            },
+            {
+              "id": "telegramToken",
+              "name": "telegramBotToken",
+              "value": "={{ $env.TELEGRAM_BOT_TOKEN || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "telegramChat",
+              "name": "telegramChatId",
+              "value": "={{ $env.TELEGRAM_CHAT_ID || '' }}",
+              "type": "string"
             }
           ]
         },
@@ -43,7 +58,10 @@
       "name": "Config",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [220, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
@@ -58,7 +76,10 @@
       "name": "Login Content Bot",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 300]
+      "position": [
+        600,
+        300
+      ]
     },
     {
       "parameters": {
@@ -79,17 +100,23 @@
       "name": "Probe SEO Health",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const payload = $input.first().json;\nconst report = payload.data || payload;\nconst failed = (report.checks || []).filter((c) => !c.ok);\nconst lines = (report.checks || []).map((c) => `${c.ok ? '✅' : '❌'} ${c.name} ${c.statusCode ?? '-'} ${c.elapsedMs}ms ${c.error || ''}`);\nconst text = [\n  `SEO Health ${report.isHealthy ? 'OK' : 'FAILED'}`,\n  `Site: ${report.siteBaseUrl}`,\n  `Failed: ${report.failedCount}`,\n  '',\n  ...lines\n].join('\\n');\n\nreturn [{\n  json: {\n    isHealthy: !!report.isHealthy,\n    failedCount: report.failedCount || 0,\n    text,\n    alertWebhook: $('Config').item.json.alertWebhook,\n    report\n  }\n}];"
+        "jsCode": "const payload = $input.first().json;\nconst report = payload.data || payload;\nconst failed = (report.checks || []).filter((c) => !c.ok);\nconst lines = (report.checks || []).map((c) => `${c.ok ? '✅' : '❌'} ${c.name} ${c.statusCode ?? '-'} ${c.elapsedMs}ms ${c.error || ''}`);\nconst text = [\n  `SEO Health ${report.isHealthy ? 'OK' : 'FAILED'}`,\n  `Site: ${report.siteBaseUrl}`,\n  `Failed: ${report.failedCount}`,\n  '',\n  ...lines\n].join('\\n');\n\nreturn [{\n  json: {\n    isHealthy: !!report.isHealthy,\n    failedCount: report.failedCount || 0,\n    text,\n    alertWebhook: $('Config').item.json.alertWebhook, telegramBotToken: $('Config').item.json.telegramBotToken || '', telegramChatId: $('Config').item.json.telegramChatId || '',\n    report\n  }\n}];"
       },
       "id": "format",
       "name": "Format Report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300]
+      "position": [
+        1200,
+        300
+      ]
     },
     {
       "parameters": {
@@ -106,7 +133,10 @@
       "name": "Need Alert?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [1100, 300]
+      "position": [
+        1500,
+        300
+      ]
     },
     {
       "parameters": {
@@ -121,30 +151,127 @@
       "name": "Send Alert Webhook",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1320, 200],
+      "position": [
+        1800,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $input.first().json;\nconst text = String(src.text || src.reportText || 'SEO workflow finished');\nconst token = String(src.telegramBotToken || $('Config').item.json.telegramBotToken || '').trim();\nconst chatId = String(src.telegramChatId || $('Config').item.json.telegramChatId || '').trim();\nconst webhook = String(src.alertWebhook || $('Config').item.json.alertWebhook || '').trim();\nconst targets = [];\nif (token && chatId) {\n  targets.push({\n    channel: 'telegram',\n    url: 'https://api.telegram.org/bot' + token + '/sendMessage',\n    body: { chat_id: chatId, text: text.slice(0, 3900), disable_web_page_preview: true }\n  });\n}\nif (webhook) {\n  targets.push({ channel: 'webhook', url: webhook, body: { text } });\n}\nif (!targets.length) {\n  return [{ json: { skippedNotify: true, text, reason: 'No TELEGRAM_BOT_TOKEN/CHAT_ID or SEO_ALERT_WEBHOOK_URL' } }];\n}\nreturn targets.map((t) => ({ json: { ...src, notify: t, text } }));"
+      },
+      "id": "build-notify-targets",
+      "name": "Build Notify Targets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.notify.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.notify.body }}",
+        "options": {}
+      },
+      "id": "send-notify",
+      "name": "Notify Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        80
+      ],
       "continueOnFail": true
     }
   ],
   "connections": {
     "Daily 07:00": {
-      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Config": {
-      "main": [[{ "node": "Login Content Bot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Login Content Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Login Content Bot": {
-      "main": [[{ "node": "Probe SEO Health", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Probe SEO Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Probe SEO Health": {
-      "main": [[{ "node": "Format Report", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Format Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format Report": {
-      "main": [[{ "node": "Need Alert?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Need Alert?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Notify Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Need Alert?": {
       "main": [
-        [{ "node": "Send Alert Webhook", "type": "main", "index": 0 }],
+        [
+          {
+            "node": "Send Alert Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
         []
+      ]
+    },
+    "Build Notify Targets": {
+      "main": [
+        [
+          {
+            "node": "Notify Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -157,5 +284,12 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "tags": [{ "name": "seo" }, { "name": "ops" }]
+  "tags": [
+    {
+      "name": "seo"
+    },
+    {
+      "name": "ops"
+    }
+  ]
 }
