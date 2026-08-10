@@ -80,8 +80,8 @@ export default async function AdminDock() {
   ];
 
   return (
-    <div className="admin-dock" aria-label={t('dock.aria')}>
-      <nav className="admin-dock-bar">
+    <div className="admin-dock">
+      <nav className="admin-dock-bar" aria-label={t('dock.aria')}>
         {items.map((item) => (
           <Link
             key={item.key}

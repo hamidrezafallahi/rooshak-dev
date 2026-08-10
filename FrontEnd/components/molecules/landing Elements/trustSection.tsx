@@ -61,7 +61,11 @@ const TrustSection: React.FC = () => {
               </div>
               <div className="ms-3">
                 <h3 className="font-semibold">{t(`reviews.${id}.name`)}</h3>
-                <div className="flex text-yellow-500" aria-label={tCommon('fiveOfFive')}>
+                <div
+                  className="flex text-yellow-500"
+                  role="img"
+                  aria-label={tCommon('fiveOfFive')}
+                >
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} aria-hidden>
                       <StarIcon />

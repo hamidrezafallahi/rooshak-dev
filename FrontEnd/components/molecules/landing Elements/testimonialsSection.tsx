@@ -35,6 +35,7 @@ const TestimonialsSection: React.FC = () => {
 
               <div
                 className="flex items-center gap-1 mb-2 text-yellow-500"
+                role="img"
                 aria-label={tCommon('fiveOfFive')}
               >
                 {Array.from({ length: 5 }).map((_, i) => (
