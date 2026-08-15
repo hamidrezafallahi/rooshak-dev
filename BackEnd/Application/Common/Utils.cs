@@ -20,6 +20,21 @@ namespace Application.Common
 
             return claim.Value;
         }
+
+        /// <summary>
+        /// Catalog staff already authorized on ProductOffers commands.
+        /// They must be able to update any offer, not only rows they personally supplied.
+        /// </summary>
+        public static bool IsCatalogStaff(this HttpContext context)
+        {
+            var user = context.User;
+            if (user?.Identity?.IsAuthenticated != true)
+                return false;
+
+            return user.IsInRole("SuperAdmin")
+                || user.IsInRole("Admin")
+                || user.IsInRole("ContentEditor");
+        }
     }
     public static class HttpContextExtensions
     {

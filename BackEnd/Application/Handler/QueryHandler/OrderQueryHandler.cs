@@ -14,8 +14,10 @@ using OnlineShop.Domain.Interfaces;
 
     public async Task<ServiceResult<IEnumerable<OrderDto>>> Handle(GetOpenOrdersQuery request, CancellationToken cancellationToken)
         {
-        var orders = await _repository.Query().Include(o => o.Items)
+        var orders = await _repository.Query()
+            .Include(o => o.Items)
                 .ThenInclude(i => i.ProductOffer)
+                    .ThenInclude(po => po.Product)
             .Include(o => o.ShippingAddress)
             .ToListAsync();
 
@@ -34,9 +36,9 @@ using OnlineShop.Domain.Interfaces;
                 UnitPrice = oi.UnitPrice,
                 Product= new ProductReadModel
                 {
-                    Name=oi.ProductOffer.Product.Name,
-                    Description=oi.ProductOffer.Product.Description,
-                    Price=oi.ProductOffer.BasePrice,
+                    Name=oi.ProductOffer?.Product?.Name ?? "",
+                    Description=oi.ProductOffer?.Product?.Description,
+                    Price=oi.ProductOffer?.BasePrice ?? 0,
                 }
                 }).ToList(),
             }).ToList(); 

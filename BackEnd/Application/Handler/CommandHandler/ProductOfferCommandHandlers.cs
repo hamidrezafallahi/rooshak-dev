@@ -52,7 +52,7 @@ public class ProductOfferCommandHandler(
         if (offer == null || offer.IsDeleted)
             return ServiceResult<IdDto>.Failed("Offer not found");
 
-        if (offer.SupplierId != userId.Value)
+        if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
             return ServiceResult<IdDto>.Failed("Unauthorized");
 
         offer.Update(
@@ -77,7 +77,7 @@ public class ProductOfferCommandHandler(
         var offer = await _offerRepo.GetByIdAsync(request.Id);
         if (offer == null || offer.IsDeleted)
             return ServiceResult<IdDto>.Failed("Offer not found");
-        if (offer.SupplierId != userId.Value)
+        if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
             return ServiceResult<IdDto>.Failed("Unauthorized");
 
         offer.SetActive(request.IsActive, userId.Value);
@@ -94,7 +94,7 @@ public class ProductOfferCommandHandler(
         var offer = await _offerRepo.GetByIdAsync(request.Id);
         if (offer == null || offer.IsDeleted)
             return ServiceResult<IdDto>.Failed("Offer not found");
-        if (offer.SupplierId != userId.Value)
+        if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
             return ServiceResult<IdDto>.Failed("Unauthorized");
 
         offer.Delete(userId.Value);
