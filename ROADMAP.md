@@ -45,11 +45,11 @@
 |------|----------------|
 | فروشگاه | `shop-frontend-prod` + `shop-backend-prod` + Postgres — healthy |
 | n8n | Docker، فقط `127.0.0.1:5678` — ورک‌فلوهای shop فعال‌اند |
-| Hermes | Docker `shop-hermes-prod` روی شبکهٔ فروشگاه — systemd قدیمی failed/disabled |
-| تلگرام | یک user در allowlist |
+| Hermes | Docker `shop-hermes-prod`؛ bind `127.0.0.1`؛ systemd `hermes-gateway` masked |
+| تلگرام | allowlist یک کاربر؛ بدون terminal؛ persona Rooshak فارسی؛ **Gate A = 5/5** |
 | بک‌اند از داخل Hermes | HTTP 200 روی `/api/Products` |
-| LLM | **خراب:** OpenRouter `401 User not found` |
-| خطر | Telegram toolset هنوز `terminal` دارد؛ ساخت محصول `IsActive=true` است |
+| LLM | **P005:** کلید معتبر؛ Hermes chat فارسی 200 |
+| کاتالوگ | `CreateCatalogItem` + `IsActive=false` در کد (P009/P010). n8n هنوز ۳ HTTP قدیمی است (P011) |
 | اسکریپت‌ها | `shop/shop-owner/scripts/*` روی دیسک هست؛ اسکیل قدیمی تکراری هم هست |
 
 ---
@@ -118,7 +118,7 @@
 ## 5) جملهٔ آماده برای فاز بعد
 
 ```
-فاز: P002 را طبق ROADMAP شروع کن. فقط همین فاز؛ بدون scope creep.
+فاز: P011 را طبق ROADMAP شروع کن. فقط همین فاز؛ بدون scope creep.
 ```
 
-P002 در توسعه skip شد. بعدی: **P004**.
+P010 Done · Gate A = 5/5. P011 = n8n create به `POST /api/CatalogItems`؛ نه ۳ HTTP. ساخت محصول از تلگرام تا Gate B ممنوع است.
