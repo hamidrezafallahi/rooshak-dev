@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Interfaces;
 using OnlineShop.Domain.ValueObjects;
+using Services.Services.Uploader.DTO;
 
 namespace Application.Handler.CommandHandler
 {
@@ -16,7 +17,8 @@ namespace Application.Handler.CommandHandler
         IProductOfferRepository offerRepository,
         IProductImageRepository imageRepository,
         IUnitOfWork unitOfWork,
-        IHttpContextAccessor accessor)
+        IHttpContextAccessor accessor,
+        IUploaderService uploaderService)
         : IRequestHandler<CreateCatalogItemCommand, ServiceResult<CatalogItemIdsDto>>
     {
         public async Task<ServiceResult<CatalogItemIdsDto>> Handle(
@@ -70,12 +72,15 @@ namespace Application.Handler.CommandHandler
                     await productRepository.SaveChangesAsync(cancellationToken);
                 }
 
+                ApplyVesselSpecifications(product, request);
+
                 ProductImage? image = null;
-                if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+                var storedImageUrl = await ResolveImageUrl(request, product.Id);
+                if (!string.IsNullOrWhiteSpace(storedImageUrl))
                 {
                     image = ProductImage.Create(
                         productId: product.Id,
-                        imageUrl: request.ImageUrl.Trim(),
+                        imageUrl: storedImageUrl,
                         isMain: request.ImageIsMain,
                         currentUserId: userId.Value);
                     image.SetActive(false, userId.Value);
@@ -127,7 +132,41 @@ namespace Application.Handler.CommandHandler
                 return "Offer base price must be greater than zero.";
             if (request.Inventory < 0)
                 return "Offer inventory cannot be negative.";
+            if (request.Diameter is < 0)
+                return "Diameter cannot be negative.";
+            if (request.PieceCount is < 0)
+                return "Piece count cannot be negative.";
             return null;
+        }
+
+        private static void ApplyVesselSpecifications(Product product, CreateCatalogItemCommand request)
+        {
+            if (request.Diameter is > 0)
+                product.AddSpecification(VesselCatalogSpecs.DiameterKey, VesselCatalogSpecs.FormatCm(request.Diameter.Value));
+
+            if (request.Height is > 0)
+                product.AddSpecification(VesselCatalogSpecs.HeightKey, VesselCatalogSpecs.FormatCm(request.Height.Value));
+
+            if (request.PieceCount is >= 1)
+                product.AddSpecification(VesselCatalogSpecs.PieceCountKey, VesselCatalogSpecs.FormatPieces(request.PieceCount.Value));
+        }
+
+        private async Task<string?> ResolveImageUrl(CreateCatalogItemCommand request, int productId)
+        {
+            if (request.ImageFile is { Length: > 0 })
+            {
+                var uploaded = await uploaderService.UploadAsWebp(new UploadDTO
+                {
+                    File = request.ImageFile,
+                    Path = UploadPaths.Products(productId)
+                });
+                if (!UploadPaths.IsStoredPath(uploaded))
+                    throw new InvalidOperationException("Catalog item image upload failed.");
+
+                return UploadPaths.Normalize(uploaded);
+            }
+
+            return string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
         }
     }
 }

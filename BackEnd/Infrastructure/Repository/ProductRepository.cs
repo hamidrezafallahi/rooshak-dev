@@ -62,7 +62,7 @@ namespace OnlineShop.Infrastructure.Repositories
 
             keyword = keyword.ToLower();
             return await QueryWithAggregate()
-                         .Where(p => !p.IsDeleted && p.Name.ToLower().Contains(keyword))
+                         .Where(p => !p.IsDeleted && p.IsActive && p.Name.ToLower().Contains(keyword))
                          .ToListAsync();
         }
 

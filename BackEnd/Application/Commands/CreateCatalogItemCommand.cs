@@ -1,6 +1,8 @@
 using Application.Dtos;
 using Common;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json.Serialization;
 
 namespace Application.Commands
 {
@@ -19,7 +21,16 @@ namespace Application.Commands
         public decimal BasePrice { get; set; }
         public int Inventory { get; set; }
 
+        /// <summary>Vessel diameter in cm → ProductSpecification «قطر». Not perfume volume.</summary>
+        public decimal? Diameter { get; set; }
+
+        /// <summary>Set piece count for multi-piece crystal sets → ProductSpecification «تعداد پارچه».</summary>
+        public int? PieceCount { get; set; }
+
         public string? ImageUrl { get; set; }
         public bool ImageIsMain { get; set; } = true;
+
+        [JsonIgnore]
+        public IFormFile? ImageFile { get; set; }
     }
 }

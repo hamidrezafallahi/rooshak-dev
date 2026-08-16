@@ -116,15 +116,12 @@ public class ProductOffersController : BaseController
     }
 
     [HttpPut]
-    [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
-
-    public async Task<ActionResult<IdDto>> Update(
-        int offerId,
-        UpdateProductOfferCommand command)
+    [Authorize(Policy = Application.Common.CatalogApiKey.PolicyName)]
+    public async Task<ActionResult<IdDto>> Update([FromBody] UpdateProductOfferCommand command)
     {
         var result = await _mediator.Send(command);
-        if (result.Error == "Unauthorized")
-            return Unauthorized();
+        if (!result.IsSuccess && result.Error == "Unauthorized")
+            return Unauthorized(result);
 
         return Ok(result);
     }

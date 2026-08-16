@@ -1,5 +1,6 @@
 ﻿using Api.Security;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -104,12 +105,21 @@ public class Program
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
                 };
-            });
+            })
+            .AddScheme<AuthenticationSchemeOptions, CatalogApiKeyAuthenticationHandler>(
+                Application.Common.CatalogApiKey.SchemeName,
+                _ => { });
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             options.AddPolicy("StoreManagerOnly", policy => policy.RequireRole("StoreManager"));
             options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+            options.AddPolicy(Application.Common.CatalogApiKey.PolicyName, policy =>
+            {
+                policy.AddAuthenticationSchemes("Bearer", Application.Common.CatalogApiKey.SchemeName);
+                policy.RequireAuthenticatedUser();
+                policy.RequireRole("SuperAdmin", "Admin", "ContentEditor");
+            });
         });
         var allowedOrigins = builder.Configuration
             .GetSection("Cors:AllowedOrigins")

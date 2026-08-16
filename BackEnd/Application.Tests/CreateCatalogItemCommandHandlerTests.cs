@@ -2,11 +2,13 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Claims;
 using Application.Commands;
+using Application.Common;
 using Application.Common.Interfaces;
 using Application.Handler.CommandHandler;
 using Microsoft.AspNetCore.Http;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Interfaces;
+using Services.Services.Uploader.DTO;
 using Xunit;
 
 namespace Application.Tests;
@@ -85,6 +87,76 @@ public class CreateCatalogItemCommandHandlerTests
         Assert.Empty(store.Products);
     }
 
+    [Fact]
+    public async Task Failed_image_upload_does_not_leave_orphan_product()
+    {
+        var store = new FakeCatalogStore();
+        var handler = CreateHandler(store, userId: 7, uploader: new FakeUploader { Fail = true });
+        var command = ValidCommand();
+        command.ImageFile = TinyJpeg();
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Catalog item could not be created as a complete Product+Offer unit.", result.Error);
+        Assert.Empty(store.Products);
+        Assert.Empty(store.Offers);
+        Assert.Empty(store.Images);
+    }
+
+    [Fact]
+    public async Task Uploaded_image_file_is_stored_on_the_draft()
+    {
+        var store = new FakeCatalogStore();
+        var handler = CreateHandler(store, userId: 7);
+        var command = ValidCommand();
+        command.ImageFile = TinyJpeg();
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Single(store.Images);
+        Assert.Equal("uploads/products/1/test.webp", store.Images[0].ImageUrl);
+        Assert.False(store.Images[0].IsActive);
+        Assert.Equal(store.Images[0].Id, result.Data!.ImageId);
+    }
+
+    [Fact]
+    public async Task Vessel_diameter_and_height_are_stored_as_specifications()
+    {
+        var store = new FakeCatalogStore();
+        var handler = CreateHandler(store, userId: 7);
+
+        var command = ValidCommand();
+        command.Name = "گلدان کریستال P019";
+        command.Diameter = 18;
+        command.Height = 32;
+        command.PieceCount = 1;
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        var specs = store.Products[0].Specifications.ToList();
+        Assert.Equal(3, specs.Count);
+        Assert.Contains(specs, s => s.Key == VesselCatalogSpecs.DiameterKey && s.Value.Contains("18"));
+        Assert.Contains(specs, s => s.Key == VesselCatalogSpecs.HeightKey && s.Value.Contains("32"));
+        Assert.Contains(specs, s => s.Key == VesselCatalogSpecs.PieceCountKey && s.Value == "1");
+        Assert.DoesNotContain(specs, s => s.Key.Contains("ml", StringComparison.OrdinalIgnoreCase)
+            || s.Key.Contains("عطر", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Create_without_vessel_fields_adds_no_specifications()
+    {
+        var store = new FakeCatalogStore();
+        var handler = CreateHandler(store, userId: 7);
+
+        var result = await handler.Handle(ValidCommand(), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Empty(store.Products[0].Specifications);
+    }
+
     private static CreateCatalogItemCommand ValidCommand() => new()
     {
         Name = "گلدان بلور",
@@ -95,10 +167,22 @@ public class CreateCatalogItemCommandHandlerTests
         Inventory = 4
     };
 
+    private static IFormFile TinyJpeg()
+    {
+        var bytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xD9 };
+        var stream = new MemoryStream(bytes);
+        return new FormFile(stream, 0, bytes.Length, "ImageFile", "gate-b.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "image/jpeg"
+        };
+    }
+
     private static CreateCatalogItemCommandHandler CreateHandler(
         FakeCatalogStore store,
         int userId,
-        FakeUnitOfWork? unitOfWork = null)
+        FakeUnitOfWork? unitOfWork = null,
+        FakeUploader? uploader = null)
     {
         var http = new DefaultHttpContext
         {
@@ -112,7 +196,8 @@ public class CreateCatalogItemCommandHandlerTests
             new FakeProductOfferRepository(store),
             new FakeProductImageRepository(store),
             unitOfWork ?? new FakeUnitOfWork(store),
-            new HttpContextAccessor { HttpContext = http });
+            new HttpContextAccessor { HttpContext = http },
+            uploader ?? new FakeUploader());
     }
 
     private sealed class FakeCatalogStore
@@ -307,5 +392,19 @@ public class CreateCatalogItemCommandHandlerTests
         public Task<IEnumerable<ProductImage>> GetImagesByProductIdAsync(int productId) => throw new NotImplementedException();
         public Task<ProductImage?> GetMainImageByProductIdAsync(int productId) => throw new NotImplementedException();
         public Task<bool> DeleteImagesByProductIdAsync(int productId) => throw new NotImplementedException();
+    }
+
+    private sealed class FakeUploader : IUploaderService
+    {
+        public bool Fail { get; set; }
+
+        public Task<string?> UploadAsWebp(UploadDTO request) =>
+            Task.FromResult<string?>(Fail ? "upload failed" : "uploads/products/1/test.webp");
+
+        public Task<string?> UploadAsPng(UploadDTO request) => UploadAsWebp(request);
+        public Task<string?> UploadAsJpeg(UploadDTO request) => UploadAsWebp(request);
+        public Task<string?> UploadAsJpg(UploadDTO request) => UploadAsWebp(request);
+        public Task DeleteFile(DeleteDTO request) => Task.CompletedTask;
+        public Task DeleteStoredFile(string? storedPath, string fallbackDirectory) => Task.CompletedTask;
     }
 }
