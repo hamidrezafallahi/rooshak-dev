@@ -1,0 +1,25 @@
+# PR-only checks. Does not build/push Docker or deploy to the VPS.
+# Production deploy remains on push to master (main.yml).
+
+name: PR checks
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  frontend-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FrontEnd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+          cache-dependency-path: FrontEnd/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: npx --no-install tsc --noEmit -p tsconfig.json

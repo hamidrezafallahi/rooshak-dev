@@ -36,15 +36,19 @@ export default function ProductCTA({
     }
   };
   return (
-    <div className="flex gap-3 mt-4">
+    <div className="flex flex-col sm:flex-row gap-2 w-full min-w-0">
       <button
+        type="button"
         onClick={handleAddToCart}
-        className="bg-primary px-6 py-3 rounded-xl text-white"
+        className="flex-1 min-w-0 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-white text-sm text-center transition-colors"
       >
         {t('common.addToCart')}
       </button>
-      <button className="px-6 py-3 border rounded-xl">
-        ❤️ {t('common.wishlist')}
+      <button
+        type="button"
+        className="flex-1 min-w-0 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium text-gray-700 text-sm text-center transition-colors"
+      >
+        {t('common.wishlist')}
       </button>
     </div>
   );
