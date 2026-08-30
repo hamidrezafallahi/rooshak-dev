@@ -21,6 +21,7 @@ export interface ISupplier {
   createdAt: string;
   activeDiscounts: [];
 }
+
 export async function SupplierCardGrid({
   supplier,
   productId,
@@ -31,69 +32,67 @@ export async function SupplierCardGrid({
   locale: string;
 }) {
   const t = await getTranslations();
+  const inStock = supplier.inventory > 0;
+  const hasDiscount = Array.isArray(supplier.activeDiscounts) && supplier.activeDiscounts.length > 0;
+  const profileHref = `/${locale}/suppliers/${supplier.supplierSlug || supplier.supplierId}`;
+
   return (
-    <div className="group relative bg-white hover:shadow-xl p-6 border border-gray-100 hover:border-gray-200 rounded-2xl transition-all duration-300">
-      {/* بخش بالای کارت - هدر */}
-      <div className="flex justify-between items-start mb-4">
-        <Link href={`/${locale}/suppliers/${supplier.supplierSlug || supplier.supplierId}`} className="relative">
-          <div className="relative w-16 h-16 group-hover:scale-110 transition-transform duration-300">
-            <MediaImage
-              alt={supplier.supplierName}
-              src={supplier.supplierImage}
-              width={64}
-              height={64}
-              className="rounded-xl ring-4 ring-gray-50 group-hover:ring-primary/10 w-16 h-16 object-cover"
-            />
-          </div>
-        </Link>
-
-        {/* نشان موجودی */}
-        <div
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            supplier.inventory > 0
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-          }`}
-        >
-          {supplier.inventory > 0 ? t('common.inStock') : t('common.outOfStock')}
-        </div>
-      </div>
-
-      {/* اطلاعات تأمین‌کننده */}
-      <Link
-        href={`/${locale}/suppliers/${supplier.supplierSlug || supplier.supplierId}`}
-        className="block mb-3 group-hover:text-primary transition-colors"
-      >
-        <h4 className="font-bold text-gray-800 text-lg line-clamp-1">
-          {supplier.supplierName}
-        </h4>
-      </Link>
-
-      {supplier.supplierDesc && (
-        <p className="mb-4 text-gray-500 text-xs line-clamp-2 leading-5">
-          {supplier.supplierDesc}
-        </p>
-      )}
-
-      {/* قیمت و دکمه خرید */}
-      <div className="flex justify-between items-center mt-auto pt-4 border-gray-100 border-t">
-        <div className="flex flex-col">
-          <span className="text-gray-500 text-xs">{t('common.price')}</span>
-          <span className="font-bold text-gray-800 text-lg">
-            {supplier.finalPrice.toLocaleString("fa-IR")}
-          </span>
-          <span className="text-gray-400 text-xs">{t('common.currency')}</span>
-        </div>
-
-        <ProductCTA id={supplier.id}  productId={productId} />
-      </div>
-
-      {/* تخفیف در صورت وجود */}
-      {supplier.activeDiscounts?.length > 0 && (
-        <div className="top-4 right-4 absolute bg-gradient-to-r from-red-500 to-pink-500 shadow-lg px-3 py-1 rounded-full font-medium text-white text-xs">
+    <article className="group relative flex flex-col bg-white shadow-sm hover:shadow-lg border border-gray-100 rounded-2xl h-full overflow-hidden transition-shadow duration-300">
+      {hasDiscount && (
+        <div className="top-3 left-3 z-10 absolute bg-red-500 px-2 py-1 rounded-full font-bold text-white text-xs">
           {t('common.specialDiscount')}
         </div>
       )}
-    </div>
+      {!inStock && (
+        <div className="top-3 right-3 z-10 absolute bg-gray-500 px-2 py-1 rounded-full font-medium text-white text-xs">
+          {t('common.outOfStock')}
+        </div>
+      )}
+
+      <Link
+        href={profileHref}
+        className="block relative bg-gray-50 h-48 overflow-hidden"
+      >
+        <MediaImage
+          alt={supplier.supplierName}
+          src={supplier.supplierImage}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        />
+      </Link>
+
+      <div className="flex flex-col flex-1 p-4 min-w-0">
+        <Link
+          href={profileHref}
+          className="block mb-2 group-hover:text-primary transition-colors"
+        >
+          <h4 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-1">
+            {supplier.supplierName}
+          </h4>
+        </Link>
+
+        {supplier.supplierDesc ? (
+          <p className="mb-3 text-gray-500 text-xs line-clamp-2 leading-5">
+            {supplier.supplierDesc}
+          </p>
+        ) : null}
+
+        {inStock ? (
+          <span className="mb-3 bg-gray-100 px-2 py-1 rounded-full w-fit text-gray-600 text-xs">
+            {t('common.inStock')}
+          </span>
+        ) : null}
+
+        <div className="flex flex-wrap items-baseline gap-1 mt-auto mb-3">
+          <span className="font-bold text-gray-800 text-lg">
+            {supplier.finalPrice.toLocaleString('fa-IR')}
+          </span>
+          <span className="text-gray-500 text-sm">{t('common.currency')}</span>
+        </div>
+
+        <ProductCTA id={supplier.id} productId={productId} />
+      </div>
+    </article>
   );
 }

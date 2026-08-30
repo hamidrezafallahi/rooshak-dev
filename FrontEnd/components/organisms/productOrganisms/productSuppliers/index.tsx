@@ -3,6 +3,7 @@ import {
   getTranslations,
 } from 'next-intl/server';
 
+import EntityGrid from '@components/molecules/storefront/EntityGrid';
 import { serverApiBaseUrl } from '@lib/api';
 import { safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
@@ -31,28 +32,28 @@ export async function ProductSupplierExtended({
 
   return (
     <section className="mt-16">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary rounded-full w-1 h-7"></div>
-          <h3 className="font-bold text-gray-800 text-xl">
+      <div className="flex justify-between items-center gap-3 mb-6">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="bg-primary rounded-full w-1 h-7 shrink-0"></div>
+          <h3 className="font-bold text-gray-800 text-xl truncate">
             {t('product.suppliersTitle')}
           </h3>
         </div>
-        <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-600 text-sm">
+        <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-600 text-sm shrink-0">
           {t('product.suppliersCount', { count: suppliers.length })}
         </span>
       </div>
 
-      <div className="gap-5 grid grid-cols-1 lg:grid-cols-4">
+      <EntityGrid cols="cards">
         {suppliers.map((supplier: ISupplier, index: number) => (
           <SupplierCardGrid
-            key={index}
+            key={supplier.id ?? index}
             supplier={supplier}
             productId={Number(productId)}
             locale={locale}
           />
         ))}
-      </div>
+      </EntityGrid>
     </section>
   );
 }
