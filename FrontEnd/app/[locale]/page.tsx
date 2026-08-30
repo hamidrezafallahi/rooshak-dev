@@ -2,12 +2,18 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import BlogSection from '@components/molecules/landing Elements/blogSection';
-import LandingBrands from '@components/molecules/landing Elements/landingBrands';
-import LandingCategory from '@components/molecules/landing Elements/landingCategory';
-import LandingSlider from '@components/molecules/landing Elements/landingSlider';
-import LandingSpecialOffer from '@components/molecules/landing Elements/landingSpecialOffer';
-import TestimonialsSection from '@components/molecules/landing Elements/testimonialsSection';
-import TheMostProducts from '@components/molecules/landing Elements/theMostProducts';
+import LandingBrands
+  from '@components/molecules/landing Elements/landingBrands';
+import LandingCategory
+  from '@components/molecules/landing Elements/landingCategory';
+import LandingSlider
+  from '@components/molecules/landing Elements/landingSlider';
+import LandingSpecialOffer
+  from '@components/molecules/landing Elements/landingSpecialOffer';
+import TestimonialsSection
+  from '@components/molecules/landing Elements/testimonialsSection';
+import TheMostProducts
+  from '@components/molecules/landing Elements/theMostProducts';
 import TrustSection from '@components/molecules/landing Elements/trustSection';
 import USPSection from '@components/molecules/landing Elements/uspSection';
 import JsonLd from '@components/molecules/storefront/JsonLd';
@@ -17,7 +23,10 @@ import Footer from '@layout/footer';
 import Header from '@layout/header';
 import { getCategories } from '@lib/category';
 import { getSlides } from '@lib/landing';
-import { absoluteUrl, buildPageMetadata } from '@lib/seo';
+import {
+  absoluteUrl,
+  buildPageMetadata,
+} from '@lib/seo';
 
 /** ISR: homepage cacheable; regenerate every 60s. */
 export const revalidate = 60;
