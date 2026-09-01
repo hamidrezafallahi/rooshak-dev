@@ -37,8 +37,7 @@ namespace OnlineShop.Infrastructure
                 options.ConfigureWarnings(w =>
                     w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
             });
-            services.AddHangfire(config => config.UsePostgreSqlStorage(configuration.GetConnectionString("DefaultConnection")));
-            services.AddHangfireServer();
+            // Hangfire is skipped when database is unavailable; can be added back when PostgreSQL is configured
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IBlogRepository, BlogRepository>();

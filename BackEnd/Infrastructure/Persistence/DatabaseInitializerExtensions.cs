@@ -24,41 +24,51 @@ public static class DatabaseInitializerExtensions
         if (dbContext is null)
             return app;
 
-        var pendingMigrations = dbContext.Database.GetPendingMigrations().ToList();
-        if (pendingMigrations.Count > 0)
+        try
         {
-            // Legacy DBs may have been created with EnsureCreated (no __EFMigrationsHistory).
-            // Baseline InitialCreate as applied, then run the remaining additive migrations.
-            var appliedAny = dbContext.Database.GetAppliedMigrations().Any();
-            var hasLegacySchema = !appliedAny && TableExists(dbContext, "EntityConfigs");
-            if (hasLegacySchema)
+            var pendingMigrations = dbContext.Database.GetPendingMigrations().ToList();
+            if (pendingMigrations.Count > 0)
             {
-                logger?.LogWarning(
-                    "Legacy DB without EF migration history detected. Baselining {MigrationId}, then applying pending migrations.",
-                    "20260729110612_InitialCreate");
-                BaselineInitialMigration(dbContext, "20260729110612_InitialCreate");
+                // Legacy DBs may have been created with EnsureCreated (no __EFMigrationsHistory).
+                // Baseline InitialCreate as applied, then run the remaining additive migrations.
+                var appliedAny = dbContext.Database.GetAppliedMigrations().Any();
+                var hasLegacySchema = !appliedAny && TableExists(dbContext, "EntityConfigs");
+                if (hasLegacySchema)
+                {
+                    logger?.LogWarning(
+                        "Legacy DB without EF migration history detected. Baselining {MigrationId}, then applying pending migrations.",
+                        "20260729110612_InitialCreate");
+                    BaselineInitialMigration(dbContext, "20260729110612_InitialCreate");
+                }
+
+                dbContext.Database.Migrate();
+            }
+            else
+            {
+                dbContext.Database.EnsureCreated();
             }
 
-            dbContext.Database.Migrate();
-        }
-        else
-        {
-            dbContext.Database.EnsureCreated();
-        }
-
-        foreach (var dataInitializer in scope.ServiceProvider.GetServices<IDataInitializer>())
-        {
-            try
+            foreach (var dataInitializer in scope.ServiceProvider.GetServices<IDataInitializer>())
             {
-                dataInitializer.InitializeData();
+                try
+                {
+                    dataInitializer.InitializeData();
+                }
+                catch (Exception ex)
+                {
+                    logger?.LogError(
+                        ex,
+                        "Data initializer {Initializer} failed. Application will continue.",
+                        dataInitializer.GetType().Name);
+                }
             }
-            catch (Exception ex)
-            {
-                logger?.LogError(
-                    ex,
-                    "Data initializer {Initializer} failed. Application will continue.",
-                    dataInitializer.GetType().Name);
-            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(
+                ex,
+                "Database initialization failed. The API will run without database access. " +
+                "This is acceptable for testing/development without a configured database.");
         }
 
         return app;

@@ -171,13 +171,20 @@ public class Program
         }
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        try
         {
-            Authorization = new[]
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                new HangfireDashboardAuthFilter(app.Environment, app.Configuration)
-            }
-        });
+                Authorization = new[]
+                {
+                    new HangfireDashboardAuthFilter(app.Environment, app.Configuration)
+                }
+            });
+        }
+        catch
+        {
+            // Hangfire dashboard unavailable if database not configured
+        }
         app.MapHealthChecks("/health");
         app.MapControllers();
         app.Run();
