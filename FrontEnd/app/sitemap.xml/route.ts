@@ -160,6 +160,7 @@ export async function GET() {
     { path: 'categories', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'suppliers', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'tags', priority: 0.7, changeFrequency: 'weekly' },
+    { path: 'exhibition', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'discounts', priority: 0.8, changeFrequency: 'daily' },
   ];
 
@@ -217,6 +218,15 @@ export async function GET() {
         `tags/${item.key}`,
         0.5,
         'monthly',
+        item.lastmod || fallbackLastmod,
+      ),
+    ),
+    // Exhibition price lists are keyed by the same tag slugs.
+    ...tags.map((item) =>
+      buildUrlXml(
+        `exhibition/${item.key}`,
+        0.7,
+        'weekly',
         item.lastmod || fallbackLastmod,
       ),
     ),

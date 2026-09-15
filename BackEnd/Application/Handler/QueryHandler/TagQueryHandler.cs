@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Dtos;
 using Application.Queries;
 using Common;
@@ -8,13 +9,15 @@ using Microsoft.EntityFrameworkCore;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Interfaces;
 
-public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _productOfferRepository, IEntityConfigRepository _configRepo)
+public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _productOfferRepository, IProductRepository _productRepository, IEntityConfigRepository _configRepo)
     : IRequestHandler<GetTagsQuery, ServiceResult<ListDto<TagDto>>>,
     IRequestHandler<GetTags4selectOptionQuery, ServiceResult<ListDto<SelectOptionDto>>>,
     IRequestHandler<GetTagBySlugQuery, ServiceResult<TagDto?>>,
     IRequestHandler<GetTagsByProductOfferIdQuery, ServiceResult<IEnumerable<TagDto>>>,
     IRequestHandler<GetAllTagIdsQuery, ServiceResult<List<IdDto>>>,
-    IRequestHandler<GetAllTagsSlugsQuery, ServiceResult<IEnumerable<SlugDto>>>
+    IRequestHandler<GetAllTagsSlugsQuery, ServiceResult<IEnumerable<SlugDto>>>,
+    IRequestHandler<GetTagPriceListQuery, ServiceResult<TagPriceListDto>>,
+    IRequestHandler<GetTagFamiliesQuery, ServiceResult<IEnumerable<TagFamilyDto>>>
 {
      
     public async Task<ServiceResult<ListDto<TagDto>>> Handle(GetTagsQuery request,CancellationToken cancellationToken)
@@ -185,4 +188,171 @@ public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _p
         return ServiceResult<IEnumerable<SlugDto>>.Ok(slugs);
     }
 
+    public async Task<ServiceResult<TagPriceListDto>> Handle(GetTagPriceListQuery request, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        var key = (request.IdOrSlug ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(key))
+            return ServiceResult<TagPriceListDto>.Failed("Tag not found");
+
+        Tag? tag = int.TryParse(key, out var tagId)
+            ? await _repo.Query(t => t.Id == tagId && !t.IsDeleted)
+                         .FirstOrDefaultAsync(cancellationToken)
+            : await _repo.Query(t => (t.Slug == key || t.Name == key) && !t.IsDeleted)
+                         .FirstOrDefaultAsync(cancellationToken);
+
+        if (tag == null || !tag.IsActive)
+            return ServiceResult<TagPriceListDto>.Failed("Tag not found");
+
+        // The tag lives on ProductOffers, so only offers carrying it may price the family.
+        var products = await _productRepository
+            .Query(p => p.IsActive && !p.IsDeleted &&
+                   p.ProductOffers.Any(po => po.IsActive && !po.IsDeleted &&
+                        po.ProductOfferTags.Any(pot => !pot.IsDeleted && pot.TagId == tag.Id)))
+            .Include(p => p.Images)
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Include(p => p.Specifications)
+            .Include(p => p.ProductOffers).ThenInclude(po => po.ProductOfferTags)
+            .Include(p => p.ProductOffers).ThenInclude(po => po.Discounts).ThenInclude(d => d.Discount)
+            .ToListAsync(cancellationToken);
+
+        var items = new List<TagPriceListItemDto>();
+
+        foreach (var product in products)
+        {
+            var taggedOffers = product.ProductOffers
+                .Where(po => po.IsActive && !po.IsDeleted &&
+                       po.ProductOfferTags.Any(pot => !pot.IsDeleted && pot.TagId == tag.Id))
+                .ToList();
+
+            if (taggedOffers.Count == 0)
+                continue;
+
+            var bestOffer = taggedOffers
+                    .Where(po => po.Inventory > 0)
+                    .OrderBy(po => po.GetFinalPrice(now))
+                    .FirstOrDefault()
+                ?? taggedOffers
+                    .OrderBy(po => po.GetFinalPrice(now))
+                    .FirstOrDefault();
+
+            if (bestOffer == null)
+                continue;
+
+            var activeDiscount = bestOffer.Discounts
+                .Where(d => d.Discount != null && !d.IsDeleted && d.IsActive)
+                .Select(d => d.Discount)
+                .Where(d => !d.IsDeleted && d.IsActive && d.StartDate <= now && d.EndDate >= now)
+                .OrderByDescending(d => d.Priority)
+                .FirstOrDefault();
+
+            var basePrice = bestOffer.BasePrice;
+            var finalPrice = bestOffer.GetFinalPrice(now);
+            var inventory = taggedOffers.Sum(po => po.Inventory);
+
+            items.Add(new TagPriceListItemDto
+            {
+                ProductId = product.Id,
+                Slug = product.Slug,
+                Name = product.Name,
+                Description = product.Description,
+                MainImage = product.Images
+                    .Where(i => !i.IsDeleted && i.IsMain)
+                    .Select(i => i.ImageUrl.TrimStart('/'))
+                    .FirstOrDefault()
+                    ?? product.Images
+                        .Where(i => !i.IsDeleted)
+                        .Select(i => i.ImageUrl.TrimStart('/'))
+                        .FirstOrDefault(),
+                CategoryName = product.Category?.PersianName,
+                CategorySlug = product.Category?.Slug,
+                BrandName = product.Brand?.Name,
+                BrandSlug = product.Brand?.Slug,
+                Code = $"RSK-{product.Id:0000}",
+                Price = basePrice,
+                FinalPrice = finalPrice,
+                DiscountAmount = activeDiscount?.Amount,
+                DiscountIsPercent = activeDiscount?.IsPercent,
+                HasDiscount = finalPrice < basePrice,
+                Inventory = inventory,
+                InStock = inventory > 0,
+                Diameter = SpecValue(product, VesselCatalogSpecs.DiameterKey),
+                Height = SpecValue(product, VesselCatalogSpecs.HeightKey),
+                PieceCount = SpecValue(product, VesselCatalogSpecs.PieceCountKey),
+                Dimensions = product.Dimensions == null ? null : new ProductDimensionsDto
+                {
+                    Width = product.Dimensions.Width,
+                    Height = product.Dimensions.Height,
+                    Depth = product.Dimensions.Depth,
+                    Weight = product.Dimensions.Weight,
+                },
+            });
+        }
+
+        var ordered = items
+            .OrderBy(i => i.CategoryName)
+            .ThenBy(i => i.Name)
+            .ToList();
+
+        var dto = new TagPriceListDto
+        {
+            TagId = tag.Id,
+            TagName = tag.Name,
+            TagSlug = tag.Slug,
+            Currency = "IRR",
+            ItemCount = ordered.Count,
+            UpdatedAt = products.Count == 0
+                ? (tag.UpdatedAt ?? tag.CreatedAt)
+                : products.Max(p => p.UpdatedAt ?? p.CreatedAt),
+            Items = ordered,
+        };
+
+        return ServiceResult<TagPriceListDto>.Ok(dto);
+    }
+
+    public async Task<ServiceResult<IEnumerable<TagFamilyDto>>> Handle(GetTagFamiliesQuery request, CancellationToken cancellationToken)
+    {
+        var rows = await _productOfferRepository
+            .Query(pot => !pot.IsDeleted &&
+                   pot.ProductOffer.IsActive && !pot.ProductOffer.IsDeleted &&
+                   pot.ProductOffer.Product.IsActive && !pot.ProductOffer.Product.IsDeleted &&
+                   pot.Tag.IsActive && !pot.Tag.IsDeleted)
+            .Select(pot => new
+            {
+                pot.TagId,
+                TagName = pot.Tag.Name,
+                TagSlug = pot.Tag.Slug,
+                pot.ProductOffer.ProductId,
+                CoverImage = pot.ProductOffer.Product.Images
+                    .Where(i => !i.IsDeleted && i.IsMain)
+                    .Select(i => i.ImageUrl)
+                    .FirstOrDefault(),
+            })
+            .ToListAsync(cancellationToken);
+
+        var families = rows
+            .GroupBy(r => r.TagId)
+            .Select(g => new TagFamilyDto
+            {
+                Id = g.Key,
+                Name = g.First().TagName ?? string.Empty,
+                Slug = g.First().TagSlug ?? string.Empty,
+                ProductCount = g.Select(r => r.ProductId).Distinct().Count(),
+                CoverImage = g.Select(r => r.CoverImage)
+                              .FirstOrDefault(i => !string.IsNullOrWhiteSpace(i))
+                              ?.TrimStart('/'),
+            })
+            .OrderByDescending(f => f.ProductCount)
+            .ThenBy(f => f.Name)
+            .ToList();
+
+        return ServiceResult<IEnumerable<TagFamilyDto>>.Ok(families);
+    }
+
+    private static string? SpecValue(Product product, string key) =>
+        product.Specifications
+            .Where(s => !s.IsDeleted && s.Key == key)
+            .Select(s => s.Value)
+            .FirstOrDefault();
 }

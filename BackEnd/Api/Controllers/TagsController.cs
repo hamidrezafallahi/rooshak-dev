@@ -72,6 +72,27 @@ public class TagsController : BaseController
         return Ok(result);
     }
 
+    /// <summary>Tags that currently hold priced products — powers the exhibition index.</summary>
+    [HttpGet("families")]
+    public async Task<ActionResult<IEnumerable<TagFamilyDto>>> GetFamilies()
+    {
+        var result = await _mediator.Send(new GetTagFamiliesQuery());
+        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+
+        return Ok(result);
+    }
+
+    /// <summary>Public price list of one tag ("family") for the exhibition QR pages.</summary>
+    [HttpGet("{idOrSlug}/pricelist")]
+    public async Task<ActionResult<TagPriceListDto>> GetPriceList(string idOrSlug)
+    {
+        var result = await _mediator.Send(new GetTagPriceListQuery { IdOrSlug = idOrSlug });
+        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (!result.IsSuccess || result.Data is null) return NotFound(result);
+
+        return Ok(result);
+    }
+
 
 
 

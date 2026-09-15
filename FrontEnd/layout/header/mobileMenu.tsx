@@ -22,6 +22,7 @@ const LINKS = [
   { href: 'brands', labelKey: 'brands' as const },
   { href: 'suppliers', labelKey: 'suppliers' as const },
   { href: 'tags', labelKey: 'tags' as const },
+  { href: 'exhibition', labelKey: 'exhibition' as const },
   { href: 'discounts', labelKey: 'discounts' as const },
   { href: 'blog', labelKey: 'blogs' as const },
   { href: 'shoppingCart', labelKey: 'shopping cart' as const },

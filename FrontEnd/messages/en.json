@@ -37,7 +37,8 @@
     "lang": "Change language",
     "mainNav": "Main navigation",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "exhibition": "Price Lists"
   },
   "footer": {
     "tagline": "Rooshak — specialist crystal tableware. Authentic pieces, careful packing, and reliable delivery.",
@@ -671,5 +672,34 @@
     "needHelp": "Need Help?",
     "needHelpDesc": "Our support team is available 24/7 to answer your questions.",
     "contactSupport": "Contact Support →"
+  },
+  "exhibition": {
+    "eyebrow": "Exhibition Price List",
+    "indexTitle": "Product Family Price Lists",
+    "indexDescription": "Pick a Rooshak crystal collection to see its up-to-date price list.",
+    "indexEmpty": "No collection published yet",
+    "indexEmptyHint": "Collection price lists will appear here soon.",
+    "browseProducts": "Browse all products",
+    "viewPriceList": "View price list →",
+    "metaTitle": "{family} Price List",
+    "metaDescription": "Up-to-date price list for the {family} collection — {count} Rooshak crystal products.",
+    "heroDesc": "These prices are current and prepared for exhibition visitors. Tap any item for full details.",
+    "itemCount": "{count} products",
+    "updatedAt": "Updated: {date}",
+    "empty": "No products in this collection",
+    "emptyHint": "No active product currently carries this tag.",
+    "backToIndex": "Back to collections",
+    "disclaimer": "Prices are in Toman and exclude shipping. The final amount is calculated at checkout.",
+    "diameter": "Diameter",
+    "height": "Height",
+    "pieces": "Pieces",
+    "shareTitle": "Share this price list",
+    "shareDesc": "Scan the QR code or send the link so customers can open this page on their phone.",
+    "qrHint": "Scan to open this page",
+    "qrAlt": "QR code for {title}",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "print": "Print"
   }
 }

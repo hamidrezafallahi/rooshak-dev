@@ -35,5 +35,16 @@ namespace Application.Queries
  
     };
 
+    /// <summary>Public price list of one tag ("family") for the exhibition pages.</summary>
+    public class GetTagPriceListQuery : IRequest<ServiceResult<TagPriceListDto>>
+    {
+        public string IdOrSlug { get; set; } = string.Empty;
+    }
+
+    /// <summary>Tags that currently have priced products, for the exhibition index.</summary>
+    public class GetTagFamiliesQuery : IRequest<ServiceResult<IEnumerable<TagFamilyDto>>>
+    {
+    }
+
    
     }
