@@ -715,4 +715,292 @@ html {
   }
 }
 
+/* ================== Exhibition Price List ==================
+   Catalog-sheet layout for a product family: scanned from a QR at the stand,
+   read on a phone, and printable as a handout. */
+@layer components {
+  .exhibit-page {
+    @apply gap-6 md:gap-8;
+  }
+
+  .exhibit-hero {
+    @apply flex flex-col items-center gap-3 px-5 sm:px-8 py-8 sm:py-10 text-center;
+    background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--primary-color) 10%, var(--store-surface-solid)) 0%,
+      var(--store-surface-solid) 55%,
+      color-mix(in srgb, var(--highlight-color) 12%, var(--store-surface-solid)) 100%
+    );
+    border: 1px solid var(--store-border);
+    border-radius: var(--store-radius);
+    box-shadow: var(--store-shadow);
+  }
+
+  .exhibit-hero-eyebrow {
+    @apply text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase;
+    color: var(--highlight-color);
+  }
+
+  .exhibit-hero-title {
+    @apply font-bold text-3xl sm:text-4xl md:text-5xl tracking-tight;
+    color: var(--primary-color);
+  }
+
+  .exhibit-hero-desc {
+    @apply max-w-2xl text-sm sm:text-base leading-relaxed;
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-hero-meta {
+    @apply flex flex-wrap justify-center items-center gap-2 text-xs sm:text-sm;
+    color: var(--store-text-muted);
+  }
+
+  /* ---- Share + QR ---- */
+  .exhibit-share {
+    @apply flex flex-col sm:flex-row items-center gap-5 sm:gap-7 p-5 sm:p-6 store-panel;
+  }
+
+  .exhibit-share-qr {
+    @apply flex flex-col items-center gap-2 shrink-0;
+  }
+
+  .exhibit-qr {
+    @apply w-32 h-32 sm:w-36 sm:h-36 p-2 bg-white rounded-xl;
+    border: 1px solid var(--store-border);
+  }
+
+  .exhibit-qr svg {
+    @apply block w-full h-full;
+  }
+
+  .exhibit-share-hint {
+    @apply max-w-[9rem] text-[0.7rem] text-center leading-snug;
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-share-body {
+    @apply flex flex-col gap-2 min-w-0 w-full text-center sm:text-start;
+  }
+
+  .exhibit-share-title {
+    @apply font-semibold text-lg;
+    color: var(--store-text);
+  }
+
+  .exhibit-share-desc {
+    @apply text-sm leading-relaxed;
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-share-url {
+    @apply px-3 py-2 rounded-lg w-full text-xs break-all;
+    background: color-mix(in srgb, var(--primary-color) 6%, transparent);
+    border: 1px solid var(--store-border);
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-share-actions {
+    @apply flex flex-wrap justify-center sm:justify-start gap-2 pt-1;
+  }
+
+  .exhibit-share-actions .store-btn {
+    @apply px-4 py-2 text-xs sm:text-sm;
+  }
+
+  /* ---- Catalog grid ---- */
+  .exhibit-grid {
+    @apply grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5;
+  }
+
+  .exhibit-card {
+    @apply flex flex-col overflow-hidden transition-all duration-300;
+    background: var(--store-surface-solid);
+    border: 1px solid var(--store-border);
+    border-radius: var(--store-radius-sm);
+    box-shadow: var(--store-shadow);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exhibit-card:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
+    }
+  }
+
+  .exhibit-card-media {
+    @apply relative flex justify-center items-center w-full aspect-square overflow-hidden;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--secondary-color) 16%, white) 0%,
+      color-mix(in srgb, var(--neutral-color) 70%, white) 100%
+    );
+  }
+
+  .exhibit-card-placeholder {
+    @apply px-3 text-center text-xs font-semibold tracking-widest uppercase;
+    color: color-mix(in srgb, var(--primary-color) 45%, transparent);
+  }
+
+  .exhibit-badge-discount,
+  .exhibit-badge-stock {
+    @apply absolute top-2 px-2 py-0.5 rounded-full text-[0.65rem] font-semibold;
+    inset-inline-start: 0.5rem;
+  }
+
+  .exhibit-badge-discount {
+    background: var(--error-color);
+    color: #fff;
+  }
+
+  .exhibit-badge-stock {
+    top: auto;
+    bottom: 0.5rem;
+    background: color-mix(in srgb, var(--store-text) 72%, transparent);
+    color: #fff;
+  }
+
+  .exhibit-card-body {
+    @apply flex flex-col flex-1 gap-1.5 p-3 sm:p-4;
+  }
+
+  .exhibit-code {
+    @apply text-[0.65rem] font-semibold tracking-[0.15em];
+    color: var(--highlight-color);
+  }
+
+  .exhibit-name {
+    @apply font-semibold text-sm sm:text-base leading-snug line-clamp-2;
+    color: var(--store-text);
+  }
+
+  .exhibit-specs {
+    @apply flex flex-wrap gap-x-3 gap-y-0.5 text-[0.7rem];
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-specs > div {
+    @apply inline-flex items-center gap-1;
+  }
+
+  .exhibit-specs dt::after {
+    content: ':';
+  }
+
+  .exhibit-specs dd {
+    @apply font-medium;
+    color: var(--store-text);
+  }
+
+  .exhibit-price {
+    @apply flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mt-auto pt-2;
+    border-top: 1px dashed var(--store-border);
+  }
+
+  .exhibit-price-base {
+    @apply text-xs line-through;
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-price-final {
+    @apply font-bold text-base sm:text-lg;
+    color: var(--primary-color);
+  }
+
+  .exhibit-price-unit {
+    @apply text-[0.7rem];
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-disclaimer {
+    @apply text-xs text-center leading-relaxed;
+    color: color-mix(in srgb, var(--store-text-on-dark) 65%, transparent);
+  }
+
+  /* ---- Family index cards ---- */
+  .exhibit-family-card {
+    @apply flex flex-col overflow-hidden transition-all duration-300;
+    background: var(--store-surface-solid);
+    border: 1px solid var(--store-border);
+    border-radius: var(--store-radius);
+    box-shadow: var(--store-shadow);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exhibit-family-card:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
+    }
+  }
+
+  .exhibit-family-media {
+    @apply relative flex justify-center items-center w-full h-44 overflow-hidden;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--secondary-color) 18%, white) 0%,
+      color-mix(in srgb, var(--neutral-color) 70%, white) 100%
+    );
+  }
+
+  .exhibit-family-body {
+    @apply flex flex-col gap-1 p-4;
+  }
+
+  .exhibit-family-name {
+    @apply font-semibold text-base;
+    color: var(--store-text);
+  }
+
+  .exhibit-family-count {
+    @apply text-xs;
+    color: var(--store-text-muted);
+  }
+
+  .exhibit-family-cta {
+    @apply mt-1 text-sm font-medium;
+    color: var(--primary-color);
+  }
+}
+
+/* ---- Printed handout: drop chrome, force ink-friendly colours ---- */
+@media print {
+  .store-nav,
+  .store-footer,
+  .admin-dock,
+  .exhibit-share-actions,
+  .exhibit-share-hint {
+    display: none !important;
+  }
+
+  .exhibit-page {
+    @apply gap-4 py-0 max-w-none;
+  }
+
+  .exhibit-hero,
+  .exhibit-share,
+  .exhibit-card,
+  .exhibit-family-card {
+    background: #fff !important;
+    box-shadow: none !important;
+    border-color: #d4d4d4 !important;
+  }
+
+  .exhibit-hero-title,
+  .exhibit-price-final {
+    color: #000 !important;
+  }
+
+  .exhibit-disclaimer {
+    color: #444 !important;
+  }
+
+  .exhibit-grid {
+    @apply grid-cols-3 gap-2;
+  }
+
+  .exhibit-card {
+    break-inside: avoid;
+  }
+}
+
  

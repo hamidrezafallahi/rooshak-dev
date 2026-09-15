@@ -16,6 +16,7 @@ const NAV_KEYS = [
   { href: 'products', labelKey: 'products' as const },
   { href: 'categories', labelKey: 'categories' as const },
   { href: 'brands', labelKey: 'brands' as const },
+  { href: 'exhibition', labelKey: 'exhibition' as const },
   { href: 'discounts', labelKey: 'discounts' as const },
   { href: 'blog', labelKey: 'blogs' as const },
 ] as const;
