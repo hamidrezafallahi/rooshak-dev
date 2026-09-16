@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { getTranslations } from 'next-intl/server';
@@ -33,8 +34,10 @@ async function fetchPriceList(slug: string): Promise<IPriceList | null> {
     { next: { revalidate: 300 } },
   );
 
-  if (!result.ok || !result.data?.data) return null;
-  if (result.data.isSuccess === false) return null;
+  if (!result.ok || !result.data?.data || result.data.isSuccess === false) {
+    noStore();
+    return null;
+  }
   return result.data.data;
 }
 
@@ -140,13 +143,6 @@ export default async function Page({ params }: Props) {
         </div>
       </header>
 
-      <SharePanel
-        url={shareUrl}
-        title={priceList.tagName}
-        qrSvg={qrSvg}
-        locale={locale}
-      />
-
       {priceList.items.length === 0 ? (
         <EmptyState
           title={t('empty')}
@@ -169,6 +165,13 @@ export default async function Page({ params }: Props) {
           ))}
         </section>
       )}
+
+      <SharePanel
+        url={shareUrl}
+        title={priceList.tagName}
+        qrSvg={qrSvg}
+        locale={locale}
+      />
 
       <p className="exhibit-disclaimer">{t('disclaimer')}</p>
     </article>
