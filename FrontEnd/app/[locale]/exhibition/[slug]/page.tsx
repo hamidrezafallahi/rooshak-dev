@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale,
       path: `exhibition/${slug}`,
       title: t('indexTitle'),
+      description: t('indexDescription'),
       noIndex: true,
     });
   }
