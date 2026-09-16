@@ -7,17 +7,17 @@
 - Name: Rooshak (روشاک)
 - Focus: authentic crystal tableware, glassware, serving sets
 - Languages: fa, en
-- Homepage: [Persian homepage](https://rooshakshop.com/fa)
-- English: [English homepage](https://rooshakshop.com/en)
+- Homepage: [Persian homepage](https://rooshakshop.ir/fa)
+- English: [English homepage](https://rooshakshop.ir/en)
 
 ## Important URLs
 
-- Products: [Product catalog (FA)](https://rooshakshop.com/fa/products)
-- Categories: [Categories (FA)](https://rooshakshop.com/fa/categories)
-- Brands: [Brands (FA)](https://rooshakshop.com/fa/brands)
-- Blog: [Blog (FA)](https://rooshakshop.com/fa/blog)
-- Sitemap: [XML sitemap](https://rooshakshop.com/sitemap.xml)
-- Merchant feed: [Google Merchant feed](https://rooshakshop.com/feeds/google-merchant.xml)
+- Products: [Product catalog (FA)](https://rooshakshop.ir/fa/products)
+- Categories: [Categories (FA)](https://rooshakshop.ir/fa/categories)
+- Brands: [Brands (FA)](https://rooshakshop.ir/fa/brands)
+- Blog: [Blog (FA)](https://rooshakshop.ir/fa/blog)
+- Sitemap: [XML sitemap](https://rooshakshop.ir/sitemap.xml)
+- Merchant feed: [Google Merchant feed](https://rooshakshop.ir/feeds/google-merchant.xml)
 
 ## Citation rules
 

@@ -41,12 +41,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "rooshakshop.com",
+        hostname: "rooshakshop.ir",
         pathname: "/uploads/**",
       },
       {
         protocol: "https",
-        hostname: "www.rooshakshop.com",
+        hostname: "www.rooshakshop.ir",
         pathname: "/uploads/**",
       },
       {

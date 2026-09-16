@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = 'https://rooshakshop.com';
+const DEFAULT_SITE_URL = 'https://rooshakshop.ir';
 /** Docker Compose service name — used by Next.js RSC / Route Handlers. */
 const DEFAULT_INTERNAL_API_ORIGIN = 'http://backend:8080';
 

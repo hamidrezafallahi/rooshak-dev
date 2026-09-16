@@ -41,7 +41,7 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/shop-frontend:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_SITE_URL=https://rooshakshop.com
+            NEXT_PUBLIC_SITE_URL=https://rooshakshop.ir
             NEXT_PUBLIC_SITE_NAME=Rooshak
             INTERNAL_SERVER_SIDE_API_URL=http://backend:8080
           cache-from: type=gha

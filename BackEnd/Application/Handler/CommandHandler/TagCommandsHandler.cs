@@ -32,8 +32,15 @@ namespace Application.Handler.CommandHandler
 
             await _repo.AddAsync(tag);
             await _repo.SaveChangesAsync(cancellationToken);
-            tag.EnsureSlug(tag.Id);
-            await _repo.SaveChangesAsync(cancellationToken);
+
+            // Keep clean exhibition URLs (e.g. /exhibition/sunshine).
+            // Only append the tag Id when that slug is already taken.
+            if (string.IsNullOrWhiteSpace(tag.Slug)
+                || await _repo.ExistsBySlugAsync(tag.Slug, tag.Id))
+            {
+                tag.EnsureSlug(tag.Id);
+                await _repo.SaveChangesAsync(cancellationToken);
+            }
 
             return ServiceResult<IdDto>.Ok(new IdDto { Id = tag.Id });
         }
@@ -49,7 +56,11 @@ namespace Application.Handler.CommandHandler
                 return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
 
             tag.Update(request.Name, userId.Value, request.Slug);
-            tag.EnsureSlug(tag.Id);
+            if (string.IsNullOrWhiteSpace(tag.Slug)
+                || await _repo.ExistsBySlugAsync(tag.Slug, tag.Id))
+            {
+                tag.EnsureSlug(tag.Id);
+            }
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = tag.Id });
 
