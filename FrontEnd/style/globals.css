@@ -799,6 +799,22 @@ html {
     padding: 1.25rem 1rem 2rem;
   }
 
+  .exhibit-index-all {
+    margin: 0 0 1rem;
+    text-align: center;
+  }
+
+  .exhibit-index-all-link {
+    display: inline-block;
+    padding: 0.65rem 1.1rem;
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, #c9a84c 18%, #1a1a1a);
+    border: 1px solid color-mix(in srgb, #c9a84c 45%, transparent);
+    color: #f5f0e6;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
   .exhibit-index-list {
     list-style: none;
     margin: 0;

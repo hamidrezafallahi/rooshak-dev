@@ -132,3 +132,12 @@ export function exhibitionCatalogName(catalog: ExhibitionCatalog, locale: string
 export function exhibitionStaticSlugs() {
   return EXHIBITION_CATALOGS.map((c) => c.slug);
 }
+
+/**
+ * Full catalog roll: each family contributes 6 product shots then its price-list flyer.
+ * Order matches EXHIBITION_CATALOGS (positions 7, 14, 21, … are price lists).
+ */
+export function allExhibitionPhotos(): ExhibitionPhoto[] {
+  return EXHIBITION_CATALOGS.flatMap((catalog) => catalog.photos);
+}
+

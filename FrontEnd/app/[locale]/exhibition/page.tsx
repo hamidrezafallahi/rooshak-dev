@@ -36,6 +36,11 @@ export default async function Page({ params }: Props) {
   return (
     <main className="exhibit-index" aria-label={t('indexTitle')}>
       <h1 className="sr-only">{t('indexTitle')}</h1>
+      <p className="exhibit-index-all">
+        <Link href={`/${locale}/exhibition/all`} className="exhibit-index-all-link">
+          {locale === 'fa' ? 'مشاهده همه خانواده‌ها' : 'View all families'}
+        </Link>
+      </p>
       <ul className="exhibit-index-list">
         {EXHIBITION_CATALOGS.map((catalog) => {
           const name = exhibitionCatalogName(catalog, locale);
