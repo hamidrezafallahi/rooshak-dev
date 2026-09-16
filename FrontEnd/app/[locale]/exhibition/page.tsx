@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import { getTranslations } from 'next-intl/server';
 
@@ -38,8 +39,12 @@ async function fetchFamilies(): Promise<ITagFamily[] | null> {
     { next: { revalidate: 300 } },
   );
 
-  if (!result.ok || !result.data) return null;
-  if (result.data.isSuccess === false) return null;
+  // Soft-fail UI must not be ISR-cached for `revalidate` seconds —
+  // otherwise a brief backend blip sticks as "خطا در دریافت اطلاعات".
+  if (!result.ok || !result.data || result.data.isSuccess === false) {
+    noStore();
+    return null;
+  }
   return result.data.data ?? [];
 }
 
