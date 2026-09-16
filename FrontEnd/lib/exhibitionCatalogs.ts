@@ -78,6 +78,24 @@ export const EXHIBITION_CATALOGS: ExhibitionCatalog[] = [
       { src: '/exhibition/icy/99-price-list.webp', alt: 'لیست قیمت یخی', width: 567, height: 850 },
     ],
   },
+  {
+    slug: 'smoky',
+    aliases: ['doodi', 'dudi', 'smoke'],
+    nameFa: 'دودی',
+    nameEn: 'Smoky',
+    coverImage: '/exhibition/smoky/01-fruit-bowl.webp',
+    coverWidth: 960,
+    coverHeight: 710,
+    photos: [
+      { src: '/exhibition/smoky/01-fruit-bowl.webp', alt: 'کاسه میوه دودی', width: 960, height: 710 },
+      { src: '/exhibition/smoky/02-chocolate.webp', alt: 'شکلات‌خوری دودی', width: 827, height: 1024 },
+      { src: '/exhibition/smoky/03-nut-bowl.webp', alt: 'ظرف آجیل دودی', width: 960, height: 756 },
+      { src: '/exhibition/smoky/04-single-tier.webp', alt: 'شیرینی تک‌طبقه دودی', width: 960, height: 624 },
+      { src: '/exhibition/smoky/05-two-tier.webp', alt: 'شیرینی دوطبقه دودی', width: 891, height: 1024 },
+      { src: '/exhibition/smoky/06-small-bowl.webp', alt: 'پیاله دودی', width: 960, height: 738 },
+      { src: '/exhibition/smoky/99-price-list.webp', alt: 'لیست قیمت دودی', width: 567, height: 850 },
+    ],
+  },
 ];
 
 export function findExhibitionCatalog(slug: string): ExhibitionCatalog | null {
