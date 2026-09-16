@@ -183,6 +183,21 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/:locale/exhibition/sunshine-11',
+        destination: '/:locale/exhibition/lab-tala',
+        permanent: true,
+      },
+      {
+        source: '/:locale/exhibition/sunshine',
+        destination: '/:locale/exhibition/lab-tala',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

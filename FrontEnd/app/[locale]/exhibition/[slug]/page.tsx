@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { getTranslations } from 'next-intl/server';
 
+import ExhibitionPhoto from '@components/organisms/exhibition/ExhibitionPhoto';
 import {
   exhibitionCatalogName,
+  exhibitionStaticSlugs,
   findExhibitionCatalog,
 } from '@lib/exhibitionCatalogs';
 import { buildPageMetadata } from '@lib/seo';
@@ -14,13 +15,12 @@ type Props = {
   params: Promise<{ slug: string; locale: string }>;
 };
 
-export const revalidate = 3600;
+/** Fully static sheets — data lives in the repo, not the API. */
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export function generateStaticParams() {
-  return [
-    { slug: 'lab-tala' },
-    { slug: 'sunshine-11' },
-  ];
+  return exhibitionStaticSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -70,18 +70,14 @@ export default async function Page({ params }: Props) {
     <main className="exhibit-sheet" aria-label={name}>
       <h1 className="sr-only">{name}</h1>
       {catalog.photos.map((photo, index) => (
-        <figure key={photo.src} className="exhibit-photo">
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            width={1600}
-            height={2000}
-            className="exhibit-photo-img"
-            sizes="100vw"
-            priority={index === 0}
-            quality={90}
-          />
-        </figure>
+        <ExhibitionPhoto
+          key={photo.src}
+          src={photo.src}
+          alt={photo.alt}
+          width={photo.width}
+          height={photo.height}
+          priority={index === 0}
+        />
       ))}
     </main>
   );

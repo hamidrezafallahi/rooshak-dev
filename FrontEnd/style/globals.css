@@ -731,15 +731,65 @@ html {
   }
 
   .exhibit-photo {
+    position: relative;
     margin: 0;
     width: 100%;
-    line-height: 0;
+    overflow: hidden;
+    background: #111;
   }
 
-  .exhibit-photo-img {
+  .exhibit-photo-img,
+  .exhibit-index-cover {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .exhibit-photo-img.is-loaded,
+  .exhibit-index-cover.is-loaded {
+    opacity: 1;
+  }
+
+  .exhibit-photo-skeleton {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(
+      110deg,
+      #141414 0%,
+      #1f1f1f 40%,
+      #141414 80%
+    );
+    background-size: 200% 100%;
+    animation: exhibit-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .exhibit-photo-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid color-mix(in srgb, #c9a84c 35%, transparent);
+    border-top-color: #c9a84c;
+    border-radius: 50%;
+    animation: exhibit-spin 0.8s linear infinite;
+  }
+
+  @keyframes exhibit-shimmer {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  @keyframes exhibit-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .exhibit-index {
@@ -767,10 +817,12 @@ html {
     color: inherit;
   }
 
-  .exhibit-index-cover {
+  .exhibit-index-media {
+    position: relative;
     display: block;
     width: 100%;
-    height: auto;
+    overflow: hidden;
+    background: #111;
   }
 
   .exhibit-index-name {
@@ -793,6 +845,15 @@ html {
 
   .exhibit-photo {
     break-inside: avoid;
+  }
+
+  .exhibit-photo-skeleton {
+    display: none;
+  }
+
+  .exhibit-photo-img,
+  .exhibit-index-cover {
+    opacity: 1;
   }
 }
 

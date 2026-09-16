@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { getTranslations } from 'next-intl/server';
 
+import ExhibitionCover from '@components/organisms/exhibition/ExhibitionCover';
 import {
   EXHIBITION_CATALOGS,
   exhibitionCatalogName,
@@ -14,7 +14,8 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
-export const revalidate = 3600;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -44,14 +45,11 @@ export default async function Page({ params }: Props) {
                 href={`/${locale}/exhibition/${catalog.slug}`}
                 className="exhibit-index-card"
               >
-                <Image
+                <ExhibitionCover
                   src={catalog.coverImage}
                   alt={name}
-                  width={800}
-                  height={1000}
-                  className="exhibit-index-cover"
-                  sizes="(max-width: 640px) 100vw, 420px"
-                  priority
+                  width={catalog.coverWidth}
+                  height={catalog.coverHeight}
                 />
                 <span className="exhibit-index-name">{name}</span>
               </Link>
