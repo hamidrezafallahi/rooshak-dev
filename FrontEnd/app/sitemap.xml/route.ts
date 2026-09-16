@@ -221,14 +221,9 @@ export async function GET() {
         item.lastmod || fallbackLastmod,
       ),
     ),
-    // Exhibition price lists are keyed by the same tag slugs.
-    ...tags.map((item) =>
-      buildUrlXml(
-        `exhibition/${item.key}`,
-        0.7,
-        'weekly',
-        item.lastmod || fallbackLastmod,
-      ),
+    // Hard-coded exhibition photo sheets.
+    ...['lab-tala'].map((slug) =>
+      buildUrlXml(`exhibition/${slug}`, 0.7, 'weekly', fallbackLastmod),
     ),
     ...discounts.map((item) =>
       buildUrlXml(

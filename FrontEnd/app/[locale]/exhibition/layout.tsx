@@ -1,16 +1,8 @@
 import React, { ReactNode } from 'react';
 
-import Footer from '@layout/footer';
-import Header from '@layout/header';
-
+/** Bare shell — price-list sheets are full-bleed photo stacks with no chrome. */
 function ExhibitionLayout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <Header />
-      <div className="pt-20 sm:pt-24 min-h-[70vh]">{children}</div>
-      <Footer />
-    </>
-  );
+  return <div className="exhibit-root min-h-screen">{children}</div>;
 }
 
 export default ExhibitionLayout;

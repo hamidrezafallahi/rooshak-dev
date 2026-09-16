@@ -1,25 +1,20 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { unstable_noStore as noStore } from 'next/cache';
 
 import { getTranslations } from 'next-intl/server';
 
-import MediaImage from '@components/atoms/MediaImage';
-import EmptyState from '@components/molecules/storefront/EmptyState';
-import EntityGrid from '@components/molecules/storefront/EntityGrid';
-import JsonLd from '@components/molecules/storefront/JsonLd';
-import PageHeader from '@components/molecules/storefront/PageHeader';
-import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
-import { absoluteUrl, buildPageMetadata } from '@lib/seo';
-import { SimpleResponse } from '@models/base';
-import { ITagFamily } from '@models/exhibition';
+import {
+  EXHIBITION_CATALOGS,
+  exhibitionCatalogName,
+} from '@lib/exhibitionCatalogs';
+import { buildPageMetadata } from '@lib/seo';
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -33,102 +28,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-async function fetchFamilies(): Promise<ITagFamily[] | null> {
-  const result = await safeFetchJson<SimpleResponse<ITagFamily[]>>(
-    `${serverApiBaseUrl}/Tags/families`,
-    { next: { revalidate: 300 } },
-  );
-
-  // Soft-fail UI must not be ISR-cached for `revalidate` seconds —
-  // otherwise a brief backend blip sticks as "خطا در دریافت اطلاعات".
-  if (!result.ok || !result.data || result.data.isSuccess === false) {
-    noStore();
-    return null;
-  }
-  return result.data.data ?? [];
-}
-
 export default async function Page({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'exhibition' });
-  const tStore = await getTranslations({ locale, namespace: 'store' });
-
-  const families = await fetchFamilies();
-  const loadFailed = families === null;
-  const list = families ?? [];
-
-  const collectionLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: t('indexTitle'),
-    description: t('indexDescription'),
-    url: absoluteUrl(locale, 'exhibition'),
-    inLanguage: locale,
-  };
 
   return (
-    <article className="store-page !pt-6">
-      <JsonLd data={collectionLd} />
-      <PageHeader
-        title={t('indexTitle')}
-        description={t('indexDescription')}
-        eyebrow={t('eyebrow')}
-      />
-
-      {loadFailed && (
-        <div
-          className="store-panel px-4 py-3 border-[color-mix(in_srgb,var(--error-color)_35%,transparent)] text-[var(--error-color)]"
-          role="alert"
-        >
-          <p className="font-medium">{tStore('error')}</p>
-          <p>{tStore('fetchError')}</p>
-        </div>
-      )}
-
-      {list.length === 0 ? (
-        <EmptyState
-          title={loadFailed ? tStore('loadError') : t('indexEmpty')}
-          description={loadFailed ? tStore('serverError') : t('indexEmptyHint')}
-          action={
-            <Link href={`/${locale}/products`} className="store-btn store-btn-primary">
-              {t('browseProducts')}
-            </Link>
-          }
-        />
-      ) : (
-        <EntityGrid cols="cards">
-          {list.map((family) => (
-            <Link
-              key={family.id}
-              href={`/${locale}/exhibition/${family.slug || family.id}`}
-              className="group exhibit-family-card"
-            >
-              <div className="exhibit-family-media">
-                {family.coverImage ? (
-                  <MediaImage
-                    src={family.coverImage}
-                    alt={family.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
-                  />
-                ) : (
-                  <span className="exhibit-card-placeholder" aria-hidden>
-                    {family.name}
-                  </span>
-                )}
-              </div>
-              <div className="exhibit-family-body">
-                <h2 className="exhibit-family-name">{family.name}</h2>
-                <p className="exhibit-family-count">
-                  {t('itemCount', { count: family.productCount })}
-                </p>
-                <span className="exhibit-family-cta">{t('viewPriceList')}</span>
-              </div>
-            </Link>
-          ))}
-        </EntityGrid>
-      )}
-    </article>
+    <main className="exhibit-index" aria-label={t('indexTitle')}>
+      <h1 className="sr-only">{t('indexTitle')}</h1>
+      <ul className="exhibit-index-list">
+        {EXHIBITION_CATALOGS.map((catalog) => {
+          const name = exhibitionCatalogName(catalog, locale);
+          return (
+            <li key={catalog.slug}>
+              <Link
+                href={`/${locale}/exhibition/${catalog.slug}`}
+                className="exhibit-index-card"
+              >
+                <Image
+                  src={catalog.coverImage}
+                  alt={name}
+                  width={800}
+                  height={1000}
+                  className="exhibit-index-cover"
+                  sizes="(max-width: 640px) 100vw, 420px"
+                  priority
+                />
+                <span className="exhibit-index-name">{name}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </main>
   );
 }
