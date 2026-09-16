@@ -13,4 +13,4 @@ Disallow: /en/payment
 Disallow: /fa/order
 Disallow: /en/order
 
-Sitemap: https://rooshakshop.com/sitemap.xml
+Sitemap: https://rooshakshop.ir/sitemap.xml

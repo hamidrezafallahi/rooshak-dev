@@ -26,6 +26,17 @@ namespace OnlineShop.Infrastructure.Repositories
                 .AnyAsync();
         }
 
+        public async Task<bool> ExistsBySlugAsync(string slug, int? excludeTagId = null)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return false;
 
+            var normalized = slug.Trim().ToLower();
+            return await Query(t =>
+                    !t.IsDeleted &&
+                    t.Slug.ToLower() == normalized &&
+                    (!excludeTagId.HasValue || t.Id != excludeTagId.Value))
+                .AnyAsync();
+        }
     }
 }

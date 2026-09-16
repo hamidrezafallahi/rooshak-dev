@@ -74,10 +74,6 @@ export default function ShareActions({ url, title }: Props) {
       >
         Telegram
       </a>
-
-      <button type="button" onClick={() => window.print()} className="store-btn">
-        {t('print')}
-      </button>
     </div>
   );
 }

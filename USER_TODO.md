@@ -4,7 +4,7 @@
 نقشهٔ فازها: `ROADMAP.md` · وضعیت: `EXECUTION_REPORT.md`  
 آخرین به‌روزرسانی Agent: 2026-08-16
 
-VPS فعلی: `65.109.212.237` (`/opt/shop`) · فروشگاه: `rooshakshop.com`
+VPS فعلی: `65.109.212.237` (`/opt/shop`) · فروشگاه: `rooshakshop.ir`
 
 ---
 
