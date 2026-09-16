@@ -222,7 +222,7 @@ export async function GET() {
       ),
     ),
     // Hard-coded exhibition photo sheets.
-    ...['lab-tala', 'carameli'].map((slug) =>
+    ...['lab-tala', 'carameli', 'icy'].map((slug) =>
       buildUrlXml(`exhibition/${slug}`, 0.7, 'weekly', fallbackLastmod),
     ),
     ...discounts.map((item) =>

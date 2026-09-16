@@ -60,6 +60,24 @@ export const EXHIBITION_CATALOGS: ExhibitionCatalog[] = [
       { src: '/exhibition/carameli/99-price-list.webp', alt: 'لیست قیمت کاراملی', width: 567, height: 850 },
     ],
   },
+  {
+    slug: 'icy',
+    aliases: ['ice', 'yakh', 'yakhī', 'yakhi'],
+    nameFa: 'یخی',
+    nameEn: 'Icy',
+    coverImage: '/exhibition/icy/01-fruit-bowl.webp',
+    coverWidth: 960,
+    coverHeight: 872,
+    photos: [
+      { src: '/exhibition/icy/01-fruit-bowl.webp', alt: 'کاسه میوه یخی', width: 960, height: 872 },
+      { src: '/exhibition/icy/02-chocolate.webp', alt: 'شکلات‌خوری یخی', width: 768, height: 1024 },
+      { src: '/exhibition/icy/03-nut-bowl.webp', alt: 'ظرف آجیل یخی', width: 960, height: 960 },
+      { src: '/exhibition/icy/04-single-tier.webp', alt: 'شیرینی تک‌طبقه یخی', width: 960, height: 760 },
+      { src: '/exhibition/icy/05-two-tier.webp', alt: 'شیرینی دوطبقه یخی', width: 940, height: 1024 },
+      { src: '/exhibition/icy/06-small-bowl.webp', alt: 'پیاله یخی', width: 768, height: 1024 },
+      { src: '/exhibition/icy/99-price-list.webp', alt: 'لیست قیمت یخی', width: 567, height: 850 },
+    ],
+  },
 ];
 
 export function findExhibitionCatalog(slug: string): ExhibitionCatalog | null {
