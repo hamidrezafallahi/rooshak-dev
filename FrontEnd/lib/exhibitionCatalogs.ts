@@ -96,6 +96,24 @@ export const EXHIBITION_CATALOGS: ExhibitionCatalog[] = [
       { src: '/exhibition/smoky/99-price-list.webp', alt: 'لیست قیمت دودی', width: 567, height: 850 },
     ],
   },
+  {
+    slug: 'saria',
+    aliases: ['sariya', 'sarya'],
+    nameFa: 'ساریا',
+    nameEn: 'Saria',
+    coverImage: '/exhibition/saria/01-fruit-bowl.webp',
+    coverWidth: 819,
+    coverHeight: 1024,
+    photos: [
+      { src: '/exhibition/saria/01-fruit-bowl.webp', alt: 'کاسه میوه ساریا', width: 819, height: 1024 },
+      { src: '/exhibition/saria/02-chocolate.webp', alt: 'شکلات‌خوری ساریا', width: 768, height: 1024 },
+      { src: '/exhibition/saria/03-nut-bowl.webp', alt: 'ظرف آجیل ساریا', width: 768, height: 1024 },
+      { src: '/exhibition/saria/04-single-tier.webp', alt: 'شیرینی تک‌طبقه ساریا', width: 819, height: 1024 },
+      { src: '/exhibition/saria/05-two-tier.webp', alt: 'شیرینی دوطبقه ساریا', width: 768, height: 1024 },
+      { src: '/exhibition/saria/06-small-bowl.webp', alt: 'پیاله ساریا', width: 768, height: 1024 },
+      { src: '/exhibition/saria/99-price-list.webp', alt: 'لیست قیمت ساریا', width: 567, height: 850 },
+    ],
+  },
 ];
 
 export function findExhibitionCatalog(slug: string): ExhibitionCatalog | null {
