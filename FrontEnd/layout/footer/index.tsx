@@ -39,6 +39,8 @@ const COLUMNS = [
       { href: 'blog', labelKey: 'blog' as const },
       { href: 'suppliers', labelKey: 'suppliers' as const },
       { href: 'tags', labelKey: 'tags' as const },
+      { href: 'faq', labelKey: 'faq' as const },
+      { href: 'cooperation', labelKey: 'cooperation' as const },
       { href: 'sitemap', labelKey: 'sitemap' as const },
     ],
   },

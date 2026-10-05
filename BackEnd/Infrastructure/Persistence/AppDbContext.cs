@@ -37,6 +37,8 @@ namespace OnlineShop.Infrastructure.Persistence
         public DbSet<ProductSpecification> ProductSpecification => Set<ProductSpecification>();
         public DbSet<ProductOffers> ProductOffers => Set<ProductOffers>();
         public DbSet<SeoSetting> SeoSettings => Set<SeoSetting>();
+        public DbSet<Faq> Faqs => Set<Faq>();
+        public DbSet<ContactRequest> ContactRequests => Set<ContactRequest>();
 
 
 

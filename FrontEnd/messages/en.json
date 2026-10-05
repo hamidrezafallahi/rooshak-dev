@@ -59,7 +59,9 @@
       "sitemap": "Sitemap",
       "register": "Sign in / Register",
       "cart": "Cart",
-      "orders": "Orders"
+      "orders": "Orders",
+      "faq": "FAQ",
+      "cooperation": "Work with us"
     }
   },
   "seo": {
@@ -701,5 +703,47 @@
     "copyLink": "Copy link",
     "copied": "Copied!",
     "print": "Print"
+  },
+  "faqPage": {
+    "title": "Frequently asked questions",
+    "description": "Answers to common questions about ordering, shipping and payment at Rooshak.",
+    "empty": "No questions yet",
+    "emptyHint": "Answers to common questions will appear here soon.",
+    "viewAll": "View all questions",
+    "contactHint": "Did not find your answer? Leave your contact details and we will call you.",
+    "contactCta": "Request a call"
+  },
+  "cooperationPage": {
+    "title": "Work with us",
+    "description": "If you would like to work with Rooshak (supplying goods, wholesale purchasing or reselling), fill in the form below and we will contact you shortly.",
+    "metaDescription": "Cooperation form for suppliers, wholesale buyers and resellers of the Rooshak shop.",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phoneNumber": "Phone number",
+      "email": "Email (optional)",
+      "address": "Address",
+      "preferredContactTime": "Best time to call (optional)",
+      "preferredContactTimePlaceholder": "e.g. Saturday to Wednesday, 9 to 13",
+      "message": "Details (optional)",
+      "messagePlaceholder": "Tell us about the kind of cooperation you have in mind"
+    },
+    "submit": "Send request",
+    "submitting": "Sending...",
+    "privacyNote": "Your details are only used to contact you about this request.",
+    "successTitle": "Your request was received",
+    "successText": "Thank you. Our team will contact you as soon as possible.",
+    "sendAnother": "Send another request",
+    "errors": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "minTwoChars": "Enter at least 2 characters",
+      "phoneRequired": "Phone number is required",
+      "invalidPhone": "Invalid phone number (09xxxxxxxxx)",
+      "invalidEmail": "Invalid email address",
+      "addressRequired": "Address is required",
+      "submitFailed": "Could not send the request. Please try again.",
+      "connectionError": "Could not reach the server. Please try again."
+    }
   }
 }

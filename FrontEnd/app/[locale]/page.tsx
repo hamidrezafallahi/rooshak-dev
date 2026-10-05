@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import BlogSection from '@components/molecules/landing Elements/blogSection';
+import LandingFaq from '@components/molecules/landing Elements/landingFaq';
 import LandingBrands
   from '@components/molecules/landing Elements/landingBrands';
 import LandingCategory
@@ -119,6 +120,7 @@ export default async function Home({ params }: Props) {
         <USPSection />
         <BlogSection />
         <TestimonialsSection />
+        <LandingFaq locale={locale} />
       </main>
       <AdminDock />
       <Footer />

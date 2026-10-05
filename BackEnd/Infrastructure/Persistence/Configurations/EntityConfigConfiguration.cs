@@ -88,7 +88,9 @@ namespace OnlineShop.Infrastructure.Configurations
                 CreateRatesEntity(),
                 CreateProductSpecificationsEntity(),
                 CreateSeoSettingsEntity(),
-                CreateSeoDashboardEntity()
+                CreateSeoDashboardEntity(),
+                CreateFaqsEntity(),
+                CreateContactRequestsEntity()
             //CreateCartsEntity(),
             //CreateOrdersEntity(),
 
@@ -2362,6 +2364,127 @@ namespace OnlineShop.Infrastructure.Configurations
                 ActionsJson = JsonSerializer.Serialize(new List<string>()),
                 ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>()),
                 FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>()),
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 1, 1),
+                CreatedBy = 1,
+                IsDeleted = false
+            };
+        }
+
+        private static object CreateFaqsEntity()
+        {
+            return new
+            {
+                Id = 30,
+                EntityName = "faqs",
+                PersianDisplayName = "سوالات متداول",
+                EnglishDisplayName = "FAQs",
+                EndPoint = "faqs",
+                EntityIconBase64 = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"" /></svg>",
+                ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit", "delete", "new" }),
+                ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+                {
+                    new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "سوال", Accessor = "question", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "پاسخ", Accessor = "answer", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "ترتیب نمایش", Accessor = "displayOrder", Type = "number", Sortable = false, Filterable = false }
+                }),
+                FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+                {
+                    new FormFieldDefinition
+                    {
+                        Name = "question",
+                        Caption = "سوال",
+                        Type = "text",
+                        PlaceHolder = "مثلا: ارسال سفارش چقدر زمان می برد؟",
+                        Help = "متن سوال همان طور که در سایت نمایش داده می شود",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "متن سوال الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition { Name = "displayOrder", Caption = "ترتیب نمایش", Type = "number", PlaceHolder = "مثلا: 1", Help = "عدد کوچک تر بالاتر نمایش داده می شود" },
+                    new FormFieldDefinition
+                    {
+                        Name = "answer",
+                        Caption = "پاسخ",
+                        Type = "textarea",
+                        PlaceHolder = "پاسخ کامل سوال",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "متن پاسخ الزامی است" }
+                        }
+                    }
+                }),
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 1, 1),
+                CreatedBy = 1,
+                IsDeleted = false
+            };
+        }
+
+        private static object CreateContactRequestsEntity()
+        {
+            return new
+            {
+                Id = 31,
+                EntityName = "contactRequests",
+                PersianDisplayName = "همکاری با ما",
+                EnglishDisplayName = "Contact requests",
+                EndPoint = "contactRequests",
+                EntityIconBase64 = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"" /></svg>",
+                ActionsJson = JsonSerializer.Serialize(new List<string> { "edit", "delete", "new" }),
+                ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+                {
+                    new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "نام", Accessor = "firstName", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "نام خانوادگی", Accessor = "lastName", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "شماره تماس", Accessor = "phoneNumber", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "آدرس", Accessor = "address", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "زمان مناسب تماس", Accessor = "preferredContactTime", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "تاریخ ثبت", Accessor = "createdAt", Type = "date", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "بررسی شده", Accessor = "isReviewed", Type = "bool", Sortable = false, Filterable = false }
+                }),
+                FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+                {
+                    new FormFieldDefinition
+                    {
+                        Name = "firstName",
+                        Caption = "نام",
+                        Type = "text",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "نام الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name = "lastName",
+                        Caption = "نام خانوادگی",
+                        Type = "text",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "نام خانوادگی الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name = "phoneNumber",
+                        Caption = "شماره تماس",
+                        Type = "text",
+                        PlaceHolder = "09123456789",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "شماره تماس الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition { Name = "email", Caption = "ایمیل", Type = "text", PlaceHolder = "name@example.com" },
+                    new FormFieldDefinition { Name = "preferredContactTime", Caption = "زمان مناسب تماس", Type = "text", PlaceHolder = "مثلا: شنبه تا چهارشنبه ۹ تا ۱۳" },
+                    new FormFieldDefinition { Name = "isReviewed", Caption = "بررسی شده", Type = "checkbox", Help = "بعد از تماس یا پیگیری درخواست، این گزینه را فعال کنید" },
+                    new FormFieldDefinition { Name = "address", Caption = "آدرس", Type = "textarea" },
+                    new FormFieldDefinition { Name = "message", Caption = "متن پیام", Type = "textarea" },
+                    new FormFieldDefinition { Name = "adminNote", Caption = "یادداشت ادمین", Type = "textarea", PlaceHolder = "نتیجه تماس یا پیگیری" }
+                }),
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1),
                 CreatedBy = 1,
