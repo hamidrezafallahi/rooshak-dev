@@ -90,7 +90,9 @@ namespace OnlineShop.Infrastructure.Configurations
                 CreateSeoSettingsEntity(),
                 CreateSeoDashboardEntity(),
                 CreateFaqsEntity(),
-                CreateContactRequestsEntity()
+                CreateContactRequestsEntity(),
+                CreateThemeSettingsEntity(),
+                CreateAnnouncementBarsEntity()
             //CreateCartsEntity(),
             //CreateOrdersEntity(),
 
@@ -1719,7 +1721,8 @@ namespace OnlineShop.Infrastructure.Configurations
                     new JsonDefinition {Header="توضیح بنر",Accessor="bannerDescription",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس اول",Accessor="firstUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس دوم",Accessor="secondUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
-                    new JsonDefinition {Header="ویدیو",Accessor="videoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
+                    new JsonDefinition {Header="ویدیو دسکتاپ",Accessor="videoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
+                    new JsonDefinition {Header="ویدیو موبایل",Accessor="mobileVideoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="نمایش بنر",Accessor="isHero",Type ="bool",Sortable =false,Filterable =false,Options =null},
 
                 }),
@@ -1728,10 +1731,10 @@ namespace OnlineShop.Infrastructure.Configurations
                     new FormFieldDefinition
                     {
                         Name ="bannerUrl",
-                        Caption = "انتخاب بنر",
+                        Caption = "پوستر / عکس دسکتاپ",
                         Type ="file",
                         PlaceHolder = "انتخاب بنر",
-                        Help = "عکسی که انتظار می رود در صفحه اصلی دیده شود",
+                        Help = "عکس نسخه‌ی دسکتاپ؛ پوستر ویدیو و جایگزین آن هم هست",
                         Rules = new List<ValidationRule>
                         {
                             new ValidationRule { Rule = "required", Condition = "true", Message = "انتخاب عکس الزامی است" }
@@ -1788,10 +1791,46 @@ namespace OnlineShop.Infrastructure.Configurations
                     new FormFieldDefinition
                     {
                         Name ="videoUrl",
-                        Caption ="ویدیوی هیرو (اختیاری)",
+                        Caption ="ویدیوی دسکتاپ (اختیاری)",
                         Type = "video",
                         PlaceHolder ="انتخاب ویدیو (mp4 یا webm)",
                         Help = "ویدیوی کوتاه بی‌صدا، حداکثر ۳۰ مگابایت، ترجیحاً ۱۶:۹ و حدود ۱۵ ثانیه. عکس بنر به‌عنوان پوستر و جایگزین نمایش داده می‌شود.",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="mobileBannerUrl",
+                        Caption ="پوستر موبایل (اختیاری)",
+                        Type = "file",
+                        PlaceHolder ="انتخاب پوستر موبایل",
+                        Help = "عکس عمودی مخصوص صفحه‌های کوچک؛ اگر خالی باشد از عکس دسکتاپ استفاده می‌شود",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="mobileVideoUrl",
+                        Caption ="ویدیوی موبایل (اختیاری)",
+                        Type = "video",
+                        PlaceHolder ="انتخاب ویدیو (mp4 یا webm)",
+                        Help = "ویدیوی سبک و عمودی برای موبایل، حداکثر ۳۰ مگابایت؛ اگر خالی باشد از ویدیوی دسکتاپ استفاده می‌شود",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="removeMobileBanner",
+                        Caption ="حذف پوستر موبایل فعلی",
+                        Type = "checkbox",
+                        PlaceHolder ="",
+                        Help = "در ویرایش: برای حذف پوستر موبایل ثبت‌شده فعال کنید.",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="removeMobileVideo",
+                        Caption ="حذف ویدیوی موبایل فعلی",
+                        Type = "checkbox",
+                        PlaceHolder ="",
+                        Help = "در ویرایش: برای حذف ویدیوی موبایل ثبت‌شده فعال کنید.",
                         Rules = new List<ValidationRule>()
                     },
                     new FormFieldDefinition
@@ -2434,6 +2473,115 @@ namespace OnlineShop.Infrastructure.Configurations
                             new ValidationRule { Rule = "required", Condition = "true", Message = "متن پاسخ الزامی است" }
                         }
                     }
+                }),
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 1, 1),
+                CreatedBy = 1,
+                IsDeleted = false
+            };
+        }
+
+        private static object CreateThemeSettingsEntity()
+        {
+            return new
+            {
+                Id = 32,
+                EntityName = "themeSettings",
+                PersianDisplayName = "تم سایت",
+                EnglishDisplayName = "Site theme",
+                EndPoint = "themeSettings",
+                EntityIconBase64 = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42"" /></svg>",
+                ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit", "delete", "new" }),
+                ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+                {
+                    new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "نام تم", Accessor = "name", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "رنگ اصلی", Accessor = "primaryColor", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "پس‌زمینه", Accessor = "surfaceColor", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "متن", Accessor = "textColor", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "فعال (نمایش در سایت)", Accessor = "isActive", Type = "bool", Sortable = false, Filterable = false }
+                }),
+                FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+                {
+                    new FormFieldDefinition
+                    {
+                        Name = "name",
+                        Caption = "نام تم",
+                        Type = "text",
+                        PlaceHolder = "مثلا: پاییز کریستال",
+                        Help = "فقط برای شناسایی در پنل",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "نام تم الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition { Name = "primaryColor", Caption = "رنگ اصلی", Type = "color", PlaceHolder = "#000000", Help = "دکمه‌ها، لینک‌های مهم و تأکیدها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ اصلی الزامی است" } } },
+                    new FormFieldDefinition { Name = "secondaryColor", Caption = "رنگ ثانویه", Type = "color", PlaceHolder = "#f2f2f2", Help = "پس‌زمینه‌های ملایم و جداکننده‌ها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ ثانویه الزامی است" } } },
+                    new FormFieldDefinition { Name = "highlightColor", Caption = "رنگ تأکید (طلایی)", Type = "color", PlaceHolder = "#a38a52", Help = "نشان‌ها و جزئیات تزئینی", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ تأکید (طلایی) الزامی است" } } },
+                    new FormFieldDefinition { Name = "neutralColor", Caption = "رنگ خنثی", Type = "color", PlaceHolder = "#f7f7f7", Help = "پس‌زمینه‌ی بخش‌های کم‌اهمیت", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ خنثی الزامی است" } } },
+                    new FormFieldDefinition { Name = "successColor", Caption = "رنگ موفقیت", Type = "color", PlaceHolder = "#0d9488", Help = "پیام‌های موفق", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ موفقیت الزامی است" } } },
+                    new FormFieldDefinition { Name = "errorColor", Caption = "رنگ خطا", Type = "color", PlaceHolder = "#c8102e", Help = "خطاها و تخفیف‌ها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ خطا الزامی است" } } },
+                    new FormFieldDefinition { Name = "warningColor", Caption = "رنگ هشدار", Type = "color", PlaceHolder = "#b45309", Help = "هشدارها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ هشدار الزامی است" } } },
+                    new FormFieldDefinition { Name = "infoColor", Caption = "رنگ اطلاع‌رسانی", Type = "color", PlaceHolder = "#3b82f6", Help = "پیام‌های اطلاعاتی", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ اطلاع‌رسانی الزامی است" } } },
+                    new FormFieldDefinition { Name = "surfaceColor", Caption = "رنگ پس‌زمینه‌ی صفحه", Type = "color", PlaceHolder = "#ffffff", Help = "پس‌زمینه‌ی اصلی سایت و کارت‌ها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ پس‌زمینه‌ی صفحه الزامی است" } } },
+                    new FormFieldDefinition { Name = "surfaceMutedColor", Caption = "رنگ پس‌زمینه‌ی ملایم", Type = "color", PlaceHolder = "#f7f7f7", Help = "قاب عکس محصولات و بخش‌های خاکستری", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ پس‌زمینه‌ی ملایم الزامی است" } } },
+                    new FormFieldDefinition { Name = "borderColor", Caption = "رنگ خط و حاشیه", Type = "color", PlaceHolder = "#e3e3e3", Help = "خط‌های جداکننده و حاشیه‌ی کارت‌ها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ خط و حاشیه الزامی است" } } },
+                    new FormFieldDefinition { Name = "textColor", Caption = "رنگ متن", Type = "color", PlaceHolder = "#000000", Help = "متن اصلی و تیترها", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ متن الزامی است" } } },
+                    new FormFieldDefinition { Name = "textMutedColor", Caption = "رنگ متن کم‌رنگ", Type = "color", PlaceHolder = "#6b6b6b", Help = "توضیحات و متن‌های فرعی", Rules = new List<ValidationRule> { new ValidationRule { Rule = "required", Condition = "true", Message = "رنگ متن کم‌رنگ الزامی است" } } }
+                }),
+                IsActive = true,
+                CreatedAt = new DateTime(2026, 1, 1),
+                CreatedBy = 1,
+                IsDeleted = false
+            };
+        }
+
+        private static object CreateAnnouncementBarsEntity()
+        {
+            return new
+            {
+                Id = 33,
+                EntityName = "announcementBars",
+                PersianDisplayName = "نوار اعلان",
+                EnglishDisplayName = "Announcement bar",
+                EndPoint = "announcementBars",
+                EntityIconBase64 = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"" /></svg>",
+                ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit", "delete", "new" }),
+                ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+                {
+                    new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "متن فارسی", Accessor = "messageFa", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "آدرس لینک", Accessor = "linkUrl", Type = "text", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "ارتفاع (px)", Accessor = "heightPx", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "شروع نمایش", Accessor = "startsAt", Type = "date", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "پایان نمایش", Accessor = "endsAt", Type = "date", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "ترتیب", Accessor = "displayOrder", Type = "number", Sortable = false, Filterable = false },
+                    new JsonDefinition { Header = "نمایش داده شود", Accessor = "isActive", Type = "bool", Sortable = false, Filterable = false }
+                }),
+                FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+                {
+                    new FormFieldDefinition
+                    {
+                        Name = "messageFa",
+                        Caption = "متن فارسی",
+                        Type = "text",
+                        PlaceHolder = "مثلا: ارسال رایگان برای خرید بالای ...",
+                        Help = "متنی که در صفحه‌های فارسی روی نوار نمایش داده می‌شود",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "required", Condition = "true", Message = "متن فارسی الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition { Name = "messageEn", Caption = "متن انگلیسی", Type = "text", PlaceHolder = "English message", Help = "برای صفحه‌های انگلیسی؛ اگر خالی باشد متن فارسی نمایش داده می‌شود" },
+                    new FormFieldDefinition { Name = "linkUrl", Caption = "آدرس لینک", Type = "text", PlaceHolder = "مثلا: discounts یا https://example.com", Help = "با کلیک روی نوار به این آدرس می‌رود؛ خالی = بدون لینک" },
+                    new FormFieldDefinition { Name = "backgroundImageUrl", Caption = "تصویر پس‌زمینه (اختیاری)", Type = "file", PlaceHolder = "انتخاب تصویر", Help = "روی رنگ پس‌زمینه قرار می‌گیرد؛ تصویر افقی و کم‌حجم پیشنهاد می‌شود" },
+                    new FormFieldDefinition { Name = "removeBackgroundImage", Caption = "حذف تصویر پس‌زمینه فعلی", Type = "checkbox", PlaceHolder = "", Help = "در ویرایش: برای حذف تصویر ثبت‌شده فعال کنید." },
+                    new FormFieldDefinition { Name = "backgroundColor", Caption = "رنگ پس‌زمینه", Type = "color", PlaceHolder = "#000000", Help = "اگر تصویر پس‌زمینه ندارید این رنگ دیده می‌شود" },
+                    new FormFieldDefinition { Name = "textColor", Caption = "رنگ متن", Type = "color", PlaceHolder = "#ffffff", Help = "رنگ متن روی نوار" },
+                    new FormFieldDefinition { Name = "heightPx", Caption = "ارتفاع نوار (پیکسل)", Type = "number", PlaceHolder = "36", Help = "بین ۲۴ تا ۱۶۰ پیکسل" },
+                    new FormFieldDefinition { Name = "startsAt", Caption = "شروع نمایش", Type = "date", PlaceHolder = "", Help = "خالی = از همین حالا" },
+                    new FormFieldDefinition { Name = "endsAt", Caption = "پایان نمایش", Type = "date", PlaceHolder = "", Help = "خالی = بدون پایان" },
+                    new FormFieldDefinition { Name = "displayOrder", Caption = "ترتیب", Type = "number", PlaceHolder = "0", Help = "اگر چند نوار هم‌زمان معتبر باشند، عدد کوچک‌تر نمایش داده می‌شود" }
                 }),
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1),

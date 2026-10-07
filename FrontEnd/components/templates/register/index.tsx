@@ -39,8 +39,7 @@ function Register({ imageSrc, videoSrc, mediaAlt, playLabel, pauseLabel }: Props
         }`}
       >
         <HeroMedia
-          imageSrc={imageSrc}
-          videoSrc={videoSrc}
+          desktop={{ image: imageSrc, video: videoSrc }}
           alt={mediaAlt}
           playLabel={playLabel}
           pauseLabel={pauseLabel}

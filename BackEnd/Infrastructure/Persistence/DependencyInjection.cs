@@ -82,6 +82,8 @@ namespace OnlineShop.Infrastructure
             services.AddScoped<IUserTagRepository, UserTagRepository>();
             services.AddScoped<ISeoSettingRepository, SeoSettingRepository>();
             services.AddScoped<IFaqRepository, FaqRepository>();
+            services.AddScoped<IThemeSettingRepository, ThemeSettingRepository>();
+            services.AddScoped<IAnnouncementBarRepository, AnnouncementBarRepository>();
             services.AddScoped<IContactRequestRepository, ContactRequestRepository>();
             services.AddScoped<IBlogContentQualityService, BlogContentQualityService>();
             services.AddHttpClient("SeoOpsProbe", client =>

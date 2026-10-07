@@ -39,6 +39,8 @@ namespace OnlineShop.Infrastructure.Persistence
         public DbSet<SeoSetting> SeoSettings => Set<SeoSetting>();
         public DbSet<Faq> Faqs => Set<Faq>();
         public DbSet<ContactRequest> ContactRequests => Set<ContactRequest>();
+        public DbSet<ThemeSetting> ThemeSettings => Set<ThemeSetting>();
+        public DbSet<AnnouncementBar> AnnouncementBars => Set<AnnouncementBar>();
 
 
 

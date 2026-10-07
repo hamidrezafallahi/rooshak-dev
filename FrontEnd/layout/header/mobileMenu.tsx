@@ -13,7 +13,6 @@ import { createPortal } from 'react-dom';
 
 import { CloseIcon, MenuIcon } from '@components/atoms/iconComponents';
 import LangSwitcher from '@components/molecules/lang';
-import ThemeSwitcher from '@components/molecules/theme';
 
 const LINKS = [
   { href: '', labelKey: 'home' as const },
@@ -174,7 +173,6 @@ function MobileMenu() {
               >
                 {t('register')}
               </Link>
-              <ThemeSwitcher />
               <LangSwitcher />
             </div>
           </aside>

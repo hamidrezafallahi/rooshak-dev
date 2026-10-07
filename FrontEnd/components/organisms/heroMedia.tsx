@@ -2,44 +2,80 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import MediaImage from '@components/atoms/MediaImage';
+import { getImageProps } from 'next/image';
+
+import { isUploadMediaPath } from '@utils/toMediaUrl';
+
+export type HeroMediaSet = {
+  /** Poster / fallback image. Rendered first, so it is the LCP element. */
+  image: string;
+  /** Optional looping background video (muted, inline). */
+  video?: string;
+};
 
 type Props = {
-  /** Poster / fallback image. Rendered first, so it is the LCP element. */
-  imageSrc: string;
-  /** Optional looping background video (muted, inline). */
-  videoSrc?: string;
+  desktop: HeroMediaSet;
+  /** Phone version (< 768px). Missing parts fall back to the desktop ones. */
+  mobile?: Partial<HeroMediaSet>;
   alt: string;
   playLabel: string;
   pauseLabel: string;
+  /** Hide the dark readability scrim (e.g. on the sign-in split screen). */
+  noScrim?: boolean;
 };
 
 type NetworkInformation = { saveData?: boolean; effectiveType?: string };
 
+const MOBILE_QUERY = '(max-width: 767px)';
+
 /**
- * Full-bleed hero media. The image paints immediately (priority); the video is only
- * attached on the client when it is safe: no reduced-motion preference, no data-saver,
- * and not on a 2G-class connection. Users can always pause it (WCAG 2.2.2).
+ * Full-bleed hero media with separate desktop and mobile assets, each video with
+ * its own poster. The poster is a <picture> (art-directed, so a phone never downloads
+ * the desktop image); the video is only attached on the client, after choosing the
+ * right file for the viewport, and only when it is safe: no reduced-motion preference,
+ * no data-saver and not on a 2G-class connection. Users can always pause it (WCAG 2.2.2).
  */
 export default function HeroMedia({
-  imageSrc,
-  videoSrc,
+  desktop,
+  mobile,
   alt,
   playLabel,
   pauseLabel,
+  noScrim = false,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [allowVideo, setAllowVideo] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(true);
 
+  const mobileImage = mobile?.image || desktop.image;
+  const mobileVideo = mobile?.video || desktop.video;
+  const hasMobileArt = mobileImage !== desktop.image;
+  const anyVideo = Boolean(desktop.video || mobileVideo);
+
   useEffect(() => {
-    if (!videoSrc) return;
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!anyVideo) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const conn = (navigator as Navigator & { connection?: NetworkInformation })
-      .connection;
+    const conn = (navigator as Navigator & { connection?: NetworkInformation }).connection;
     const slow = Boolean(conn?.saveData) || /(^|-)2g$/.test(conn?.effectiveType ?? '');
     setAllowVideo(!reduce && !slow);
+  }, [anyVideo]);
+
+  const videoSrc = isMobile ? mobileVideo : desktop.video;
+  const posterSrc = isMobile ? mobileImage : desktop.image;
+
+  // A different file (viewport change) starts hidden again until it plays.
+  useEffect(() => {
+    setReady(false);
   }, [videoSrc]);
 
   const toggle = () => {
@@ -52,23 +88,57 @@ export default function HeroMedia({
     }
   };
 
+  const build = (src: string) =>
+    getImageProps({
+      src,
+      alt,
+      fill: true,
+      priority: true,
+      fetchPriority: 'high',
+      sizes: '100vw',
+      unoptimized: isUploadMediaPath(src),
+      className: 'object-cover',
+    }).props;
+
+  const desktopImg = build(desktop.image);
+  const mobileImg = hasMobileArt ? build(mobileImage) : null;
+
   return (
     <div className="absolute inset-0">
-      <MediaImage
-        src={imageSrc}
-        alt={alt}
-        fill
-        priority
+      {mobileImg ? (
+        <link
+          rel="preload"
+          as="image"
+          href={mobileImg.src}
+          imageSrcSet={mobileImg.srcSet}
+          imageSizes={mobileImg.sizes}
+          media={MOBILE_QUERY}
+          fetchPriority="high"
+        />
+      ) : null}
+      <link
+        rel="preload"
+        as="image"
+        href={desktopImg.src}
+        imageSrcSet={desktopImg.srcSet}
+        imageSizes={desktopImg.sizes}
+        media={mobileImg ? '(min-width: 768px)' : undefined}
         fetchPriority="high"
-        sizes="100vw"
-        className="object-cover"
       />
+
+      <picture>
+        {mobileImg ? (
+          <source media={MOBILE_QUERY} srcSet={mobileImg.srcSet ?? mobileImg.src} sizes="100vw" />
+        ) : null}
+        <img {...desktopImg} alt={alt} />
+      </picture>
 
       {allowVideo && videoSrc && (
         <video
+          key={videoSrc}
           ref={videoRef}
           src={videoSrc}
-          poster={imageSrc}
+          poster={posterSrc}
           autoPlay
           muted
           loop
@@ -87,8 +157,9 @@ export default function HeroMedia({
         />
       )}
 
-      {/* readability scrim */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/40" />
+      {!noScrim && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/40" />
+      )}
 
       {allowVideo && videoSrc && ready && (
         <button

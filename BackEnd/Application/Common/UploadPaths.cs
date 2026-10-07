@@ -16,6 +16,7 @@ public static class UploadPaths
     public static string Blogs(int id) => $"{Root}/blogs/{id}";
     public static string Users(int id) => $"{Root}/users/{id}";
     public static string LandingSlides(int id) => $"{Root}/landingslides/{id}";
+    public static string AnnouncementBars(int id) => $"{Root}/announcementbars/{id}";
 
     /// <summary>
     /// Normalize any stored media path to: uploads/.../file.ext (no leading slash, forward slashes).

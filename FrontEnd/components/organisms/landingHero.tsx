@@ -24,8 +24,15 @@ export default async function LandingHero({ slide }: Props) {
   const t = await getTranslations('homePage');
 
   const hasSlide = Boolean(slide?.bannerUrl);
-  const imageSrc = hasSlide ? toMediaUrl(slide?.bannerUrl) : DEFAULT_IMAGE;
-  const videoSrc = slide?.videoUrl ? toMediaUrl(slide.videoUrl) : undefined;
+  const desktop = {
+    image: hasSlide ? toMediaUrl(slide?.bannerUrl) : DEFAULT_IMAGE,
+    video: slide?.videoUrl ? toMediaUrl(slide.videoUrl) : undefined,
+  };
+  // Phone assets are optional; HeroMedia falls back to the desktop ones per part.
+  const mobile = {
+    image: slide?.mobileBannerUrl ? toMediaUrl(slide.mobileBannerUrl) : undefined,
+    video: slide?.mobileVideoUrl ? toMediaUrl(slide.mobileVideoUrl) : undefined,
+  };
 
   const primaryHref = internalHref(locale, slide?.firstUrl) ?? `/${locale}/products`;
   const secondaryHref = internalHref(locale, slide?.secondUrl) ?? `/${locale}/discounts`;
@@ -36,8 +43,8 @@ export default async function LandingHero({ slide }: Props) {
       aria-labelledby="home-hero-title"
     >
       <HeroMedia
-        imageSrc={imageSrc}
-        videoSrc={videoSrc}
+        desktop={desktop}
+        mobile={mobile}
         alt={t('heroImageAlt')}
         playLabel={t('videoPlay')}
         pauseLabel={t('videoPause')}

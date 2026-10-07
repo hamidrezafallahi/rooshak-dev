@@ -1,115 +1,49 @@
-'use client';
+import { getLocale } from 'next-intl/server';
 
-import React, { useEffect, useState } from 'react';
+import { getCurrentAnnouncement, resolveAnnouncementHref } from '@lib/announcement';
+import { toMediaUrl } from '@utils/toMediaUrl';
 
-import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
+import HeaderClient from './headerClient';
 
-import BrandLogo from '@components/atoms/brandLogo';
-import { usePathname } from 'next/navigation';
-
-import { UserIcon } from '@components/atoms/iconComponents';
-import LangSwitcher from '@components/molecules/lang';
-import ThemeSwitcher from '@components/molecules/theme';
-
-import MobileMenu from './mobileMenu';
-import ShoppingCart from './shoppingCart';
-
-const NAV_KEYS = [
-  { href: 'products', labelKey: 'products' as const },
-  { href: 'categories', labelKey: 'categories' as const },
-  { href: 'brands', labelKey: 'brands' as const },
-  { href: 'exhibition', labelKey: 'exhibition' as const },
-  { href: 'discounts', labelKey: 'discounts' as const },
-  { href: 'blog', labelKey: 'blogs' as const },
-] as const;
-
-type HeaderProps = {
+type Props = {
   /** Float transparently over a full-bleed hero (home page); turns solid after scroll. */
   overlay?: boolean;
 };
 
-export default function Header({ overlay = false }: HeaderProps) {
-  const locale = useLocale();
-  const pathname = usePathname();
-  const t = useTranslations('header');
-  const tBrand = useTranslations('brand');
-  const [scrolled, setScrolled] = useState(false);
+const HEX = /^#[0-9a-fA-F]{6}$/;
 
-  useEffect(() => {
-    if (!overlay) return;
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [overlay]);
+/**
+ * Server shell: loads the announcement bar that the admin scheduled for "now"
+ * (text, link, colours, background image, height) and hands it to the client header.
+ * The bar height is published as --store-announce-h so every page's top padding follows it.
+ */
+export default async function Header({ overlay = false }: Props) {
+  const [locale, bar] = await Promise.all([getLocale(), getCurrentAnnouncement()]);
 
-  const floating = overlay && !scrolled;
+  const message = bar
+    ? (locale === 'fa' ? bar.messageFa || bar.messageEn : bar.messageEn || bar.messageFa)?.trim()
+    : '';
+  const visible = Boolean(bar && message);
+
+  const announcement =
+    bar && visible
+      ? {
+          message: message as string,
+          link: resolveAnnouncementHref(locale, bar.linkUrl),
+          backgroundColor: HEX.test(bar.backgroundColor) ? bar.backgroundColor : '#000000',
+          textColor: HEX.test(bar.textColor) ? bar.textColor : '#ffffff',
+          backgroundImage: toMediaUrl(bar.backgroundImageUrl) || null,
+        }
+      : null;
+
+  const heightPx = visible && bar ? Math.round(Number(bar.heightPx) || 36) : 0;
 
   return (
-    <header
-      role="banner"
-      data-floating={floating}
-      className="top-0 inset-x-0 z-50 fixed bg-store-surface data-[floating=true]:bg-transparent data-[floating=true]:bg-gradient-to-b data-[floating=true]:from-black/50 data-[floating=true]:to-transparent border-b border-store-border data-[floating=true]:border-transparent text-store-text data-[floating=true]:text-white transition-colors duration-300"
-    >
-      <p className="flex justify-center items-center bg-black px-4 h-[var(--store-announce-h)] font-medium text-[0.7rem] text-white sm:text-xs text-center">
-        {t('announcement')}
-      </p>
-
-      <div className="relative items-center gap-3 grid grid-cols-[1fr_auto_1fr] mx-auto px-4 sm:px-6 lg:px-10 max-w-[1600px] h-[var(--store-nav-h)]">
-        <div className="flex items-center gap-1">
-          <div className="md:hidden">
-            <MobileMenu />
-          </div>
-          <nav
-            className="hidden md:flex items-center -ms-3"
-            aria-label={t('mainNav')}
-          >
-            {NAV_KEYS.map((item) => {
-              const href = `/${locale}/${item.href}`;
-              const active = pathname?.startsWith(href);
-              return (
-                <Link
-                  key={item.href}
-                  href={href}
-                  aria-current={active ? 'page' : undefined}
-                  className="after:bottom-1 after:absolute relative after:inset-x-3 after:bg-current px-3 py-2 after:h-px font-medium text-sm hover:after:scale-x-100 aria-[current=page]:after:scale-x-100 after:content-[''] after:scale-x-0 after:transition-transform after:duration-300"
-                >
-                  {t(item.labelKey)}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <Link
-          href={`/${locale}`}
-          aria-label={tBrand('name')}
-          className="flex justify-center"
-        >
-          <BrandLogo
-            alt={tBrand('name')}
-            onDark={floating}
-            priority
-            className="w-32 sm:w-44"
-          />
-        </Link>
-
-        <div className="flex justify-end items-center gap-1">
-          <div className="hidden sm:flex items-center gap-1">
-            <ThemeSwitcher />
-            <LangSwitcher />
-          </div>
-          <Link
-            href={`/${locale}/register`}
-            aria-label={t('register')}
-            className="inline-flex justify-center items-center w-10 h-10 hover:opacity-60 transition-opacity"
-          >
-            <UserIcon />
-          </Link>
-          <ShoppingCart />
-        </div>
-      </div>
-    </header>
+    <>
+      <style
+        dangerouslySetInnerHTML={{ __html: `:root:root{--store-announce-h:${heightPx}px}` }}
+      />
+      <HeaderClient overlay={overlay} announcement={announcement} />
+    </>
   );
 }

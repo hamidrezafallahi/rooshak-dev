@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Checkbox } from '@components/atoms/defaultElements/customCheckbox';
+import ColorField from '@components/atoms/defaultElements/colorField';
 import CustomDatePicker
   from '@components/atoms/defaultElements/customDatePicker';
 import { Input } from '@components/atoms/defaultElements/customInput';
@@ -75,6 +76,16 @@ const FormFieldRenderer = ({
             placeHolder={field.PlaceHolder}
             value={watch(field.Name) || ''}
             onChange={(file) => setValue(field.Name, file)}
+          />
+        </FieldShell>
+      );
+    case 'color':
+      return (
+        <FieldShell caption={field.Caption} help={field.Help} error={error}>
+          <ColorField
+            placeHolder={field.PlaceHolder}
+            value={watch(field.Name) || ''}
+            onChange={(hex) => setValue(field.Name, hex)}
           />
         </FieldShell>
       );

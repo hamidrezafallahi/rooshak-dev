@@ -17,6 +17,8 @@ export type LandingSlide = {
   id?: number;
   bannerUrl: string;
   videoUrl?: string;
+  mobileBannerUrl?: string;
+  mobileVideoUrl?: string;
   firstUrl: string;
   secondUrl?: string;
   bannerTitle?: string;
