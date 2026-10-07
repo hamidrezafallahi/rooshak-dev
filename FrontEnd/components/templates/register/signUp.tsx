@@ -147,7 +147,7 @@ const handleRegister = async () => {
     signup.phoneNumber.trim() &&
     signup.password.trim();
   return (
-    <div className={cn("...", className)} {...props}>
+    <div className={cn("w-full", className)} {...props}>
       <form
         className="space-y-6 w-full"
         onSubmit={(e) => {
@@ -156,7 +156,7 @@ const handleRegister = async () => {
         }}
       >
         {/* Uploader */}
-        <div className="bg-red-500 mx-auto rounded-full w-20 h-20 overflow-hidden">
+        <div className="bg-store-muted border border-store-border mx-auto rounded-full w-20 h-20 overflow-hidden">
           <Uploader
             className="!min-h-0 !h-full border-0 rounded-full"
             onChange={(file) => setSignup((prev) => ({ ...prev, image: file }))}
@@ -164,64 +164,64 @@ const handleRegister = async () => {
         </div>
         {/* FullName */}
         <div>
-          <Label htmlFor="fullName">{t("register.fullName")}</Label>
+          <Label htmlFor="fullName" className="block mb-2 font-medium text-store-text text-sm">{t("register.fullName")}</Label>
           <Input
             id="fullName"
             name="fullName"
             value={signup.fullName}
             onChange={handleChange}
             className={cn(
-              "w-full ...",
+              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
               errors.fullName &&
-                "border-red-500 focus:border-red-500 ring-1 ring-red-200",
+                "border-error focus:border-error",
             )}
           />
           {errors.fullName && (
-            <p className="mt-1 text-red-600 text-sm">{errors.fullName}</p>
+            <p className="mt-1 text-error text-sm">{errors.fullName}</p>
           )}
         </div>
 
         {/* Email */}
         <div>
-          <Label htmlFor="email">{t("register.email")}</Label>
+          <Label htmlFor="email" className="block mb-2 font-medium text-store-text text-sm">{t("register.email")}</Label>
           <Input
             id="email"
             name="email"
             value={signup.email}
             onChange={handleChange}
             className={cn(
-              "w-full ...",
+              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
               errors.email &&
-                "border-red-500 focus:border-red-500 ring-1 ring-red-200",
+                "border-error focus:border-error",
             )}
           />
           {errors.email && (
-            <p className="mt-1 text-red-600 text-sm">{errors.email}</p>
+            <p className="mt-1 text-error text-sm">{errors.email}</p>
           )}
         </div>
 
         {/* Phone */}
         <div>
-          <Label htmlFor="phoneNumber">{t("register.phoneNumber")}</Label>
+          <Label htmlFor="phoneNumber" className="block mb-2 font-medium text-store-text text-sm">{t("register.phoneNumber")}</Label>
           <Input
             id="phoneNumber"
             name="phoneNumber"
             value={signup.phoneNumber}
             onChange={handleChange}
             className={cn(
-              "w-full ...",
+              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
               errors.phoneNumber &&
-                "border-red-500 focus:border-red-500 ring-1 ring-red-200",
+                "border-error focus:border-error",
             )}
           />
           {errors.phoneNumber && (
-            <p className="mt-1 text-red-600 text-sm">{errors.phoneNumber}</p>
+            <p className="mt-1 text-error text-sm">{errors.phoneNumber}</p>
           )}
         </div>
 
         {/* Password */}
         <div>
-          <Label htmlFor="password">{t("register.password")}</Label>
+          <Label htmlFor="password" className="block mb-2 font-medium text-store-text text-sm">{t("register.password")}</Label>
           <Input
             id="password"
             type="password"
@@ -229,20 +229,20 @@ const handleRegister = async () => {
             value={signup.password}
             onChange={handleChange}
             className={cn(
-              "w-full ...",
+              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
               errors.password &&
-                "border-red-500 focus:border-red-500 ring-1 ring-red-200",
+                "border-error focus:border-error",
             )}
           />
           {errors.password && (
-            <p className="mt-1 text-red-600 text-sm">{errors.password}</p>
+            <p className="mt-1 text-error text-sm">{errors.password}</p>
           )}
         </div>
 
         <Button
   type="submit"
   disabled={!isFormValid }
-  className="bg-primary disabled:bg-gray-400 w-full text-primary-foreground"
+  className="bg-primary hover:bg-primary/90 disabled:opacity-50 px-5 py-2.5 rounded-lg w-full font-medium text-primary-foreground text-sm text-center"
 >
   {t("register.register")}
 </Button>
@@ -250,7 +250,7 @@ const handleRegister = async () => {
           type="button"
           variant="outline"
           onClick={() => setIsLogin(true)}
-          className="hover:bg-store-text border-store-strong rounded-none w-full text-store-text hover:text-store-surface"
+          className="hover:bg-primary px-5 py-2.5 border border-primary rounded-lg w-full font-medium text-primary hover:text-primary-foreground text-sm text-center bg-transparent"
         >
           {t("register.backToLogin")}
         </Button>
