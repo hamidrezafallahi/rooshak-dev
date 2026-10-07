@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildPageMetadata({
     locale,
     path: 'exhibition/all',
-    title: locale === 'fa' ? 'لیست قیمت همه خانواده‌ها' : 'All family price lists',
+    title: locale === 'fa' ? 'لیست قیمت رویال' : 'Royal price lists',
     description: t('indexDescription'),
     images: photos.slice(0, 3).map((p) => p.src),
   });
@@ -39,7 +39,7 @@ export default async function Page({ params }: Props) {
   const { locale } = await params;
   const photos = [EXHIBITION_INTRO_PHOTO, ...allExhibitionPhotos()];
   const title =
-    locale === 'fa' ? 'لیست قیمت همه خانواده‌ها' : 'All family price lists';
+    locale === 'fa' ? 'لیست قیمت رویال' : 'Royal price lists';
 
   return (
     <main className="exhibit-sheet" aria-label={title}>
