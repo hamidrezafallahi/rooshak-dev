@@ -15,7 +15,7 @@ export type HeroMediaSet = {
 
 type Props = {
   desktop: HeroMediaSet;
-  /** Phone version (< 768px). Missing parts fall back to the desktop ones. */
+  /** Phone version (< 768px). Missing parts fall back to the desktop ones (and vice versa for video). */
   mobile?: Partial<HeroMediaSet>;
   alt: string;
   playLabel: string;
@@ -50,9 +50,12 @@ export default function HeroMedia({
   const [playing, setPlaying] = useState(true);
 
   const mobileImage = mobile?.image || desktop.image;
+  // Each viewport falls back to the other one's video, so a single uploaded video is
+  // used everywhere (the poster still comes from that viewport's own image).
   const mobileVideo = mobile?.video || desktop.video;
+  const desktopVideo = desktop.video || mobile?.video;
   const hasMobileArt = mobileImage !== desktop.image;
-  const anyVideo = Boolean(desktop.video || mobileVideo);
+  const anyVideo = Boolean(desktopVideo || mobileVideo);
 
   useEffect(() => {
     const mq = window.matchMedia(MOBILE_QUERY);
@@ -70,7 +73,7 @@ export default function HeroMedia({
     setAllowVideo(!reduce && !slow);
   }, [anyVideo]);
 
-  const videoSrc = isMobile ? mobileVideo : desktop.video;
+  const videoSrc = isMobile ? mobileVideo : desktopVideo;
   const posterSrc = isMobile ? mobileImage : desktop.image;
 
   // A different file (viewport change) starts hidden again until it plays.
