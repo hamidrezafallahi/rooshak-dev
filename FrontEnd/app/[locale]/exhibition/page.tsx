@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-
 import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 
 import ExhibitionCover from '@components/organisms/exhibition/ExhibitionCover';
 import { buildPageMetadata } from '@lib/seo';
@@ -15,14 +14,14 @@ const EXHIBITION_FAMILIES = [
     slug: 'all',
     nameFa: 'رویال',
     nameEn: 'Royal',
-    coverImage: '/exhibition/erico-intro.webp',
-    coverWidth: 689,
-    coverHeight: 1000,
+    coverImage: '/exhibition/lab-tala/01-fruit-bowl.webp',
+    coverWidth: 819,
+    coverHeight: 1024,
   },
   {
     slug: 'delvin',
-    nameFa: 'دلوین',
-    nameEn: 'Delvin',
+    nameFa: 'ساریا و دلوین',
+    nameEn: 'Saria & Delvin',
     coverImage: '/exhibition/delvin/product-1.webp',
     coverWidth: 819,
     coverHeight: 1024,
