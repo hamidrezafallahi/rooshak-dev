@@ -34,7 +34,7 @@ function Register({ imageSrc, videoSrc, mediaAlt, playLabel, pauseLabel }: Props
     <div className="lg:relative lg:overflow-hidden min-h-screen">
       {/* Desktop: both halves are absolutely placed and slide past each other. */}
       <aside
-        className={`hidden lg:block lg:absolute lg:inset-y-0 lg:start-0 lg:w-1/2 bg-black overflow-hidden lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
+        className={`hidden lg:block lg:absolute lg:z-10 lg:inset-y-0 lg:start-0 lg:w-1/2 bg-black overflow-hidden lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
           isLogin ? '' : 'ltr:lg:translate-x-full rtl:lg:-translate-x-full'
         }`}
       >
@@ -53,7 +53,7 @@ function Register({ imageSrc, videoSrc, mediaAlt, playLabel, pauseLabel }: Props
       </aside>
 
       <main
-        className={`flex flex-col justify-center items-center gap-6 px-4 sm:px-10 py-10 min-h-screen lg:absolute lg:inset-y-0 lg:end-0 lg:w-1/2 lg:min-h-0 lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
+        className={`flex flex-col justify-center items-center gap-6 px-4 sm:px-10 py-10 min-h-screen lg:absolute lg:z-0 lg:inset-y-0 lg:end-0 lg:w-1/2 lg:min-h-0 lg:overflow-y-auto lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
           isLogin ? '' : 'ltr:lg:-translate-x-full rtl:lg:translate-x-full'
         }`}
       >
@@ -72,15 +72,9 @@ function Register({ imageSrc, videoSrc, mediaAlt, playLabel, pauseLabel }: Props
             {isLogin ? t('enter') : t('signUp')}
           </h1>
           {isLogin ? (
-            <LoginForm
-              setIsLogin={setIsLogin}
-              className="shadow-none p-0 border-0 max-w-none"
-            />
+            <LoginForm setIsLogin={setIsLogin} />
           ) : (
-            <SignUpForm
-              setIsLogin={setIsLogin}
-              className="shadow-none p-0 border-0 max-w-none"
-            />
+            <SignUpForm setIsLogin={setIsLogin} />
           )}
           <Link
             href={`/${locale}`}

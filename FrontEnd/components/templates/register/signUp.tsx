@@ -18,6 +18,16 @@ import {
 } from '@utils/core';
 
 import {
+  authError,
+  authFooter,
+  authFooterLink,
+  authInput,
+  authInputError,
+  authLabel,
+  authPrimaryButton,
+  authSubtitle,
+} from './authStyles';
+import {
   IProps,
   ISignup,
 } from './type';
@@ -155,6 +165,8 @@ const handleRegister = async () => {
           handleRegister();
         }}
       >
+        <h5 className={authSubtitle}>{t("register.startSignUp")}</h5>
+
         {/* Uploader */}
         <div className="bg-store-muted border border-store-border mx-auto rounded-full w-20 h-20 overflow-hidden">
           <Uploader
@@ -164,64 +176,64 @@ const handleRegister = async () => {
         </div>
         {/* FullName */}
         <div>
-          <Label htmlFor="fullName" className="block mb-2 font-medium text-store-text text-sm">{t("register.fullName")}</Label>
+          <Label htmlFor="fullName" className={authLabel}>{t("register.fullName")}</Label>
           <Input
             id="fullName"
             name="fullName"
             value={signup.fullName}
             onChange={handleChange}
             className={cn(
-              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
+              authInput,
               errors.fullName &&
-                "border-error focus:border-error",
+                authInputError,
             )}
           />
           {errors.fullName && (
-            <p className="mt-1 text-error text-sm">{errors.fullName}</p>
+            <p className={authError}>{errors.fullName}</p>
           )}
         </div>
 
         {/* Email */}
         <div>
-          <Label htmlFor="email" className="block mb-2 font-medium text-store-text text-sm">{t("register.email")}</Label>
+          <Label htmlFor="email" className={authLabel}>{t("register.email")}</Label>
           <Input
             id="email"
             name="email"
             value={signup.email}
             onChange={handleChange}
             className={cn(
-              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
+              authInput,
               errors.email &&
-                "border-error focus:border-error",
+                authInputError,
             )}
           />
           {errors.email && (
-            <p className="mt-1 text-error text-sm">{errors.email}</p>
+            <p className={authError}>{errors.email}</p>
           )}
         </div>
 
         {/* Phone */}
         <div>
-          <Label htmlFor="phoneNumber" className="block mb-2 font-medium text-store-text text-sm">{t("register.phoneNumber")}</Label>
+          <Label htmlFor="phoneNumber" className={authLabel}>{t("register.phoneNumber")}</Label>
           <Input
             id="phoneNumber"
             name="phoneNumber"
             value={signup.phoneNumber}
             onChange={handleChange}
             className={cn(
-              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
+              authInput,
               errors.phoneNumber &&
-                "border-error focus:border-error",
+                authInputError,
             )}
           />
           {errors.phoneNumber && (
-            <p className="mt-1 text-error text-sm">{errors.phoneNumber}</p>
+            <p className={authError}>{errors.phoneNumber}</p>
           )}
         </div>
 
         {/* Password */}
         <div>
-          <Label htmlFor="password" className="block mb-2 font-medium text-store-text text-sm">{t("register.password")}</Label>
+          <Label htmlFor="password" className={authLabel}>{t("register.password")}</Label>
           <Input
             id="password"
             type="password"
@@ -229,31 +241,34 @@ const handleRegister = async () => {
             value={signup.password}
             onChange={handleChange}
             className={cn(
-              "block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm",
+              authInput,
               errors.password &&
-                "border-error focus:border-error",
+                authInputError,
             )}
           />
           {errors.password && (
-            <p className="mt-1 text-error text-sm">{errors.password}</p>
+            <p className={authError}>{errors.password}</p>
           )}
         </div>
 
         <Button
-  type="submit"
-  disabled={!isFormValid }
-  className="bg-primary hover:bg-primary/90 disabled:opacity-50 px-5 py-2.5 rounded-lg w-full font-medium text-primary-foreground text-sm text-center"
->
-  {t("register.register")}
-</Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setIsLogin(true)}
-          className="hover:bg-primary px-5 py-2.5 border border-primary rounded-lg w-full font-medium text-primary hover:text-primary-foreground text-sm text-center bg-transparent"
+          type="submit"
+          disabled={!isFormValid}
+          className={authPrimaryButton}
         >
-          {t("register.backToLogin")}
+          {t("register.register")}
         </Button>
+
+        <div className={authFooter}>
+          {t("register.havingAccount")}{" "}
+          <button
+            type="button"
+            onClick={() => setIsLogin(true)}
+            className={authFooterLink}
+          >
+            {t("register.enter")}
+          </button>
+        </div>
       </form>
     </div>
   );

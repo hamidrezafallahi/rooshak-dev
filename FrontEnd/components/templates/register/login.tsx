@@ -26,6 +26,14 @@ import { useAppSelector } from '@store/index';
 import { showErrorToast } from '@utils/core';
 
 import {
+  authFooter,
+  authFooterLink,
+  authInput,
+  authLabel,
+  authPrimaryButton,
+  authSubtitle,
+} from './authStyles';
+import {
   ILogin,
   ILoginResponse,
   IProps,
@@ -144,7 +152,7 @@ export function LoginForm({
   return (
     <div
       className={cn(
-        "bg-store-surface shadow-sm p-4 sm:p-6 md:p-8 border border-store-border rounded-lg w-full max-w-sm",
+        "w-full",
         className,
       )}
       {...props}
@@ -156,14 +164,14 @@ export function LoginForm({
           handleLogin();
         }}
       >
-        <h5 className="font-medium text-store-text dark:text-white text-xl">
+        <h5 className={authSubtitle}>
           {t("register.enterEmail")}
         </h5>
 
         <div>
           <Label
             htmlFor="email"
-            className="block mb-2 font-medium text-store-text text-sm  "
+            className={authLabel}
           >
             {t("register.email")}
           </Label>
@@ -176,14 +184,14 @@ export function LoginForm({
             )}
             onChange={handleChange}
             required
-            className="block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm"
+            className={authInput}
           />
         </div>
 
         <div>
           <Label
             htmlFor="password"
-            className="block mb-2 font-medium text-store-text dark:text-white text-sm"
+            className={authLabel}
           >
             {t("register.password")}
           </Label>
@@ -195,7 +203,7 @@ export function LoginForm({
             name="Password"
             onChange={handleChange}
             required
-            className="block bg-store-muted p-2.5 border border-store-border focus:border-store-strong rounded-lg w-full text-store-text text-sm"
+            className={authInput}
           />
         </div>
 
@@ -208,7 +216,7 @@ export function LoginForm({
 
             <Label
               htmlFor="remember"
-              className="ms-2 font-medium text-store-text dark:text-gray-300 text-sm"
+              className="ms-2 font-medium text-store-text text-sm"
             >
               {t("register.rememberMe")}
             </Label>
@@ -216,7 +224,7 @@ export function LoginForm({
 
           <a
             href="#"
-            className="text-store-text dark:text-primary text-sm hover:underline"
+            className="text-store-text text-sm hover:underline"
           >
             {t("register.forgotPassword")}
           </a>
@@ -225,19 +233,19 @@ export function LoginForm({
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-primary hover:bg-primary/90 disabled:opacity-50 px-5 py-2.5 rounded-lg w-full font-medium text-primary-foreground text-sm text-center"
+          className={authPrimaryButton}
         >
           {isLoading
             ? t("common.loading")
             : t("register.enter")}
         </Button>
 
-        <div className="font-medium text-store-subtle dark:text-gray-300 text-sm text-center">
+        <div className={authFooter}>
           {t("register.dotHaveAnyAccount")}{" "}
           <button
             type="button"
             onClick={() => setIsLogin(false)}
-            className="text-store-text dark:text-primary hover:underline"
+            className={authFooterLink}
           >
             {t("register.signUp")}
           </button>
