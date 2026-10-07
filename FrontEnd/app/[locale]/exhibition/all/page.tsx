@@ -3,7 +3,11 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import ExhibitionPhoto from '@components/organisms/exhibition/ExhibitionPhoto';
-import { allExhibitionPhotos, EXHIBITION_CATALOGS } from '@lib/exhibitionCatalogs';
+import {
+  allExhibitionPhotos,
+  EXHIBITION_CATALOGS,
+  EXHIBITION_INTRO_PHOTO,
+} from '@lib/exhibitionCatalogs';
 import { buildPageMetadata } from '@lib/seo';
 
 type Props = {
@@ -16,7 +20,7 @@ export const revalidate = false;
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'exhibition' });
-  const photos = allExhibitionPhotos();
+  const photos = [EXHIBITION_INTRO_PHOTO, ...allExhibitionPhotos()];
 
   return buildPageMetadata({
     locale,
@@ -33,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function Page({ params }: Props) {
   const { locale } = await params;
-  const photos = allExhibitionPhotos();
+  const photos = [EXHIBITION_INTRO_PHOTO, ...allExhibitionPhotos()];
   const title =
     locale === 'fa' ? 'لیست قیمت همه خانواده‌ها' : 'All family price lists';
 

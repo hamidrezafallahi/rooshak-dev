@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import ExhibitionPhoto from '@components/organisms/exhibition/ExhibitionPhoto';
+import { EXHIBITION_INTRO_PHOTO } from '@lib/exhibitionCatalogs';
 import { buildPageMetadata } from '@lib/seo';
 
 type Props = {
@@ -40,6 +41,7 @@ const DELVIN_PRICE_LIST = {
  */
 function delvinExhibitionPhotos() {
   return [
+    EXHIBITION_INTRO_PHOTO,
     ...DELVIN_PHOTOS.map((photo, index) => ({
       ...photo,
       alt: `دلوین — عکس ${index + 1}`,

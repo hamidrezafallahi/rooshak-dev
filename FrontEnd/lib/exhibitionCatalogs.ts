@@ -39,7 +39,7 @@ export const EXHIBITION_CATALOGS: ExhibitionCatalog[] = [
       { src: '/exhibition/lab-tala/04-single-tier.webp', alt: 'شیرینی تک‌طبقه لب طلا', width: 960, height: 738 },
       { src: '/exhibition/lab-tala/05-two-tier.webp', alt: 'شیرینی دوطبقه لب طلا', width: 680, height: 1024 },
       { src: '/exhibition/lab-tala/06-small-bowl.webp', alt: 'پیاله لب طلا', width: 841, height: 1024 },
-      { src: '/exhibition/lab-tala/99-price-list.webp', alt: 'لیست قیمت لب طلا', width: 732, height: 1024 },
+      { src: '/exhibition/lab-tala/99-price-list.webp', alt: 'لیست قیمت لب طلا', width: 567, height: 850 },
     ],
   },
   {
@@ -137,6 +137,14 @@ export function exhibitionStaticSlugs() {
  * Full catalog roll: each family contributes 6 product shots then its price-list flyer.
  * Order matches EXHIBITION_CATALOGS (positions 7, 14, 21, … are price lists).
  */
+/** Company intro sheet shown first on every price-list roll. */
+export const EXHIBITION_INTRO_PHOTO: ExhibitionPhoto = {
+  src: '/exhibition/erico-intro.webp',
+  alt: 'معرفی اریکو و راه‌های ارتباطی',
+  width: 689,
+  height: 1000,
+};
+
 export function allExhibitionPhotos(): ExhibitionPhoto[] {
   return EXHIBITION_CATALOGS.flatMap((catalog) => catalog.photos);
 }

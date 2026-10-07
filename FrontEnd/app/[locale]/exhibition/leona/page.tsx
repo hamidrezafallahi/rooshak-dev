@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import ExhibitionPhoto from '@components/organisms/exhibition/ExhibitionPhoto';
+import { EXHIBITION_INTRO_PHOTO } from '@lib/exhibitionCatalogs';
 import { buildPageMetadata } from '@lib/seo';
 
 type Props = {
@@ -157,6 +158,7 @@ function leonaExhibitionPhotos() {
   );
 
   return [
+    EXHIBITION_INTRO_PHOTO,
     ...familyPhotos,
     { ...LEONA_PRICE_LIST, alt: 'لیست قیمت لیونا' },
   ];
