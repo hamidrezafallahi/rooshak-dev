@@ -39,10 +39,10 @@ useEffect(()=>{
   return (
     <div className="mb-4">
       <h3 className="mb-2">{t("general.paymentMethod")}</h3>
-      <div className="space-y-2 bg-zinc-800 p-3 border border-gray-700 rounded-lg">
+      <div className="space-y-2 bg-store-muted p-3 border border-store-border rounded-lg">
           <RadioList
           name='paymentMethods'
-          className='!flex-row justify-between gap-2 text-gray-400 text-xs'
+          className='!flex-row justify-between gap-2 text-store-subtle text-xs'
             options={data?.data.records?.map((method) => ({label:method.title,value:method.id}))||[]}
              onChange={handleChangePaymentMethod}
              value={selectedPaymentMethod}

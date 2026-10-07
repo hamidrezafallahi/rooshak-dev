@@ -19,7 +19,7 @@ export default async function ProductComments({ id, locale }: ProductCommentsPro
   const t = await getTranslations();
   if (!id) {
     return (
-      <p className="text-gray-500 text-sm">{t('product.noComments')}</p>
+      <p className="text-store-subtle text-sm">{t('product.noComments')}</p>
     );
   }
 
@@ -33,14 +33,14 @@ export default async function ProductComments({ id, locale }: ProductCommentsPro
   return (
     <section className="space-y-4">
       {comments.length === 0 && (
-        <p className="text-gray-500 text-sm">{t('product.noComments')}</p>
+        <p className="text-store-subtle text-sm">{t('product.noComments')}</p>
       )}
 
       {comments.map((c: IComment) => (
-        <article key={c.id} className="pb-3 border-b text-sm">
+        <article key={c.id} className="pb-3 border-b border-store-border text-sm">
           <p className="font-medium">{c.userFullName}</p>
-          <p className="mt-1 text-gray-700">{c.content}</p>
-          <time className="text-gray-400 text-xs">
+          <p className="mt-1 text-store-text">{c.content}</p>
+          <time className="text-store-subtle text-xs">
             {Intl.DateTimeFormat(locale === 'fa' ? 'fa-IR' : 'en-US', {
               dateStyle: 'medium',
             }).format(new Date(c.createdAt))}

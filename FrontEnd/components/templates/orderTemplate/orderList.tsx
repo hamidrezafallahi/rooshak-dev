@@ -77,11 +77,11 @@ function OrderList({...props}: OrderListProps) {
           <div className="flex justify-between text-sm">
             <span>{t("order.orderNumber", { id: order.id })}</span>
             {order?.status !== undefined && (
-              <span className='text-primary text-xs'>{t(OrderStatusText[order.status])}</span>
+              <span className='text-store-text text-xs'>{t(OrderStatusText[order.status])}</span>
             )}
           </div>
 
-          <div className="mt-2 text-gray-400 text-xs">
+          <div className="mt-2 text-store-subtle text-xs">
             {t("order.itemsSummary", {
               count: order.items.length,
               total: order.totalPrice,
@@ -89,7 +89,7 @@ function OrderList({...props}: OrderListProps) {
             })}
           </div>
 
-          <div className="mt-1 text-gray-500 text-xs">
+          <div className="mt-1 text-store-subtle text-xs">
             {t("order.date", { date: formatToJalali(order.orderDate) })}
           </div>
           

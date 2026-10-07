@@ -242,10 +242,18 @@ const handleRegister = async () => {
         <Button
   type="submit"
   disabled={!isFormValid }
-  className="bg-primary disabled:bg-gray-400 w-full text-white"
+  className="bg-primary disabled:bg-gray-400 w-full text-primary-foreground"
 >
   {t("register.register")}
 </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setIsLogin(true)}
+          className="hover:bg-store-text border-store-strong rounded-none w-full text-store-text hover:text-store-surface"
+        >
+          {t("register.backToLogin")}
+        </Button>
       </form>
     </div>
   );

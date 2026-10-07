@@ -22,6 +22,8 @@ namespace OnlineShop.Infrastructure.Configurations
                    .HasMaxLength(200);
             builder.Property(b => b.SecondUrl)
                    .HasMaxLength(200);
+            builder.Property(b => b.VideoUrl)
+                   .HasMaxLength(300);
             builder.Property(ua => ua.IsHero)
                     .IsRequired()
                     .HasDefaultValue(false);

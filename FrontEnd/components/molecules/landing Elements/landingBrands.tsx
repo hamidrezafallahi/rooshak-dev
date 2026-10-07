@@ -1,40 +1,37 @@
 import React from 'react';
 
 import { getLocale, getTranslations } from 'next-intl/server';
-import Link from 'next/link';
 
+import SectionHeading from '@components/molecules/storefront/SectionHeading';
 import { getAll } from '@lib/getAll';
 import { IBrand } from '@models/brand';
 
 import BrandCard from '../brandCard';
 
-export default async function LandingBrands( ) {
-    const locale = await getLocale();
-    const t = await getTranslations('landing');
-   const response = await getAll<IBrand>("brands", {
-     page: 1,
-     pageSize: 5,
-     byConfig: false,
-   });
+export default async function LandingBrands() {
+  const locale = await getLocale();
+  const t = await getTranslations('landing');
+  const response = await getAll<IBrand>('brands', {
+    page: 1,
+    pageSize: 4,
+    byConfig: false,
+  });
+  const brands = response?.data?.records ?? [];
+  if (!brands.length) return null;
+
   return (
-     <section className="mx-auto px-4 py-12 w-full max-w-7xl">
-      {/* Header */}
-      <div className="flex sm:flex-row flex-col flex-wrap sm:justify-between sm:items-center gap-4 mb-8">
-        <div>
-          <h2 className="font-semibold text-2xl sm:text-3xl">{t('brandsTitle')}</h2>
-          <p className="text-gray-600 text-sm">
-           {t('brandsSubtitle')}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href={`/${locale}/brands`} className="text-sm underline">
-            {t('viewAllBrands')}
-          </Link>
-        </div>
+    <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 w-full max-w-[1440px]">
+      <SectionHeading
+        title={t('brandsTitle')}
+        subtitle={t('brandsSubtitle')}
+        href={`/${locale}/brands`}
+        linkLabel={t('viewAllBrands')}
+      />
+      <div className="gap-4 md:gap-6 grid grid-cols-2 lg:grid-cols-4">
+        {brands.map((brand) => (
+          <BrandCard brand={brand} key={brand.id ?? brand.slug} />
+        ))}
       </div>
-       <div className="gap-6 grid sm:grid-cols-4">
-          {response?.data?.records?.map((brand,index) => (<BrandCard brand={brand}  key={index}/>))}
-        </div>
-      </section>
-  )
+    </section>
+  );
 }

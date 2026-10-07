@@ -8,27 +8,27 @@ export async function Navigator({ ...props }: IProps) {
   const t = await getTranslations({ locale });
   const isRTL = locale == "fa";
   return (
-    <div className="bg-white shadow-sm p-6 border rounded-lg">
-      <h3 className={`font-semibold text-lg mb-4 ${isRTL ? "text-right" : ""}`}>
+    <div className="p-6 border border-store-border">
+      <h3 className={`font-normal text-lg mb-4 ${isRTL ? "text-right" : ""}`}>
         {t("blog.tableOfContents")}
       </h3>
       <nav className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
         <a
           href="#section1"
-          className="block py-2 text-gray-600 hover:text-primary"
+          className="block py-2 text-store-subtle hover:text-store-text"
         >
         {t("blog.introduction")}
         </a>
         <a
           href="#section2"
-          className="block py-2 text-gray-600 hover:text-primary"
+          className="block py-2 text-store-subtle hover:text-store-text"
           >
             {t("blog.content")}
  
         </a>
         <a
           href="#section3"
-          className="block py-2 text-gray-600 hover:text-primary"
+          className="block py-2 text-store-subtle hover:text-store-text"
           >
             {t("blog.conclusion")}
         </a>

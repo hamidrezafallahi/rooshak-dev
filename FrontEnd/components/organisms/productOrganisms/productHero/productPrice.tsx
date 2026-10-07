@@ -37,24 +37,24 @@ export default async function ProductPrice({
         : null;
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+    <div className="flex flex-col gap-2 py-4 border-y border-store-border">
       <div className="flex flex-wrap items-baseline gap-2">
         {hasDiscount && (
-          <span className="text-sm text-white/50 line-through">
+          <span className="text-sm text-store-subtle line-through">
             {formatMoney(base, locale)}
           </span>
         )}
-        <span className={`text-2xl font-bold ${hasDiscount ? 'text-amber-300' : 'text-white'}`}>
+        <span className={`text-2xl font-medium ${hasDiscount ? 'text-error' : 'text-store-text'}`}>
           {formatMoney(final, locale)}
         </span>
-        <span className="text-sm text-white/70">{unit}</span>
+        <span className="text-sm text-store-subtle">{unit}</span>
       </div>
       {stockLabel && (
         <span
-          className={`w-fit rounded-full px-2.5 py-0.5 text-xs ${
+          className={`w-fit px-2.5 py-0.5 text-xs ${
             inStock === false
-              ? 'bg-rose-500/20 text-rose-200'
-              : 'bg-amber-500/20 text-amber-200'
+              ? 'bg-store-muted text-error'
+              : 'bg-store-muted text-store-text'
           }`}
         >
           {stockLabel}

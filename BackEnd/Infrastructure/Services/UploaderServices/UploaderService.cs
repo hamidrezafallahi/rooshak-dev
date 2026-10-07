@@ -16,6 +16,14 @@ namespace Services.Services.Uploader
             "jpg", "jpeg", "png", "webp"
         };
 
+        private static readonly HashSet<string> VideoTypes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "mp4", "webm"
+        };
+
+        /// <summary>Hero videos should be short loops; keep uploads small for mobile data.</summary>
+        private const long MaxVideoBytes = 30L * 1024 * 1024;
+
         private readonly IWebHostEnvironment _webHost;
 
         public UploaderService(IWebHostEnvironment webHostEnvironment)
@@ -42,6 +50,60 @@ namespace Services.Services.Uploader
                     Quality = 70,
                     FileFormat = WebpFileFormatType.Lossy,
                 }));
+
+        public async Task<string?> UploadVideo(UploadDTO request)
+
+        {
+
+            if (request?.File is null || request.File.Length == 0 || request.File.Length > MaxVideoBytes)
+
+                return null;
+
+
+            var relativeDirectory = UploadPaths.Normalize(request.Path);
+
+            if (string.IsNullOrWhiteSpace(relativeDirectory))
+
+                return null;
+
+
+            var ext = Path.GetExtension(request.File.FileName).TrimStart('.').ToLowerInvariant();
+
+            if (!VideoTypes.Contains(ext))
+
+                return null;
+
+
+            var rootPath = ResolveDirectory(relativeDirectory);
+
+            Directory.CreateDirectory(rootPath);
+
+
+            var fileName = $"{Guid.NewGuid():N}_hero.{ext}";
+
+            await using (var input = request.File.OpenReadStream())
+
+            await using (var output = new FileStream(
+
+                Path.Combine(rootPath, fileName),
+
+                FileMode.Create,
+
+                FileAccess.Write,
+
+                FileShare.None))
+
+            {
+
+                await input.CopyToAsync(output);
+
+            }
+
+
+            return $"{relativeDirectory}/{fileName}";
+
+        }
+
 
         public Task DeleteFile(DeleteDTO request)
         {

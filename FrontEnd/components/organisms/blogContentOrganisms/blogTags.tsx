@@ -13,7 +13,7 @@ export async function BlogTags({ ...props }: IProps) {
         <Link
         href={`/${locale}/tags/${tag.name}`}
         key={idx}
-          className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full text-sm transition-colors cursor-pointer"
+          className="border border-store-border hover:border-store-strong px-4 py-2 text-sm transition-colors cursor-pointer"
         >
             #{tag.name}
         </Link>

@@ -81,7 +81,7 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
     setIsAuthenticated(Boolean(getCookie("candySession")));
   }, []);
   return (
-    <div className="flex flex-col gap-2 bg-gray-50 hover:shadow-md p-6 rounded-2xl w-5/6 md:w-1/2 text-right transition">
+    <div className="flex flex-col gap-2 bg-store-muted hover:shadow-md p-6 rounded-2xl w-5/6 md:w-1/2 text-right transition">
       {isAuthenticated ? (
         <>
           <div className="flex justify-between w-full">
@@ -96,14 +96,14 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
           <Button
             onClick={handleSubmitComment}
             disabled={isLoading}
-            className="bg-primary mt-2 px-6 py-2 rounded-xl text-white"
+            className="bg-primary mt-2 px-6 py-2 rounded-xl text-primary-foreground"
           >
             {isLoading ? <SpinnerIcon /> : <span> {t("general.save")}</span>}
           </Button>
         </>
       ) : (
         <Link
-          className="bg-primary p-2 px-3 rounded-lg text-white"
+          className="bg-primary p-2 px-3 rounded-lg text-primary-foreground"
           href={`/${locale}/register?redirect=${redirectUrl}`}
         >
           {t("general.loginFirst")}

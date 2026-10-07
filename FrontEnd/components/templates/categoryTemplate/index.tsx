@@ -43,7 +43,7 @@ export default async function CategoryTemplate({
       {category.parentCategoryId ? (
         <div className="relative">
           <Link
-            className="top-2 absolute bg-white px-3 py-2 rounded text-primary"
+            className="top-2 absolute bg-store-surface px-3 py-2 text-store-text text-sm"
             href={`/${locale}/categories/${category.parentCategoryId}`}
           >
             {t('category.goToParent')}

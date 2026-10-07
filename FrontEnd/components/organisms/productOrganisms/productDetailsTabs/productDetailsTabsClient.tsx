@@ -20,7 +20,7 @@ export default function ProductDetailsTabsClient({
   return (
     <>
       {/* Tabs Header */}
-      <div className="flex gap-6 mb-6 border-b overflow-x-auto text-sm">
+      <div className="flex gap-8 mb-6 border-b border-store-border overflow-x-auto text-sm">
         <TabButton
           label={t('product.description')}
           active={active === 'desc'}
@@ -66,10 +66,10 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`pb-3 whitespace-nowrap transition ${
+      className={`-mb-px pb-3 whitespace-nowrap transition-colors border-b-2 ${
         active
-          ? 'border-b-2 border-primary font-medium'
-          : 'text-gray-500'
+          ? 'border-store-strong font-medium text-store-text'
+          : 'border-transparent text-store-subtle hover:text-store-text'
       }`}
       aria-selected={active}
     >

@@ -7,7 +7,7 @@ function EntityLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
-      <div className="pt-20 sm:pt-24 min-h-[70vh]">{children}</div>
+      <div className="pt-[var(--store-header-h)] min-h-[70vh]">{children}</div>
       <Footer />
     </>
   );

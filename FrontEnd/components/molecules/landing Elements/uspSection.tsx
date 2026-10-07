@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 import { useTranslations } from 'next-intl';
@@ -24,35 +22,32 @@ const USPSection: React.FC = () => {
   const t = useTranslations('usp');
 
   return (
-    <section className="store-section" aria-labelledby="usp-title">
-      <div className="mx-auto px-4 sm:px-6 max-w-7xl text-center">
-        <div className="store-panel px-4 sm:px-8 py-10 md:py-12">
-          <h2 id="usp-title" className="store-section-title !mb-8">
-            {t('sectionTitle')}
-          </h2>
+    <section
+      aria-labelledby="usp-title"
+      className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 max-w-[1440px]"
+    >
+      <h2
+        id="usp-title"
+        className="mb-10 md:mb-14 font-normal text-2xl sm:text-3xl md:text-4xl text-center tracking-tight"
+      >
+        {t('sectionTitle')}
+      </h2>
 
-          <div className="gap-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-            {USP_KEYS.map((usp) => (
-              <article
-                key={usp.id}
-                className="flex flex-col items-center bg-[var(--store-surface-muted)] hover:bg-[color-mix(in_srgb,var(--primary-color)_6%,white)] p-5 rounded-2xl border border-[var(--store-border)] transition"
-              >
-                <div
-                  className="mb-3 text-[var(--primary-color)]"
-                  aria-hidden
-                >
-                  {usp.icon}
-                </div>
-                <h3 className="mb-1 font-semibold text-[var(--store-text)] text-base">
-                  {t(`items.${usp.id}.title`)}
-                </h3>
-                <p className="text-[var(--store-text-muted)] text-sm leading-relaxed">
-                  {t(`items.${usp.id}.description`)}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
+      <div className="gap-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 bg-store-border border border-store-border">
+        {USP_KEYS.map((usp) => (
+          <article
+            key={usp.id}
+            className="flex flex-col items-center gap-3 bg-store-surface p-6 sm:p-8 text-center"
+          >
+            <div aria-hidden className="text-store-text">
+              {usp.icon}
+            </div>
+            <h3 className="font-medium text-base">{t(`items.${usp.id}.title`)}</h3>
+            <p className="text-store-subtle text-sm leading-relaxed">
+              {t(`items.${usp.id}.description`)}
+            </p>
+          </article>
+        ))}
       </div>
     </section>
   );

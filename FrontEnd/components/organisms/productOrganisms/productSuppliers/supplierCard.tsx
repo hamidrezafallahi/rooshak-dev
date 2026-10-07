@@ -37,21 +37,21 @@ export async function SupplierCardGrid({
   const profileHref = `/${locale}/suppliers/${supplier.supplierSlug || supplier.supplierId}`;
 
   return (
-    <article className="group relative flex flex-col bg-white shadow-sm hover:shadow-lg border border-gray-100 rounded-2xl h-full overflow-hidden transition-shadow duration-300">
+    <article className="group relative flex flex-col bg-store-surface border border-store-border hover:border-store-strong h-full overflow-hidden transition-colors duration-300">
       {hasDiscount && (
-        <div className="top-3 left-3 z-10 absolute bg-red-500 px-2 py-1 rounded-full font-bold text-white text-xs">
+        <div className="top-3 start-3 z-10 absolute bg-primary px-2 py-1 font-medium text-primary-foreground text-xs">
           {t('common.specialDiscount')}
         </div>
       )}
       {!inStock && (
-        <div className="top-3 right-3 z-10 absolute bg-gray-500 px-2 py-1 rounded-full font-medium text-white text-xs">
+        <div className="top-3 end-3 z-10 absolute bg-store-muted px-2 py-1 font-medium text-store-text text-xs">
           {t('common.outOfStock')}
         </div>
       )}
 
       <Link
         href={profileHref}
-        className="block relative bg-gray-50 h-48 overflow-hidden"
+        className="block relative bg-store-muted h-48 overflow-hidden"
       >
         <MediaImage
           alt={supplier.supplierName}
@@ -65,30 +65,30 @@ export async function SupplierCardGrid({
       <div className="flex flex-col flex-1 p-4 min-w-0">
         <Link
           href={profileHref}
-          className="block mb-2 group-hover:text-primary transition-colors"
+          className="block mb-2 group-hover:underline underline-offset-4"
         >
-          <h4 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-1">
+          <h4 className="font-normal text-sm sm:text-base line-clamp-1">
             {supplier.supplierName}
           </h4>
         </Link>
 
         {supplier.supplierDesc ? (
-          <p className="mb-3 text-gray-500 text-xs line-clamp-2 leading-5">
+          <p className="mb-3 text-store-subtle text-xs line-clamp-2 leading-5">
             {supplier.supplierDesc}
           </p>
         ) : null}
 
         {inStock ? (
-          <span className="mb-3 bg-gray-100 px-2 py-1 rounded-full w-fit text-gray-600 text-xs">
+          <span className="mb-3 bg-store-muted px-2 py-1 w-fit text-store-subtle text-xs">
             {t('common.inStock')}
           </span>
         ) : null}
 
         <div className="flex flex-wrap items-baseline gap-1 mt-auto mb-3">
-          <span className="font-bold text-gray-800 text-lg">
+          <span className="font-medium text-lg">
             {supplier.finalPrice.toLocaleString('fa-IR')}
           </span>
-          <span className="text-gray-500 text-sm">{t('common.currency')}</span>
+          <span className="text-store-subtle text-sm">{t('common.currency')}</span>
         </div>
 
         <ProductCTA id={supplier.id} productId={productId} />

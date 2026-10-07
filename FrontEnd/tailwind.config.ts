@@ -36,6 +36,15 @@ export default {
 				secondary: 'var(--secondary-color)',
 				highlight: 'var(--highlight-color)',
 				neutral: 'var(--neutral-color)',
+				'primary-foreground': 'var(--store-surface-solid)',
+				store: {
+					surface: 'var(--store-surface-solid)',
+					muted: 'var(--store-surface-muted)',
+					border: 'var(--store-border)',
+					strong: 'var(--store-border-strong)',
+					text: 'var(--store-text)',
+					subtle: 'var(--store-text-muted)',
+				},
 				success: 'var(--success-color)',
 				error: 'var(--error-color)',
 				warning: 'var(--warning-color)',
@@ -53,6 +62,10 @@ export default {
 			},
 			keyframes: {
 
+				formIn: {
+					'0%': { opacity: '0', transform: 'translateY(14px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
 				popUpDisappear: {
 					'0%': {
 						transform: 'translateY(-10%)',
@@ -66,6 +79,7 @@ export default {
 			},
 			animation: {
 
+				formIn: 'formIn 600ms cubic-bezier(0.22, 1, 0.36, 1) both',
 				popUpDisappear: 'popUpDisappear 300ms forwards'
 			}
 		}

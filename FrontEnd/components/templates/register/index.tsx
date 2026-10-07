@@ -3,42 +3,94 @@
 import React, { useState } from 'react';
 
 import { useLocale, useTranslations } from 'next-intl';
-import Image from 'next/image';
 import Link from 'next/link';
 
-import { CardTitle } from '@components/atoms/defaultElements/card';
-import logo from '@public/arianSystemLogo1.png';
+import HeroMedia from '@components/organisms/heroMedia';
 
 import { LoginForm } from './login';
 import { SignUpForm } from './signUp';
 
-function Register() {
+type Props = {
+  imageSrc: string;
+  videoSrc?: string;
+  mediaAlt: string;
+  playLabel: string;
+  pauseLabel: string;
+};
+
+/**
+ * Standalone sign-in / sign-up screen (no header/footer). On desktop it is split in
+ * two halves: hero media on one side, the form on the other; switching between the
+ * two forms swaps the sides.
+ */
+function Register({ imageSrc, videoSrc, mediaAlt, playLabel, pauseLabel }: Props) {
   const [isLogin, setIsLogin] = useState(true);
   const t = useTranslations('register');
   const tHeader = useTranslations('header');
+  const tBrand = useTranslations('brand');
   const locale = useLocale();
 
   return (
-    <div className="flex justify-center items-center px-4 py-10 min-h-[70vh]">
-      <div className="store-panel flex flex-col items-center gap-5 p-5 sm:p-7 w-full sm:w-[26rem] overflow-hidden text-center">
-        <CardTitle className="flex flex-col items-center gap-2">
-          <Image alt={tHeader('register')} src={logo} width={60} height={60} />
-          <span className="font-semibold text-[var(--store-text)] text-lg">
-            {isLogin ? t('enter') : t('signUp')}
-          </span>
-        </CardTitle>
-        {isLogin ? (
-          <LoginForm setIsLogin={setIsLogin} />
-        ) : (
-          <SignUpForm setIsLogin={setIsLogin} />
-        )}
+    <div className="lg:relative lg:overflow-hidden min-h-screen">
+      {/* Desktop: both halves are absolutely placed and slide past each other. */}
+      <aside
+        className={`hidden lg:block lg:absolute lg:inset-y-0 lg:start-0 lg:w-1/2 bg-black overflow-hidden lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
+          isLogin ? '' : 'ltr:lg:translate-x-full rtl:lg:-translate-x-full'
+        }`}
+      >
+        <HeroMedia
+          imageSrc={imageSrc}
+          videoSrc={videoSrc}
+          alt={mediaAlt}
+          playLabel={playLabel}
+          pauseLabel={pauseLabel}
+        />
         <Link
           href={`/${locale}`}
-          className="text-[var(--store-text-muted)] hover:text-[var(--primary-color)] text-sm transition"
+          className="top-8 start-8 z-10 absolute text-2xl text-white ltr:uppercase ltr:tracking-[0.3em]"
         >
-          {tHeader('landing page')}
+          {tBrand('name')}
         </Link>
-      </div>
+      </aside>
+
+      <main
+        className={`flex flex-col justify-center items-center gap-6 px-4 sm:px-10 py-10 min-h-screen lg:absolute lg:inset-y-0 lg:end-0 lg:w-1/2 lg:min-h-0 lg:transition-transform lg:duration-[800ms] lg:ease-[cubic-bezier(0.65,0,0.35,1)] ${
+          isLogin ? '' : 'ltr:lg:-translate-x-full rtl:lg:translate-x-full'
+        }`}
+      >
+        <Link
+          href={`/${locale}`}
+          className="lg:hidden text-2xl ltr:uppercase ltr:tracking-[0.3em]"
+        >
+          {tBrand('name')}
+        </Link>
+
+        <div
+          key={isLogin ? 'login' : 'signup'}
+          className="flex flex-col items-center gap-6 w-full max-w-md text-center animate-formIn"
+        >
+          <h1 className="font-normal text-3xl sm:text-4xl">
+            {isLogin ? t('enter') : t('signUp')}
+          </h1>
+          {isLogin ? (
+            <LoginForm
+              setIsLogin={setIsLogin}
+              className="shadow-none p-0 border-0 max-w-none"
+            />
+          ) : (
+            <SignUpForm
+              setIsLogin={setIsLogin}
+              className="shadow-none p-0 border-0 max-w-none"
+            />
+          )}
+          <Link
+            href={`/${locale}`}
+            className="text-store-subtle hover:text-store-text text-sm transition-colors"
+          >
+            {tHeader('landing page')}
+          </Link>
+        </div>
+      </main>
     </div>
   );
 }

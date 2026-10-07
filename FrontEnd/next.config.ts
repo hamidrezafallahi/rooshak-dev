@@ -146,7 +146,20 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // Immutable only in production; in dev it pins stale HMR chunks in the browser.
+            value:
+              process.env.NODE_ENV === 'production'
+                ? 'public, max-age=31536000, immutable'
+                : 'no-store',
+          },
+        ],
+      },
+      {
+        source: '/video/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },

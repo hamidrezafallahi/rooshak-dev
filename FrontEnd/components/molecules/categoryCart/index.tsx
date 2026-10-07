@@ -1,12 +1,18 @@
 import React from 'react';
 
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
 import { ICategory } from '@models/category';
 
-export default async function CategoryCard({ category }: { category: ICategory}) {
+export default async function CategoryCard({
+  category,
+  priority = false,
+}: {
+  category: ICategory;
+  priority?: boolean;
+}) {
   const {
     id,
     categoryCover,
@@ -15,29 +21,33 @@ export default async function CategoryCard({ category }: { category: ICategory})
     categoryPersianDesc,
     categoryEnglishDesc,
   } = category;
-  const locale = await getLocale()
-   return (
+  const locale = await getLocale();
+  const t = await getTranslations('landing');
+  const name = locale === 'fa' ? persianName : englishName;
+  const desc = locale === 'fa' ? categoryPersianDesc : categoryEnglishDesc;
+
+  return (
     <Link
       href={`/${locale}/categories/${category.slug || id}`}
-      className="group relative shadow-sm rounded-2xl h-44 md:h-52 overflow-hidden"
+      className="group relative block bg-store-muted aspect-[4/5] sm:aspect-[4/3] overflow-hidden"
     >
       <MediaImage
         src={categoryCover}
-        alt={locale == "fa" ? persianName : englishName}
+        alt={name || ''}
         fill
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform transform"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-        loading="lazy"
+        className="object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
+        sizes="(max-width: 1024px) 50vw, 33vw"
+        loading={priority ? undefined : 'lazy'}
       />
-      <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/40 to-transparent p-4">
-        <div>
-          <h3 className="font-semibold text-white">
-            {locale == "fa" ? persianName : englishName}
-          </h3>
-          <p className="text-white text-xs">
-            {locale == "fa" ? categoryPersianDesc : categoryEnglishDesc}
-          </p>
-        </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-1 p-4 sm:p-6 text-white">
+        <h3 className="font-normal text-lg sm:text-2xl leading-tight">{name}</h3>
+        {desc ? (
+          <p className="hidden sm:block max-w-xs text-white/85 text-sm line-clamp-2">{desc}</p>
+        ) : null}
+        <span className="mt-1 pb-0.5 border-white border-b font-medium text-xs sm:text-sm">
+          {t('discover')}
+        </span>
       </div>
     </Link>
   );

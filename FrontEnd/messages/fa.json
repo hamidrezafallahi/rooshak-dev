@@ -38,7 +38,8 @@
     "mainNav": "منوی اصلی",
     "openMenu": "باز کردن منو",
     "closeMenu": "بستن منو",
-    "exhibition": "لیست قیمت"
+    "exhibition": "لیست قیمت",
+    "announcement": "بسته‌بندی ایمن و ضدضربه برای تمام ظروف کریستال · ارسال به سراسر ایران"
   },
   "footer": {
     "tagline": "فروشگاه تخصصی ظروف کریستال روشاک؛ اصالت، درخشش و ارسال مطمئن به سراسر ایران.",
@@ -157,7 +158,11 @@
     "subtitle": "کریستال اصل، بسته‌بندی ایمن و ارسال سریع — از سرویس پذیرایی تا گیلاس و دکوری.",
     "ctaProducts": "مشاهده ظروف کریستال",
     "ctaDiscounts": "تخفیف‌های ویژه",
-    "heroImageAlt": "ویترین ظروف کریستال روشاک"
+    "heroImageAlt": "ویترین ظروف کریستال روشاک",
+    "eyebrow": "هنر کریستال",
+    "videoPause": "توقف ویدیوی پس‌زمینه",
+    "videoPlay": "پخش ویدیوی پس‌زمینه",
+    "scroll": "اسکرول برای کشف بیشتر"
   },
   "usp": {
     "sectionTitle": "چرا خرید کریستال از روشاک؟",
@@ -403,7 +408,8 @@
     "minTwoChars": "حداقل ۲ کاراکتر وارد کنید",
     "minTwoCharsShort": "حداقل ۲ کاراکتر",
     "registerError": "خطا در ثبت نام",
-    "connectionError": "خطای اتصال"
+    "connectionError": "خطای اتصال",
+    "backToLogin": "بازگشت به ورود"
   },
   "shoppingCart": {
     "header": {
@@ -603,7 +609,10 @@
     "slideDetailsAria": "مشاهده جزئیات اسلاید {index}",
     "goToSlideAria": "رفتن به اسلاید {index}",
     "prevSlide": "اسلاید قبلی",
-    "nextSlide": "اسلاید بعدی"
+    "nextSlide": "اسلاید بعدی",
+    "bannersAria": "مجموعه‌های ویژه",
+    "discover": "کشف کنید",
+    "specialOfferEyebrow": "فرصت محدود"
   },
   "order": {
     "myOrders": "سفارشات من",
@@ -624,7 +633,10 @@
   },
   "uploader": {
     "placeholder": "Drag & Drop یا کلیک کنید تا تصویر انتخاب شود",
-    "previousNotFound": "تصویر قبلی یافت نشد؛ لطفاً دوباره آپلود کنید"
+    "previousNotFound": "تصویر قبلی یافت نشد؛ لطفاً دوباره آپلود کنید",
+    "videoType": "فقط ویدیوی MP4 یا WebM مجاز است.",
+    "videoSize": "حجم ویدیو باید حداکثر ۳۰ مگابایت باشد.",
+    "videoPlaceholder": "انتخاب ویدیو (mp4 / webm)"
   },
   "countdown": {
     "expired": "زمان تخفیف به پایان رسیده",

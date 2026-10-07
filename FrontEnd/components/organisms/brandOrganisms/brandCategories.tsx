@@ -18,7 +18,7 @@ export async function BrandCategories({ id }: { id: number }) {
   const t = await getTranslations();
   return (
     <div className="my-10">
-      <h2 className="mb-4 font-bold text-xl">{t('product.brandCategories')}</h2>
+      <h2 className="mb-6 font-normal text-2xl">{t('product.brandCategories')}</h2>
       <div className="flex gap-4 pb-2 overflow-x-auto">
         {categories.map((cat, idx) => (
           <CategoryCard key={idx} category={cat} />

@@ -13,13 +13,13 @@ export default async function SeoHighlight({ title, description, locale }: Props
   const t = await getTranslations('storefront');
 
   return (
-    <aside className="mb-6 rounded-2xl border border-amber-300/20 bg-gradient-to-l from-amber-500/10 to-transparent px-4 py-3">
-      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-amber-200/80">
+    <aside className="mb-6 border-s-2 border-store-strong bg-store-muted px-4 py-3">
+      <p className="mb-1 text-xs font-medium uppercase text-store-subtle ltr:tracking-[0.14em]">
         {t('seoSummary')}
       </p>
-      {title ? <h2 className="text-base font-semibold text-white">{title}</h2> : null}
+      {title ? <h2 className="text-base font-medium text-store-text">{title}</h2> : null}
       {description ? (
-        <p className="mt-1 text-sm leading-relaxed text-white/75">{description}</p>
+        <p className="mt-1 text-sm leading-relaxed text-store-subtle">{description}</p>
       ) : null}
     </aside>
   );
@@ -34,7 +34,7 @@ export function SeoRelatedChip({ href, label }: ChipProps) {
   return (
     <Link
       href={href}
-      className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/80 transition hover:border-white/30 hover:bg-white/10"
+      className="border border-store-border px-3 py-1 text-xs text-store-text transition-colors hover:border-store-strong"
     >
       {label}
     </Link>

@@ -45,7 +45,7 @@ useEffect(() => {
       <label className="block mb-2 font-medium text-sm">
         {t("shoppingCart.shippingMethod")}
       </label>
-      <div className="hidden-show-scrollbar flex flex-col gap-2 bg-zinc-800 p-3 border border-gray-700 rounded-lg max-h-40 overflow-y-auto">
+      <div className="hidden-show-scrollbar flex flex-col gap-2 bg-store-muted p-3 border border-store-border rounded-lg max-h-40 overflow-y-auto">
         {methods.map((el, i) => (
           <Button
             variant={"ghost"}
@@ -60,12 +60,12 @@ useEffect(() => {
               <div className="font-medium text-sm">{el.title}</div>
               { el.isDefault && (
                 <div>
-                  <div className="text-gray-400 text-xs">
+                  <div className="text-store-subtle text-xs">
                     {t("general.default")}
                   </div>
                 </div>
               )}
-              <div className="flex gap-2 text-gray-400 text-xs">
+              <div className="flex gap-2 text-store-subtle text-xs">
                  <span>{el.estimatedDeliveryTime}</span>
                  <span>{t("shoppingCart.days")}</span> 
               </div>

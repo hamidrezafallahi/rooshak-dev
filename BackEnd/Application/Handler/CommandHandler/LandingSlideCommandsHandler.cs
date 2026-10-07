@@ -54,7 +54,19 @@ public class SlideCommandHandler(
             if (!UploadPaths.IsStoredPath(bannerUrl))
                 return ServiceResult<IdDto>.Failed("آپلود تصویر بنر ناموفق بود");
 
-            slide.Update(userId.Value, bannerUrl, null, null, null, null);
+            string? videoPath = null;
+            if (request.VideoUrl is not null && request.VideoUrl.Length > 0)
+            {
+                videoPath = await _uploaderService.UploadVideo(new UploadDTO
+                {
+                    File = request.VideoUrl,
+                    Path = UploadPaths.LandingSlides(slide.Id)
+                });
+                if (!UploadPaths.IsStoredPath(videoPath))
+                    return ServiceResult<IdDto>.Failed("آپلود ویدیو ناموفق بود (فقط mp4/webm تا ۳۰ مگابایت)");
+            }
+
+            slide.Update(userId.Value, bannerUrl, null, null, null, null, videoPath);
             await _slideRepository.SaveChangesAsync(cancellationToken);
 
             return ServiceResult<IdDto>.Ok(new IdDto { Id = slide.Id });
@@ -93,13 +105,33 @@ public class SlideCommandHandler(
                 return ServiceResult<IdDto>.Failed("آپلود تصویر بنر ناموفق بود");
         }
 
+        string? videoPath = null;
+        if (request.RemoveVideo && !string.IsNullOrWhiteSpace(slide.VideoUrl))
+        {
+            await _uploaderService.DeleteStoredFile(slide.VideoUrl, UploadPaths.LandingSlides(slide.Id));
+            slide.ClearVideo(userId.Value);
+        }
+        if (request.VideoUrl is not null && request.VideoUrl.Length > 0)
+        {
+            if (!string.IsNullOrWhiteSpace(slide.VideoUrl))
+                await _uploaderService.DeleteStoredFile(slide.VideoUrl, UploadPaths.LandingSlides(slide.Id));
+            videoPath = await _uploaderService.UploadVideo(new UploadDTO
+            {
+                File = request.VideoUrl,
+                Path = UploadPaths.LandingSlides(slide.Id)
+            });
+            if (!UploadPaths.IsStoredPath(videoPath))
+                return ServiceResult<IdDto>.Failed("آپلود ویدیو ناموفق بود (فقط mp4/webm تا ۳۰ مگابایت)");
+        }
+
         slide.Update(
          userId.Value,
          bannerUrl,
          request.FirstUrl,
          request.SecondUrl,
          request.BannerTitle,
-         request.BannerDescription
+         request.BannerDescription,
+         videoPath
         );
         await _slideRepository.SaveChangesAsync(cancellationToken);
 

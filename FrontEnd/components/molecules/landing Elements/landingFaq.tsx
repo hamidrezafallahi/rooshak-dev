@@ -17,19 +17,19 @@ export default async function LandingFaq({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: 'faqPage' });
 
   return (
-    <section className="bg-white px-4 sm:px-6 lg:px-8 py-16">
-      <div className="mx-auto w-full max-w-3xl">
-        <h2 className="mb-3 font-bold text-2xl sm:text-3xl text-center">
+    <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20">
+      <div className="mx-auto w-full max-w-6xl">
+        <h2 className="mb-3 font-normal text-2xl sm:text-3xl md:text-4xl text-center tracking-tight">
           {t('title')}
         </h2>
-        <p className="mb-8 text-gray-600 text-sm sm:text-base text-center">
+        <p className="mb-8 md:mb-12 text-store-subtle text-sm sm:text-base text-center">
           {t('description')}
         </p>
 
         <FaqAccordion items={faqs} />
 
         <div className="flex justify-center mt-8">
-          <Link href={`/${locale}/faq`} className="store-btn store-btn-primary">
+          <Link href={`/${locale}/faq`} className="inline-flex justify-center items-center bg-primary hover:bg-transparent px-8 py-3 border border-primary font-medium text-primary-foreground hover:text-store-text text-sm transition-colors">
             {t('viewAll')}
           </Link>
         </div>

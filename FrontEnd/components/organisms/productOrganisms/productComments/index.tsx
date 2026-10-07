@@ -15,14 +15,14 @@ export default function ProductComments({
   const locale = useLocale();
   const t = useTranslations();
   return (
-    <section className="bg-white shadow-lg p-4 rounded-2xl">
+    <section className="p-4 border border-store-border">
       <h3 className="mb-2 font-semibold text-lg">{t('product.userReviews')}</h3>
 
       {comments.map((c: IComment) => (
-        <article key={c.id} className="mb-2 pb-2 border-b">
+        <article key={c.id} className="mb-2 pb-2 border-b border-store-border">
           <p className="font-medium text-sm">{c.userFullName}</p>
-          <p className="text-gray-700 text-sm">{c.content}</p>
-          <time className="text-gray-400 text-xs">
+          <p className="text-store-text text-sm">{c.content}</p>
+          <time className="text-store-subtle text-xs">
             {Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", {
               dateStyle: "full",
             }).format(new Date(c.createdAt))}

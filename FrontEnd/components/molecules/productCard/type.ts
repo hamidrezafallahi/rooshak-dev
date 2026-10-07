@@ -25,6 +25,9 @@ export interface ISimpleProduct {
     name: string;
     description: string;
     mainImage: string | null;
+    price?: number;
+    finalPrice?: number;
+    inventory?: number;
     suppliers?:IUser[]
 }
  

@@ -93,9 +93,9 @@ export default function ThemeSwitcher() {
     <button
       onClick={handleNextTheme}
       aria-label={t("header.theme")}
-      className="flex justify-center items-center bg-white/30 hover:bg-white/40 shadow-black/20 shadow-lg hover:shadow-black/30 hover:shadow-xl backdrop-blur-md border border-white/20 rounded-md xs:rounded-full w-10 h-10 transition-all duration-300"
+      className="flex justify-center items-center w-10 h-10 hover:opacity-60 transition-opacity"
     >
-      <span className="block bg-primary rounded-full w-2 h-2" />
+      <span className="block border border-current rounded-full w-3 h-3 bg-current/20" />
     </button>
   );
 }

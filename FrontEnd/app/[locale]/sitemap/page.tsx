@@ -137,7 +137,7 @@ export default async function HtmlSitemapPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main className="store-page pt-20 sm:pt-24 min-h-[70vh]">
+      <main className="store-page pt-[calc(var(--store-header-h)+2rem)] min-h-[70vh]">
         <PageHeader title={t('title')} description={t('description')} />
 
         <section className="store-panel mb-8 p-5 md:p-6">

@@ -48,21 +48,21 @@ export default async function FaqSection({ items, locale, title }: Props) {
   };
 
   return (
-    <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+    <section className="mt-10 border-t border-store-border pt-8">
       <JsonLd data={faqLd} />
-      <h2 className="mb-4 text-xl font-semibold text-white">
+      <h2 className="mb-5 text-xl sm:text-2xl font-normal text-store-text">
         {title || t('faqTitle')}
       </h2>
       <div className="space-y-3">
         {items.map((item) => (
           <details
             key={item.question}
-            className="group rounded-xl border border-white/10 bg-black/10 px-4 py-3 open:border-amber-300/30"
+            className="group border-b border-store-border py-4"
           >
-            <summary className="cursor-pointer list-none font-medium text-white marker:content-none">
+            <summary className="cursor-pointer list-none font-medium text-store-text marker:content-none [&::-webkit-details-marker]:hidden">
               {item.question}
             </summary>
-            <p className="mt-2 text-sm leading-relaxed text-white/75">{item.answer}</p>
+            <p className="mt-3 text-sm leading-relaxed text-store-subtle">{item.answer}</p>
           </details>
         ))}
       </div>

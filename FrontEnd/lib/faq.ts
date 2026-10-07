@@ -17,5 +17,8 @@ export async function getFaqs(limit = 100): Promise<IFaq[]> {
   });
 
   if (!res?.isSuccess) return [];
-  return res.data?.records ?? [];
+  // Never render blank accordions: drop rows without a question or an answer.
+  return (res.data?.records ?? []).filter(
+    (faq) => faq.question?.trim() && faq.answer?.trim(),
+  );
 }

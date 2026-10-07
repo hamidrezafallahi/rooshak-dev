@@ -1,4 +1,3 @@
-// app/components/landing/LandingSpecialOffer.tsx
 import React from 'react';
 
 import { getTranslations } from 'next-intl/server';
@@ -8,35 +7,29 @@ import { SpecialOffer } from '@models/specialOffer';
 
 import SpecialOfferCarouselClient from './SpecialOfferCarouselClient';
 
-export default async  function LandingSpecialOffer() {
+export default async function LandingSpecialOffer() {
   const t = await getTranslations('landing');
-  const spacialOffers = await getAll<SpecialOffer>("SpecialOffers/landing");
+  const specialOffers = await getAll<SpecialOffer>('SpecialOffers/landing');
+  const records = specialOffers?.data?.records ?? [];
+  if (!records.length) return null;
+
   return (
-    <section className="mx-auto px-4 py-16 w-full max-w-7xl">
-      <div
-        className="relative flex md:flex-row flex-col items-center gap-8 p-8 sm:p-12 rounded-3xl overflow-hidden text-white"
-        style={{
-          background:
-            "linear-gradient(90deg, var(--primary-color), color-mix(in srgb, var(--secondary-color) 75%, var(--primary-color)))",
-        }}
-      >
-        <div className="flex-1 min-w-0">
-          <h2 className="mb-3 font-extrabold text-3xl sm:text-4xl">
+    <section className="bg-black text-white">
+      <div className="items-center gap-8 md:gap-14 grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 max-w-[1440px]">
+        <div>
+          <p className="mb-3 font-medium text-white/70 text-xs uppercase ltr:tracking-[0.2em]">
+            {t('specialOfferEyebrow')}
+          </p>
+          <h2 className="mb-4 font-normal text-3xl sm:text-4xl md:text-5xl leading-tight">
             {t('specialOfferTitle')}
           </h2>
-          <p className="mb-6 max-w-md text-sm sm:text-base text-center text-white">
+          <p className="max-w-md text-white/80 text-sm sm:text-base leading-relaxed">
             {t('specialOfferDesc')}
           </p>
-
-
-          
         </div>
 
-        <div className="flex flex-1 justify-center w-2/3">
-          {/* اندازه این قاب به گونه‌ای انتخاب شده که جای یک تصویر قبلی را بگیرد */}
-          <div className="w-full h-80">
-            <SpecialOfferCarouselClient spacialOffers={spacialOffers?.data.records||[]} />
-          </div>
+        <div className="min-w-0 h-[22rem] sm:h-[26rem]">
+          <SpecialOfferCarouselClient spacialOffers={records} />
         </div>
       </div>
     </section>

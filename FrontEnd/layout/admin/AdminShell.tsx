@@ -53,7 +53,7 @@ export default function AdminShell({ menu, children }: AdminShellProps) {
   }, [menuOpen]);
 
   return (
-    <div className="admin-shell">
+    <div className="admin-shell" data-surface="admin">
       <header className="admin-topbar">
         <button
           type="button"

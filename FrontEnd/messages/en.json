@@ -38,7 +38,8 @@
     "mainNav": "Main navigation",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "exhibition": "Price Lists"
+    "exhibition": "Price Lists",
+    "announcement": "Complimentary gift wrapping · Secure packing for every crystal piece"
   },
   "footer": {
     "tagline": "Rooshak — specialist crystal tableware. Authentic pieces, careful packing, and reliable delivery.",
@@ -157,7 +158,11 @@
     "subtitle": "Authentic crystal dishes, secure packing, and fast delivery — from serving sets to glassware and décor.",
     "ctaProducts": "Shop crystalware",
     "ctaDiscounts": "View offers",
-    "heroImageAlt": "Rooshak crystal tableware showcase"
+    "heroImageAlt": "Rooshak crystal tableware showcase",
+    "eyebrow": "The art of crystal",
+    "videoPause": "Pause background video",
+    "videoPlay": "Play background video",
+    "scroll": "Scroll to discover"
   },
   "usp": {
     "sectionTitle": "Why buy crystal from Rooshak?",
@@ -403,7 +408,8 @@
     "minTwoChars": "Enter at least 2 characters",
     "minTwoCharsShort": "At least 2 characters",
     "registerError": "Registration error",
-    "connectionError": "Connection error"
+    "connectionError": "Connection error",
+    "backToLogin": "Back to sign in"
   },
   "shoppingCart": {
     "header": {
@@ -603,7 +609,10 @@
     "slideDetailsAria": "View slide {index} details",
     "goToSlideAria": "Go to slide {index}",
     "prevSlide": "Previous slide",
-    "nextSlide": "Next slide"
+    "nextSlide": "Next slide",
+    "bannersAria": "Featured collections",
+    "discover": "Discover",
+    "specialOfferEyebrow": "Limited time"
   },
   "order": {
     "myOrders": "My orders",
@@ -624,7 +633,10 @@
   },
   "uploader": {
     "placeholder": "Drag and drop or click to select an image",
-    "previousNotFound": "Previous image not found; please upload again"
+    "previousNotFound": "Previous image not found; please upload again",
+    "videoType": "Only MP4 or WebM videos are allowed.",
+    "videoSize": "Video must be 30 MB or smaller.",
+    "videoPlaceholder": "Choose a video (mp4 / webm)"
   },
   "countdown": {
     "expired": "The discount has ended",

@@ -12,7 +12,7 @@ function BackToLandingPageButton() {
     const locale = useLocale()
   return (
          <Link
-        className="bg-zinc-800 hover:bg-zinc-700 p-2 rounded-lg"
+        className="border border-store-border hover:border-store-strong p-2 transition-colors"
         href={`/${locale}`}
       >
            {locale == "fa"? <ArrowLongRight/>:<ArrowLongLeft/>}

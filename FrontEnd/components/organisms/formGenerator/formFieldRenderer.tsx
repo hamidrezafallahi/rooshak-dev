@@ -11,6 +11,7 @@ import { Select } from '@components/atoms/defaultElements/customSelect';
 import { Textarea } from '@components/atoms/defaultElements/customTextarea';
 import { DynamicSelect } from '@components/atoms/defaultElements/dynamicSelect';
 import Uploader from '@components/atoms/defaultElements/uploader';
+import VideoUploader from '@components/atoms/defaultElements/videoUploader';
 import ImagesInput from '@components/molecules/imagesInput';
 
 import { FormFieldRendererProps } from './type';
@@ -71,6 +72,16 @@ const FormFieldRenderer = ({
       return (
         <FieldShell caption={field.Caption} help={field.Help} error={error}>
           <Uploader
+            placeHolder={field.PlaceHolder}
+            value={watch(field.Name) || ''}
+            onChange={(file) => setValue(field.Name, file)}
+          />
+        </FieldShell>
+      );
+    case 'video':
+      return (
+        <FieldShell caption={field.Caption} help={field.Help} error={error}>
+          <VideoUploader
             placeHolder={field.PlaceHolder}
             value={watch(field.Name) || ''}
             onChange={(file) => setValue(field.Name, file)}

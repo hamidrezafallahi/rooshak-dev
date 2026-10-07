@@ -40,23 +40,23 @@ export default function FaqAccordion({
   };
 
   return (
-    <div className={`flex flex-col gap-3 ${className}`}>
+    <div className={`grid grid-cols-1 lg:grid-cols-2 lg:gap-x-14 ${className}`}>
       {withJsonLd ? <JsonLd data={faqLd} /> : null}
       {items.map((item) => (
         <details
           key={item.id}
-          className="group px-4 sm:px-5 py-3 sm:py-4 text-start store-panel"
+          className="group py-4 sm:py-5 text-start border-b border-store-border first:border-t lg:[&:nth-child(2)]:border-t self-start"
         >
-          <summary className="flex justify-between items-center gap-3 font-semibold text-sm sm:text-base list-none cursor-pointer marker:content-none [&::-webkit-details-marker]:hidden">
+          <summary className="flex justify-between items-center gap-3 font-medium text-sm sm:text-base list-none cursor-pointer marker:content-none [&::-webkit-details-marker]:hidden">
             <span>{item.question}</span>
             <span
               aria-hidden
-              className="text-[var(--primary-color)] text-xl leading-none transition-transform group-open:rotate-45 shrink-0"
+              className="text-store-text text-xl leading-none transition-transform group-open:rotate-45 shrink-0"
             >
               +
             </span>
           </summary>
-          <p className="mt-3 text-[var(--store-text-muted)] text-sm leading-relaxed whitespace-pre-line">
+          <p className="mt-3 text-store-subtle text-sm leading-relaxed whitespace-pre-line">
             {item.answer}
           </p>
         </details>

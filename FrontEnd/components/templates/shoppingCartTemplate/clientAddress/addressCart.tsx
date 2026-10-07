@@ -77,7 +77,7 @@ function AddressCart({...props}: IProps) {
       className={`p-4 rounded-lg bg-zinc-900 border cursor-pointer space-y-3 ${
         selectedAddress?.id === address.id
           ? "border-primary shadow-primary shadow-lg"
-          : "border-gray-700"
+          : "border-store-border"
       }`}
       onClick={() => dispatch(setAddress({address}))}
     >
@@ -88,23 +88,23 @@ function AddressCart({...props}: IProps) {
             {address.name} {address.phoneNumber}
           </div>
 
-          <div className="text-gray-400 text-xs">
+          <div className="text-store-subtle text-xs">
             {address.postalCode} {address.fullAddress}
           </div>
 
-          <div className="text-gray-400 text-xs">{address.state}</div>
+          <div className="text-store-subtle text-xs">{address.state}</div>
         </div>
 
         {/* لیبل نمایش Default */}
         {address.isDefault && (
-          <span className="text-primary text-xs">{t("general.default")}</span>
+          <span className="text-store-text text-xs">{t("general.default")}</span>
         )}
       </div>
 
       {/* --- چک‌باکس پیش‌فرض (Footer کارت) --- */}
-      <div className="flex justify-between items-center gap-2 pt-2 border-zinc-800 border-t">
+      <div className="flex justify-between items-center gap-2 pt-2 border-store-border border-t">
         <div className="flex justify-between items-center gap-2">
-          <span className="text-gray-400 text-xs">
+          <span className="text-store-subtle text-xs">
             {t("address.chooseAsDefault")}
           </span>
           {defaultLoading ? (
@@ -114,7 +114,7 @@ function AddressCart({...props}: IProps) {
               checked={address.isDefault}
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => handleSetDefault(address.id!)}
-              className="bg-zinc-800 p-2 rounded"
+              className="bg-store-muted p-2 rounded"
             />
           )}
         </div>
@@ -125,7 +125,7 @@ function AddressCart({...props}: IProps) {
           }}
           className="flex justify-between items-center gap-2 !bg-transparent"
         >
-          <span className="text-gray-400 text-xs">{t("general.delete")}</span>
+          <span className="text-store-subtle text-xs">{t("general.delete")}</span>
           {deleteLoading ? (
             <SpinnerIcon />
           ) : (
@@ -139,7 +139,7 @@ function AddressCart({...props}: IProps) {
           }}
           className="flex justify-between items-center gap-2 !bg-transparent"
         >
-          <span className="text-gray-400 text-xs">{t("general.edit")}</span>
+          <span className="text-store-subtle text-xs">{t("general.edit")}</span>
           <EditIcon />
         </Button>
       </div>

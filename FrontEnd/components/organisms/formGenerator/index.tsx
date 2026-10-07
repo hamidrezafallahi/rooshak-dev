@@ -148,7 +148,9 @@ export default function FormGenerator({
       }
       bodyToSend = formData;
     } else {
-      const hasFile = formFields.some((field) => field.Type === "file");
+      const hasFile = formFields.some(
+        (field) => field.Type === "file" || field.Type === "video",
+      );
       if (hasFile) {
         const formData = new FormData();
         for (const key in cleanedData) {

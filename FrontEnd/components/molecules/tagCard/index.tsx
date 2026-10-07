@@ -11,7 +11,7 @@ export default function TagCard({ tag }: { tag: ITag }) {
   const locale = useLocale();
   return (
     <Link href={`/${locale}/tags/${tag.slug || tag.id}`}>
-      <Badge variant="secondary" className="rounded-lg">
+      <Badge variant="secondary" className="border border-store-border hover:border-store-strong bg-transparent text-store-text rounded-none transition-colors">
         <TagIcon /> {tag.name}
       </Badge>
     </Link>

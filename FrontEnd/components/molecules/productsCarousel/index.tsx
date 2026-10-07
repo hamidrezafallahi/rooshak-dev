@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 
-import { Rate } from '@components/atoms/defaultElements/customRate';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -33,92 +32,66 @@ export default function ProductsCarousel({
   const t = useTranslations();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollAmount = 300;
-
-  const scrollLeft = () => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+  const scrollByCard = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // RTL scrollLeft semantics are handled by the browser; dir is visual (right = 1).
+    el.scrollBy({ left: dir * Math.max(el.clientWidth * 0.8, 280), behavior: 'smooth' });
   };
 
-  const scrollRight = () => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-  };
+  const arrowClass =
+    'hidden sm:flex top-[38%] z-20 absolute justify-center items-center bg-store-surface hover:bg-primary border border-store-strong w-11 h-11 text-store-text hover:text-primary-foreground transition-colors';
+
   return (
     <div className="relative w-full">
-      {/* عنوان */}
-      <h2 className="mb-6 font-extrabold text-rose-600 text-2xl text-center">
-        {t('landing.selectedProducts')}
-      </h2>
+      <button
+        type="button"
+        onClick={() => scrollByCard(-1)}
+        aria-label={t('common.scrollPrev')}
+        className={`${arrowClass} left-2`}
+      >
+        <ChevronLeftIcon />
+      </button>
 
-      {/* دسکتاپ: کاروسل با دکمه */}
-      <div className="hidden sm:block relative">
-        {/* دکمه سمت چپ */}
-        <button
-          type="button"
-          onClick={scrollLeft}
-          aria-label={t('common.scrollPrev')}
-          className="top-1/2 left-0 z-20 absolute flex justify-center items-center bg-white/80 hover:bg-white shadow rounded-full w-10 h-10 -translate-y-1/2"
-        >
-          <ChevronLeftIcon />
-        </button>
-
-        {/* نوار اسکرول */}
-        <div
-          ref={scrollRef}
-          className="hidden-show-scrollbar flex gap-6 px-2 overflow-x-auto scroll-smooth"
-        >
-          {Loading ? (
-            <>
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-            </>
-          ) : (
-            items?.map((p) => (
-              <div key={p.id} className="flex-shrink-0 w-1/4 min-w-[250px]">
-                <ProductCard product={p} />
+      <div
+        ref={scrollRef}
+        className="hidden-show-scrollbar flex gap-4 md:gap-6 pb-2 overflow-x-auto snap-x snap-mandatory scroll-smooth"
+      >
+        {Loading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[62%] sm:w-[34%] lg:w-[23.5%]">
+                <ProductCardSkeleton />
               </div>
             ))
-          )}
-        </div>
-
-        {/* دکمه سمت راست */}
-        <button
-          type="button"
-          onClick={scrollRight}
-          aria-label={t('common.scrollNext')}
-          className="top-1/2 right-0 z-20 absolute flex justify-center items-center bg-white/80 hover:bg-white shadow rounded-full w-10 h-10 -translate-y-1/2"
-        >
-          <ChevronRightIcon />
-        </button>
+          : items?.map((p) => (
+              <div
+                key={p.id}
+                className="flex-shrink-0 snap-start w-[62%] sm:w-[34%] lg:w-[23.5%]"
+              >
+                <ProductCard product={p} />
+              </div>
+            ))}
       </div>
 
-      {/* موبایل: اسکرول افقی ساده */}
-      <div className="hidden-show-scrollbar sm:hidden flex gap-4 px-2 pb-2 overflow-x-auto">
-        {Loading ? (
-          <>
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-          </>
-        ) : (
-          items?.map((p) => (
-            <div key={p.id} className="flex-shrink-0 min-w-[70%]">
-              <ProductCard product={p} />
-            </div>
-          ))
-        )}
-      </div>
+      <button
+        type="button"
+        onClick={() => scrollByCard(1)}
+        aria-label={t('common.scrollNext')}
+        className={`${arrowClass} right-2`}
+      >
+        <ChevronRightIcon />
+      </button>
     </div>
   );
 }
 
+function formatMoney(value: number, locale: string) {
+  return new Intl.NumberFormat(locale === 'fa' ? 'fa-IR' : 'en-US').format(value);
+}
+
 function ProductCard({ product }: { product: ILandingProduct }) {
   const t = useTranslations();
-  const isAuthenticated = Boolean(getCookie("candySession"));
+  const isAuthenticated = Boolean(getCookie('candySession'));
   const locale = useLocale();
   const [addToShoppingCart] = useGetConditionallyMutation();
   const dispatch = useDispatch();
@@ -133,7 +106,7 @@ function ProductCard({ product }: { product: ILandingProduct }) {
         },
       }).unwrap();
       if (syncCartResponse.isSuccess) {
-         dispatch(synchronousCart(syncCartResponse.data));
+        dispatch(synchronousCart(syncCartResponse.data));
       }
     } else {
       dispatch(
@@ -154,110 +127,68 @@ function ProductCard({ product }: { product: ILandingProduct }) {
       );
     }
   };
- 
+
+  const href = `/${locale}/products/${product.slug || product.id}`;
+  const hasDiscount = product.discountAmount > 0;
+
   return (
-    <article className="flex-shrink-0 bg-white shadow-sm hover:shadow-lg rounded-2xl w-64 overflow-hidden transition-shadow">
-      <div className="relative w-full h-56 overflow-hidden">
+    <article className="group flex flex-col h-full text-store-text">
+      <Link href={href} className="block relative bg-store-muted aspect-[4/5] overflow-hidden">
         <MediaImage
           src={product.mainImage}
           alt={product.name}
           fill
-          className="object-cover"
-          sizes="256px"
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+          sizes="(max-width: 640px) 62vw, (max-width: 1024px) 34vw, 24vw"
           loading="lazy"
         />
-        {product.discountAmount > 0 && (
-          <span className="top-3 left-3 absolute bg-red-600 px-2 py-1 rounded font-semibold text-white text-xs">
+        {hasDiscount && (
+          <span className="top-3 start-3 absolute bg-primary px-2.5 py-1 font-medium text-[0.7rem] text-primary-foreground">
             -{product.discountAmount}
-            {product.discountIsPercent && "%"}
+            {product.discountIsPercent && '%'}
           </span>
         )}
-        <div className="bottom-0 left-[50%] absolute flex items-center gap-1 bg-black/50 px-2 py-1 rounded max-w-full -translate-x-[50%]">
-          <Rate value={product.averageRate} />
-          {/* <span className="text-white text-xs">
-    ({product.rateCount})
-  </span> */}
+      </Link>
+      <div className="flex flex-col flex-1 gap-1 pt-4">
+        <p className="text-store-subtle text-xs">{product.brand}</p>
+        <h3 className="font-normal text-sm sm:text-base line-clamp-2">
+          <Link href={href} className="hover:underline underline-offset-4">
+            {product.name}
+          </Link>
+        </h3>
+        <div className="flex flex-wrap items-baseline gap-x-2 mt-1 text-sm">
+          <span className="font-medium">
+            {formatMoney(product.finalPrice, locale)} {t('common.currency')}
+          </span>
+          {hasDiscount && (
+            <span className="text-store-subtle text-xs line-through">
+              {formatMoney(product.price, locale)}
+            </span>
+          )}
         </div>
-      </div>
-      <div className="p-4">
-        <h3 className="font-medium text-sm line-clamp-2">{product.name}</h3>
-        <p className="text-gray-600 text-xs">{product.brand}</p>
-
-        <div className="flex justify-between items-end gap-2 mt-3">
-          <div>
-            <div className="font-semibold text-sm">{product.finalPrice}$</div>
-
-            {product.discountAmount > 0 && (
-              <div className="text-gray-600 text-xs line-through">
-                {product.price}$
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/${locale}/products/${product.slug || product.id}`}
-              className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs"
-            >
-              {t('common.view')}
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                handleAddToCart(product);
-              }}
-              aria-label={t('common.addToCartAria', { name: product.name })}
-              className="bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-lg text-white text-xs"
-            >
-              {t('common.add')}
-            </button>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            handleAddToCart(product);
+          }}
+          aria-label={t('common.addToCartAria', { name: product.name })}
+          className="self-start mt-3 pb-0.5 border-current border-b font-medium text-sm hover:opacity-60 transition-opacity"
+        >
+          {t('common.addToCart')}
+        </button>
       </div>
     </article>
   );
 }
+
 function ProductCardSkeleton() {
   return (
-    <article
-      role="status"
-      className="flex-shrink-0 bg-white shadow-sm rounded-2xl w-64 overflow-hidden animate-pulse"
-    >
-      {/* تصویر */}
-      <div className="relative bg-gray-200 dark:bg-gray-700 w-full h-56">
-        <div className="absolute inset-0 flex justify-center items-center">
-          <svg
-            className="w-10 h-10 text-gray-300 dark:text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 18"
-            aria-hidden="true"
-          >
-            <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-          </svg>
-        </div>
-      </div>
-
-      {/* متن */}
-      <div className="space-y-3 p-4">
-        {/* نام محصول */}
-        <div className="bg-gray-200 dark:bg-gray-700 rounded w-3/4 h-4"></div>
-
-        {/* برند */}
-        <div className="bg-gray-200 dark:bg-gray-700 rounded w-1/2 h-3"></div>
-
-        {/* قیمت و دکمه‌ها */}
-        <div className="flex justify-between items-end gap-2 mt-3">
-          <div className="space-y-2">
-            <div className="bg-gray-200 dark:bg-gray-700 rounded w-16 h-4"></div>
-            <div className="bg-gray-200 dark:bg-gray-700 rounded w-12 h-3"></div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="bg-gray-200 dark:bg-gray-700 rounded-lg w-16 h-8"></div>
-            <div className="bg-gray-200 dark:bg-gray-700 rounded-lg w-16 h-8"></div>
-          </div>
-        </div>
+    <article role="status" className="animate-pulse">
+      <div className="bg-store-muted aspect-[4/5]" />
+      <div className="space-y-2 pt-4">
+        <div className="bg-store-muted w-1/3 h-3" />
+        <div className="bg-store-muted w-3/4 h-4" />
+        <div className="bg-store-muted w-1/2 h-4" />
       </div>
     </article>
   );

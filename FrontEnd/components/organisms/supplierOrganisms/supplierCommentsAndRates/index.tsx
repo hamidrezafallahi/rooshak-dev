@@ -37,7 +37,7 @@ export async function SupplierCommentsAndRates(props: {
         {data.map((comment) => (
           <div
             key={comment.id}
-            className="bg-gray-50 hover:shadow-md p-6 rounded-2xl text-right transition"
+            className="bg-store-muted hover:shadow-md p-6 rounded-2xl text-right transition"
           >
             <div className="flex items-center mb-3">
               <MediaImage
@@ -56,10 +56,10 @@ export async function SupplierCommentsAndRates(props: {
                 </div>
               </div>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-store-subtle text-sm leading-relaxed">
               {comment.content}
             </p>
-            <time className="text-gray-400 text-xs">
+            <time className="text-store-subtle text-xs">
               {new Date(comment.createdAt).toLocaleDateString()}
             </time>
           </div>

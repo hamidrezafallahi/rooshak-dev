@@ -42,7 +42,11 @@ const AppReduxStore = configureStore({
     }).concat(serviceMiddleware),
 });
 
-export const persistor = persistStore(AppReduxStore);
+// `manualPersist` is supported at runtime (redux-persist 6.0.0) but missing from its typings.
+// Rehydration starts from <ReduxProvider> after mount so the first client render matches SSR.
+export const persistor = persistStore(AppReduxStore, {
+  manualPersist: true,
+} as Parameters<typeof persistStore>[1]);
 export default AppReduxStore;
 
 export type RootState = ReturnType<typeof AppReduxStore.getState>;

@@ -1,3 +1,6 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
+
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -23,7 +26,8 @@ import LandingHero from '@components/organisms/landingHero';
 import Footer from '@layout/footer';
 import Header from '@layout/header';
 import { getCategories } from '@lib/category';
-import { getSlides } from '@lib/landing';
+import { getSlides, splitHeroSlide } from '@lib/landing';
+import { siteBaseUrl } from '@lib/api';
 import {
   absoluteUrl,
   buildPageMetadata,
@@ -56,10 +60,7 @@ export default async function Home({ params }: Props) {
   const tBrand = await getTranslations({ locale, namespace: 'brand' });
   const tSeo = await getTranslations({ locale, namespace: 'seo' });
 
-  const images = await getSlides<{
-    bannerUrl: string;
-    firstUrl: string;
-  }>();
+  const { hero, rest } = splitHeroSlide(await getSlides());
   const categories = await getCategories({
     queries: { IsShowInLanding: true },
   });
@@ -70,8 +71,12 @@ export default async function Home({ params }: Props) {
     '@id': `${absoluteUrl(locale, '')}#organization`,
     name: 'روشاک',
     url: absoluteUrl(locale, ''),
-    logo: absoluteUrl(locale, 'logo.png'),
-    image: absoluteUrl(locale, 'og-image.jpg'),
+    // Root-absolute assets (never locale-prefixed). The logo is only advertised when
+    // the file exists, so structured data never points at a 404.
+    ...(existsSync(join(process.cwd(), 'public', 'brand', 'rooshak-logo.png'))
+      ? { logo: `${siteBaseUrl}/brand/rooshak-logo.png` }
+      : {}),
+    image: `${siteBaseUrl}/og-image.jpg`,
     email: 'info@rooshak.ir',
     telephone: '+98-935-4042013',
   
@@ -108,10 +113,10 @@ export default async function Home({ params }: Props) {
   return (
     <>
       <JsonLd data={[organizationLd, websiteLd]} />
-      <Header />
-      <main className="flex flex-col gap-2 pt-20 sm:pt-24 min-h-screen">
-        <LandingHero />
-        <LandingSlider images={images} />
+      <Header overlay />
+      <main className="flex flex-col min-h-screen">
+        <LandingHero slide={hero} />
+        <LandingSlider slides={rest} />
         <LandingBrands />
         <TheMostProducts />
         <LandingCategory categories={categories?.data.records ?? []} />

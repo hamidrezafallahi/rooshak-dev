@@ -35,8 +35,8 @@ function ShoppingCartComponent({ ...props }: IProps) {
       <div className="space-y-4 mt-6">
         {ShoppingCart.products.map((item, index) => {
           return (
-            <div key={index} className="flex gap-4 bg-zinc-900 p-6 rounded-lg">
-              <div className="flex-shrink-0 bg-gray-200 rounded-lg w-24 h-24 overflow-hidden">
+            <div key={index} className="flex gap-4 bg-store-muted p-6 rounded-lg">
+              <div className="flex-shrink-0 bg-store-muted rounded-lg w-24 h-24 overflow-hidden">
                 <MediaImage
                   src={item.mainImage}
                   fallbackSrc="/images/default-product.jpg"
@@ -57,14 +57,14 @@ function ShoppingCartComponent({ ...props }: IProps) {
                     id={item.id}
                     productOfferId={item.productOfferId}
                     content={<PlusIcon2 />}
-                    className="flex justify-center items-center hover:bg-zinc-800 border border-gray-600 rounded w-8 h-8 text-primary"
+                    className="flex justify-center items-center hover:bg-store-muted border border-store-border rounded w-8 h-8 text-store-text"
                   />
                   <span className="w-8 text-center">{item.quantity}</span>
                   <DecreaseButton
                     id={item.id}
                     productOfferId={item.productOfferId}
                     content={<MinusIcon />}
-                    className="flex justify-center items-center hover:bg-zinc-800 border border-gray-600 rounded w-8 h-8 text-primary"
+                    className="flex justify-center items-center hover:bg-store-muted border border-store-border rounded w-8 h-8 text-store-text"
                   />
                 </div>
               </div>
@@ -74,7 +74,7 @@ function ShoppingCartComponent({ ...props }: IProps) {
                   id={item.id}
                   productOfferId={item.productOfferId}
                   cartItemId={item.cartItemId}
-                  className="flex-shrink-0 text-gray-400 hover:text-white"
+                  className="flex-shrink-0 text-store-subtle hover:text-store-text"
                 />
                 <div className="text-right">
                   <div className="flex gap-2 font-semibold text-lg">
@@ -83,7 +83,7 @@ function ShoppingCartComponent({ ...props }: IProps) {
                     <RialIcon />
                   </div>
                   {item.discountAmount > 0 && (
-                    <div className="flex gap-2 text-gray-400 text-sm line-through">
+                    <div className="flex gap-2 text-store-subtle text-sm line-through">
                       {item.price * item.quantity}
 
                       <RialIcon />

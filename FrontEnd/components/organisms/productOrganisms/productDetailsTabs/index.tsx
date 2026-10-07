@@ -15,7 +15,7 @@ export async function ProductDetailsTabs({ product }: Props) {
   const t = await getTranslations();
   return (
     <section
-      className="bg-white shadow-sm mt-12 p-6 rounded-2xl"
+      className="mt-12 pt-8 border-t border-store-border"
       aria-labelledby="product-tabs"
     >
       <h2 id="product-tabs" className="sr-only">
@@ -24,7 +24,7 @@ export async function ProductDetailsTabs({ product }: Props) {
 
       <ProductDetailsTabsClient>
         {/* desc */}
-        <article className="text-gray-700 text-sm leading-8">
+        <article className="text-store-text text-sm leading-8">
           {product.description}
         </article>
         {/* specs */}

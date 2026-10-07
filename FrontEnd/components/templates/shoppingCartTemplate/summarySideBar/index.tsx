@@ -23,7 +23,7 @@ function SummarySideBar({ ...props }: IProps) {
       <h2 className="mb-2 font-semibold text-xl">
         {t("shoppingCart.shoppingCartSummary")}
       </h2>
-      <p className="mb-6 text-blue-400 text-sm">
+      <p className="mb-6 text-store-subtle text-sm">
         {t("shoppingCart.reviewYourCartDetailsAndShippingInformation")}
       </p>
 

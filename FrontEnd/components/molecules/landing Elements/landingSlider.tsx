@@ -1,132 +1,73 @@
-"use client";
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React from 'react';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  LinkIcon,
-} from '@components/atoms/iconComponents';
-
-export type LandingSlideImage = {
-  bannerUrl: string;
-  firstUrl: string;
-};
+import type { LandingSlide } from '@lib/landing';
 
 interface IProps {
-  images: LandingSlideImage[];
+  slides: LandingSlide[];
 }
 
-function LandingSlider({ ...props }: IProps) {
-  const { images } = props;
-  const locale = useLocale();
-  const t = useTranslations('landing');
-  const [current, setCurrent] = useState(0);
-  const length = images.length;
-  useEffect(() => {
-    if (length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [length]);
+/**
+ * Editorial banner tiles fed by the admin "landing slides" (every active slide that is
+ * not used as the hero). Pure server markup — no carousel JS, no layout shift.
+ */
+export default async function LandingSlider({ slides }: IProps) {
+  if (!slides.length) return null;
+  const locale = await getLocale();
+  const t = await getTranslations('landing');
+  const single = slides.length === 1;
 
-  if (length === 0) {
-    return null;
-  }
-
-  const goToSlide = (index: number) => setCurrent(index);
-  const prevSlide = () =>
-    setCurrent((prev) => (prev === 0 ? length - 1 : prev - 1));
-  const nextSlide = () => setCurrent((prev) => (prev + 1) % length);
   return (
-    <div className="relative w-full overflow-hidden">
-      <div className="relative shadow-lg h-56 md:h-96 overflow-hidden">
-        {images.map((item, index) => {
-          const href = item.firstUrl?.trim()
-            ? `/${locale}/${item.firstUrl.replace(/^\/+/, '')}`
-            : `/${locale}`;
+    <section
+      aria-label={t('bannersAria')}
+      className={`grid gap-1 sm:gap-2 mx-auto px-0 sm:px-2 max-w-[1920px] ${
+        single ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
+      }`}
+    >
+      {slides.map((item, index) => {
+        const href = item.firstUrl?.trim()
+          ? `/${locale}/${item.firstUrl.replace(/^\/+/, '')}`
+          : `/${locale}`;
+        const label = item.bannerTitle?.trim();
 
-          return (
-          <div
+        return (
+          <Link
             key={`${item.bannerUrl}-${index}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === current ? "opacity-100 z-10" : "opacity-0 z-0"
+            href={href}
+            aria-label={label || t('slideDetailsAria', { index: index + 1 })}
+            className={`group relative block overflow-hidden bg-store-muted ${
+              single ? 'aspect-[4/5] sm:aspect-[21/9]' : 'aspect-[4/5] sm:aspect-[4/3]'
             }`}
           >
             <MediaImage
               src={item.bannerUrl}
-              alt={`Slide ${index + 1}`}
+              alt={label || ''}
               fill
-              className="object-cover"
-              priority={index === 0}
-              sizes="100vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-[1200ms]"
+              sizes={single ? '100vw' : '(max-width: 768px) 100vw, 50vw'}
+              priority={false}
+              loading="lazy"
             />
-
-            {/* لایه‌ی تیره برای خواناتر شدن متن و دکمه */}
-            <div className="absolute inset-0 bg-black/40" />
-
-            {/* متن و دکمه */}
-            <div className="rtl:md:right-16 rtl:right-8 bottom-8 left-8 md:left-16 absolute bg-white hover:bg-gray-200 rounded-full w-10 h-10">
-              <Link
-                href={href}
-                aria-label={t('slideDetailsAria', { index: index + 1 })}
-                className="flex justify-center items-center shadow-md w-full h-full transition-all duration-200"
-              >
-                <LinkIcon />
-              </Link>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-6 sm:p-10 text-white">
+              {label ? (
+                <h2 className="font-normal text-2xl sm:text-4xl leading-tight">{label}</h2>
+              ) : null}
+              {item.bannerDescription?.trim() ? (
+                <p className="max-w-md text-white/90 text-sm sm:text-base">
+                  {item.bannerDescription}
+                </p>
+              ) : null}
+              <span className="pb-0.5 border-white border-b font-medium text-sm">
+                {t('discover')}
+              </span>
             </div>
-          </div>
-          );
-        })}
-      </div>
-
-      <div className="bottom-5 left-1/2 z-40 absolute flex rtl:flex-row-reverse gap-3 -translate-x-1/2 transform">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === current ? "bg-white" : "bg-gray-500"
-            }`}
-            onClick={() => goToSlide(index)}
-            aria-label={t('goToSlideAria', { index: index + 1 })}
-            aria-current={index === current ? 'true' : undefined}
-          />
-        ))}
-      </div>
-
-      {/* دکمه قبلی */}
-      <button
-        type="button"
-        onClick={prevSlide}
-        aria-label={t('prevSlide')}
-        className="top-0 left-0 z-40 absolute flex justify-center items-center px-4 h-full cursor-pointer"
-      >
-        <span className="inline-flex justify-center items-center bg-white/30 hover:bg-white/50 rounded-full w-10 h-10">
-          <ChevronLeftIcon />
-        </span>
-      </button>
-
-      {/* دکمه بعدی */}
-      <button
-        type="button"
-        onClick={nextSlide}
-        aria-label={t('nextSlide')}
-        className="top-0 right-0 z-40 absolute flex justify-center items-center px-4 h-full cursor-pointer"
-      >
-        <span className="inline-flex justify-center items-center bg-white/30 hover:bg-white/50 rounded-full w-10 h-10">
-          <ChevronRightIcon />
-        </span>
-      </button>
-    </div>
+          </Link>
+        );
+      })}
+    </section>
   );
 }
-
-export default LandingSlider;

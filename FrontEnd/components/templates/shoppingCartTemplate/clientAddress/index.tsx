@@ -91,7 +91,7 @@ export default function ClientAddress() {
   }, [data]);
 
   return (
-    <div className="bg-black py-4 rounded-lg text-white">
+    <div className="bg-store-surface py-4 rounded-lg text-store-text">
       {/* ADDRESSES */}
       <section>
         <h2 className="flex justify-between mb-4">
@@ -101,7 +101,7 @@ export default function ClientAddress() {
           {!showAddForm && (
             <button
               onClick={handleShowAddForm}
-              className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2 border border-gray-700 rounded-lg text-xs"
+              className="bg-store-surface hover:bg-store-muted px-4 py-2 border border-store-border rounded-lg text-xs"
             >
               {data?.data?.length === 0
                 ? t("address.addFirstAddress")
@@ -125,9 +125,9 @@ export default function ClientAddress() {
         )}
         {/* ADD ADDRESS FORM */}
         {showAddForm && (
-          <div className="space-y-3 bg-zinc-900 mt-4 p-4 border border-gray-700 rounded-lg">
+          <div className="space-y-3 bg-store-muted mt-4 p-4 border border-store-border rounded-lg">
             <input
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.name")}
               value={newAddress.name}
               onChange={(e) =>
@@ -135,7 +135,7 @@ export default function ClientAddress() {
               }
             />
             <input
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.phoneNumber")}
               value={newAddress.phoneNumber}
               onChange={(e) =>
@@ -143,7 +143,7 @@ export default function ClientAddress() {
               }
             />
             <input
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.state")}
               value={newAddress.state}
               onChange={(e) =>
@@ -151,7 +151,7 @@ export default function ClientAddress() {
               }
             />
             <input
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.city")}
               value={newAddress.city}
               onChange={(e) =>
@@ -159,7 +159,7 @@ export default function ClientAddress() {
               }
             />
             <textarea
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.fullAddress")}
               value={newAddress.fullAddress}
               onChange={(e) =>
@@ -167,7 +167,7 @@ export default function ClientAddress() {
               }
             />
             <input
-              className="bg-zinc-800 p-2 rounded w-full"
+              className="bg-store-surface border border-store-border p-2 rounded w-full"
               placeholder={t("address.postalCode")}
               value={newAddress.postalCode}
               onChange={(e) =>
@@ -204,7 +204,7 @@ export default function ClientAddress() {
                 setShowAddForm(false);
                 setNewAddress({ ...newAddress, isEdit: false, id: undefined });
               }}
-              className="mt-2 text-gray-400 text-sm"
+              className="mt-2 text-store-subtle text-sm"
             >
               {t("address.cancel")}
             </button>

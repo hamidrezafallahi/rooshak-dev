@@ -14,7 +14,7 @@ function ItemCart({ ...props }: { item: ICartProduct }) {
   const { item } = props;
   return (
     <div className="flex gap-2">
-      <div className="flex-shrink-0 bg-gray-700 rounded-lg w-14 h-14 overflow-hidden">
+      <div className="flex-shrink-0 bg-store-muted rounded-lg w-14 h-14 overflow-hidden">
         <img
           src={toMediaUrl(item.mainImage)}
           alt={item.name}
@@ -31,24 +31,24 @@ function ItemCart({ ...props }: { item: ICartProduct }) {
             id={item.id}
             cartItemId={item.cartItemId}
             productOfferId={item.productOfferId}
-            className="flex-shrink-0 text-gray-400 hover:text-white"
+            className="flex-shrink-0 text-store-subtle hover:text-store-text"
           />
         </div>
 
-        <p className="mb-1.5 text-[10px] text-gray-400">{item.description}</p>
+        <p className="mb-1.5 text-[10px] text-store-subtle">{item.description}</p>
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-1.5 bg-white/5 px-1.5 py-0.5 rounded-lg">
+          <div className="flex items-center gap-1.5 bg-store-muted px-1.5 py-0.5 rounded-lg">
             <DecreaseButton
               id={item.id}
               productOfferId={item.productOfferId}
-              className="flex justify-center items-center w-4 h-4 text-gray-400 hover:text-white text-xs"
+              className="flex justify-center items-center w-4 h-4 text-store-subtle hover:text-store-text text-xs"
             />
 
             <span className="w-5 text-xs text-center">{item.quantity}</span>
             <IncreaseButton
               id={item.id}
               productOfferId={item.productOfferId}
-              className="flex justify-center items-center w-4 h-4 text-gray-400 hover:text-white text-xs"
+              className="flex justify-center items-center w-4 h-4 text-store-subtle hover:text-store-text text-xs"
             />
           </div>
 
@@ -58,7 +58,7 @@ function ItemCart({ ...props }: { item: ICartProduct }) {
               <RialIcon config={{ size: 20 }} />
             </div>
             {item.discountAmount > 0 && (
-              <div className="flex gap-2 text-[10px] text-gray-500 line-through">
+              <div className="flex gap-2 text-[10px] text-store-subtle line-through">
                 {item.price * item.quantity}
                 <RialIcon config={{ size: 20 }} />
               </div>

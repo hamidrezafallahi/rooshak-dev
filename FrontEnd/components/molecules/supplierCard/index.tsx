@@ -18,10 +18,10 @@ export default function SupplierCard({
   return (
     <Link
       href={`/${locale}/suppliers/${supplier.slug || supplier.id}`}
-      className="group relative bg-white shadow-sm hover:shadow-lg rounded-2xl overflow-hidden transition-all duration-300"
+      className="group relative flex flex-col bg-store-surface border border-store-border hover:border-store-strong overflow-hidden transition-colors duration-300"
     >
       {/* Image Section */}
-      <div className="relative flex justify-center items-center bg-gray-50 w-full h-48">
+      <div className="relative flex justify-center items-center bg-store-muted w-full h-48">
         <MediaImage
           src={supplier.image}
           alt={supplier.fullName}
@@ -34,15 +34,15 @@ export default function SupplierCard({
       {/* Content Section */}
       <div className="space-y-2 p-4 sm:p-5">
         <div>
-          <h3 className="font-semibold text-gray-800">
+          <h3 className="font-normal text-lg">
             {supplier.fullName}
           </h3>
-          <p className="text-gray-500 text-xs">
+          <p className="text-store-subtle text-xs">
             {supplier.email}
           </p>
         </div>
 
-        <div className="space-y-1 text-gray-600 text-xs">
+        <div className="space-y-1 text-store-subtle text-xs">
           <p>📞 {supplier.phoneNumber || '—'}</p>
           <p>
             {supplier.role
@@ -52,12 +52,12 @@ export default function SupplierCard({
         </div>
 
         {supplier.userDescription && (
-          <p className="text-gray-400 text-xs line-clamp-2">
+          <p className="text-store-subtle text-xs line-clamp-2">
             {supplier.userDescription}
           </p>
         )}
 
-        <span className="inline-block pt-2 font-medium text-primary text-sm">
+        <span className="inline-block pt-2 pb-0.5 border-b border-current font-medium text-sm">
           {t('viewSupplier')}
         </span>
       </div>

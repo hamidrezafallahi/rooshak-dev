@@ -20,7 +20,7 @@ export default function OrderDetails({
 
   if (!selectedOrderId)
     return (
-      <div className="mt-40 text-gray-400 text-center">
+      <div className="mt-40 text-store-subtle text-center">
         {t("order.selectOrder")}
       </div>
     );
@@ -35,7 +35,7 @@ export default function OrderDetails({
       ) : (
         <div className="space-y-6 h-[calc(100dvh-350px)]">
           <h2 className="font-semibold text-xl">{t("order.orderDetails")}</h2>
-          <div className="bg-zinc-800 p-4 border border-gray-700 rounded-lg">
+          <div className="bg-store-muted p-4 border border-store-border rounded-lg">
             <div className="flex justify-between">
               <span>{t("order.status")}</span>
               {order?.status !== undefined && (
@@ -49,7 +49,7 @@ export default function OrderDetails({
             {order?.items.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-4 bg-zinc-800 p-3 border border-gray-700 rounded-lg"
+                className="flex gap-4 bg-store-muted p-3 border border-store-border rounded-lg"
               >
                 <img
                   src={toMediaUrl(item.product.image)}
@@ -58,10 +58,10 @@ export default function OrderDetails({
 
                 <div className="flex flex-col flex-1 justify-between">
                   <div className="text-sm">{item.product.name}</div>
-                  <div className="text-gray-400 text-xs">
+                  <div className="text-store-subtle text-xs">
                     {t("common.quantityCount", { count: item.quantity })}
                   </div>
-                  <div className="text-gray-400 text-xs">
+                  <div className="text-store-subtle text-xs">
                     {item.product.description}
                   </div>
                 </div>
@@ -76,14 +76,14 @@ export default function OrderDetails({
           </div>
 
           {/* Summary */}
-          <div className="bg-zinc-800 p-4 border border-gray-700 rounded-lg">
+          <div className="bg-store-muted p-4 border border-store-border rounded-lg">
             <div className="flex justify-between mb-1 text-sm">
               <span>{t("order.orderTotal")}</span>
               <span>
                 {order?.totalPrice} {t("common.currency")}
               </span>
             </div>
-            <div className="flex justify-between mb-1 text-gray-400 text-sm">
+            <div className="flex justify-between mb-1 text-store-subtle text-sm">
               <span>{t("order.shippingCost")}</span>
               <span>
                 {order?.shippingMethod.cost} {t("common.currency")}

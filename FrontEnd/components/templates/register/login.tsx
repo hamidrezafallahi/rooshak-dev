@@ -144,7 +144,7 @@ export function LoginForm({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 shadow-sm p-4 sm:p-6 md:p-8 border border-gray-200 dark:border-gray-700 rounded-lg w-full max-w-sm",
+        "bg-store-surface dark:bg-gray-800 shadow-sm p-4 sm:p-6 md:p-8 border border-store-border dark:border-gray-700 rounded-lg w-full max-w-sm",
         className,
       )}
       {...props}
@@ -156,14 +156,14 @@ export function LoginForm({
           handleLogin();
         }}
       >
-        <h5 className="font-medium text-gray-900 dark:text-white text-xl">
+        <h5 className="font-medium text-store-text dark:text-white text-xl">
           {t("register.enterEmail")}
         </h5>
 
         <div>
           <Label
             htmlFor="email"
-            className="block mb-2 font-medium text-gray-900 text-sm  "
+            className="block mb-2 font-medium text-store-text text-sm  "
           >
             {t("register.email")}
           </Label>
@@ -176,14 +176,14 @@ export function LoginForm({
             )}
             onChange={handleChange}
             required
-            className="block bg-gray-50 dark:bg-gray-600 p-2.5 border border-gray-300 focus:border-primary dark:border-gray-500 rounded-lg focus:ring-primary w-full text-gray-900 dark:text-white text-sm dark:placeholder-gray-400"
+            className="block bg-store-muted dark:bg-gray-600 p-2.5 border border-store-border focus:border-primary dark:border-gray-500 rounded-lg focus:ring-primary w-full text-store-text dark:text-white text-sm dark:placeholder-gray-400"
           />
         </div>
 
         <div>
           <Label
             htmlFor="password"
-            className="block mb-2 font-medium text-gray-900 dark:text-white text-sm"
+            className="block mb-2 font-medium text-store-text dark:text-white text-sm"
           >
             {t("register.password")}
           </Label>
@@ -195,7 +195,7 @@ export function LoginForm({
             name="Password"
             onChange={handleChange}
             required
-            className="block bg-gray-50 dark:bg-gray-600 p-2.5 border border-gray-300 focus:border-primary dark:border-gray-500 rounded-lg focus:ring-primary w-full text-gray-900 dark:text-white text-sm dark:placeholder-gray-400"
+            className="block bg-store-muted dark:bg-gray-600 p-2.5 border border-store-border focus:border-primary dark:border-gray-500 rounded-lg focus:ring-primary w-full text-store-text dark:text-white text-sm dark:placeholder-gray-400"
           />
         </div>
 
@@ -203,12 +203,12 @@ export function LoginForm({
           <div className="flex items-center">
             <Checkbox
               id="remember"
-              className="text-primary"
+              className="text-store-text"
             />
 
             <Label
               htmlFor="remember"
-              className="ms-2 font-medium text-gray-900 dark:text-gray-300 text-sm"
+              className="ms-2 font-medium text-store-text dark:text-gray-300 text-sm"
             >
               {t("register.rememberMe")}
             </Label>
@@ -216,7 +216,7 @@ export function LoginForm({
 
           <a
             href="#"
-            className="text-primary dark:text-primary text-sm hover:underline"
+            className="text-store-text dark:text-primary text-sm hover:underline"
           >
             {t("register.forgotPassword")}
           </a>
@@ -225,19 +225,19 @@ export function LoginForm({
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/80 px-5 py-2.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/30 dark:focus:ring-primary/50 w-full font-medium text-white text-sm text-center"
+          className="bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/80 px-5 py-2.5 rounded-lg focus:outline-none focus:ring-4 focus:ring-primary/30 dark:focus:ring-primary/50 w-full font-medium text-primary-foreground text-sm text-center"
         >
           {isLoading
             ? t("common.loading")
             : t("register.enter")}
         </Button>
 
-        <div className="font-medium text-gray-500 dark:text-gray-300 text-sm text-center">
+        <div className="font-medium text-store-subtle dark:text-gray-300 text-sm text-center">
           {t("register.dotHaveAnyAccount")}{" "}
           <button
             type="button"
             onClick={() => setIsLogin(false)}
-            className="text-primary dark:text-primary hover:underline"
+            className="text-store-text dark:text-primary hover:underline"
           >
             {t("register.signUp")}
           </button>

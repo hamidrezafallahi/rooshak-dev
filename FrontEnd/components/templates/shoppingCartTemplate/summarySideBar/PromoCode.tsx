@@ -50,17 +50,17 @@ function PromoCode() {
           placeholder={t("shoppingCart.promoCodePlaceHolder")}
           value={promoCode}
           onChange={(e) => setPromoCode(e.target.value)}
-          className="flex-1 bg-zinc-800 px-3 py-2 border border-gray-700 focus:border-gray-600 rounded-lg focus:outline-none placeholder:text-gray-500 text-sm"
+          className="flex-1 bg-store-surface px-3 py-2 border border-store-border focus:border-store-strong rounded-lg focus:outline-none placeholder:text-store-subtle text-sm"
         />
         <button
           onClick={handleSubmitPromoCode}
-          className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2 border border-gray-700 rounded-lg font-medium text-sm"
+          className="bg-primary hover:bg-primary/90 px-4 py-2 border border-primary rounded-lg font-medium text-primary-foreground text-sm"
         >
           {t("general.apply")}
         </button>
         {promotionCode?.length>0 && <button
           onClick={handleRemovePromoCode}
-          className="bg-zinc-800 hover:bg-rose-950 px-4 py-2 border border-gray-700 rounded-lg font-medium text-xs"
+          className="bg-store-surface hover:bg-store-muted px-4 py-2 border border-store-border rounded-lg font-medium text-xs"
         >
           {t("general.delete")}
         </button>}

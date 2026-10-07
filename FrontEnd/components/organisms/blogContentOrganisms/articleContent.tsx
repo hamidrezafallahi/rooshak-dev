@@ -20,7 +20,7 @@ export async function ArticleContent({ ...props }: IProps) {
         {t('blog.introduction')}
       </span>
       <div
-        className={` bg-white rounded-lg p-4 prose prose-lg max-w-none ${
+        className={`p-4 prose prose-lg max-w-none ${
           isRTL ? 'prose-rtl' : 'prose-ltr'
         }`}
         dangerouslySetInnerHTML={{
@@ -31,7 +31,7 @@ export async function ArticleContent({ ...props }: IProps) {
         {t('blog.content')}
       </span>
       <div
-        className={`  bg-white rounded-lg p-4 prose prose-lg max-w-none ${
+        className={` p-4 prose prose-lg max-w-none ${
           isRTL ? 'prose-rtl' : 'prose-ltr'
         }`}
         dangerouslySetInnerHTML={{
@@ -42,7 +42,7 @@ export async function ArticleContent({ ...props }: IProps) {
         {t('blog.conclusion')}
       </span>
       <div
-        className={`  bg-white rounded-lg p-4 prose prose-lg max-w-none ${
+        className={` p-4 prose prose-lg max-w-none ${
           isRTL ? 'prose-rtl' : 'prose-ltr'
         }`}
         dangerouslySetInnerHTML={{

@@ -68,7 +68,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
   };
 
   return (
-    <div className="bg-black p-4 min-h-screen text-white">
+    <div className="bg-store-surface p-4 min-h-screen text-store-text">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 pt-8 text-center">
           <div className="flex justify-center mb-4">
@@ -77,12 +77,12 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
             </div>
           </div>
           <h1 className="mb-2 font-bold text-3xl">{getErrorTitle()}</h1>
-          <p className="text-gray-400">{t("payment.payment_issue")}</p>
+          <p className="text-store-subtle">{t("payment.payment_issue")}</p>
         </div>
 
         <div className="gap-6 grid grid-cols-1 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <Card className="bg-zinc-900 border-zinc-800">
+            <Card className="bg-store-muted border-store-border">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="bg-red-900/20 p-3 rounded-full">
@@ -92,15 +92,15 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
                     <h3 className="mb-2 font-semibold text-xl">
                       {t("payment.what_happened")}
                     </h3>
-                    <p className="mb-4 text-gray-400">{errorMessage}</p>
+                    <p className="mb-4 text-store-subtle">{errorMessage}</p>
 
                     {errorCode && (
-                      <div className="bg-zinc-800 mt-4 p-3 rounded">
+                      <div className="bg-store-muted mt-4 p-3 rounded">
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-400 text-sm">
+                          <span className="text-store-subtle text-sm">
                             {t("payment.error_code")}
                           </span>
-                          <code className="bg-zinc-900 px-2 py-1 rounded font-mono text-sm">
+                          <code className="bg-store-muted px-2 py-1 rounded font-mono text-sm">
                             {errorCode}
                           </code>
                         </div>
@@ -111,7 +111,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 border-zinc-800">
+            <Card className="bg-store-muted border-store-border">
               <CardContent className="p-6">
                 <h3 className="mb-4 font-semibold text-xl">
                   {t("payment.solutions_title")}
@@ -124,7 +124,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
                       <p className="font-medium">
                         {t("payment.retry_title")}
                       </p>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-store-subtle text-sm">
                         {t("payment.retry_desc")}
                       </p>
                     </div>
@@ -136,7 +136,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
                       <p className="font-medium">
                         {t("payment.alternative_title")}
                       </p>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-store-subtle text-sm">
                         {t("payment.alternative_desc")}
                       </p>
                     </div>
@@ -148,7 +148,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
                       <p className="font-medium">
                         {t("payment.support_title")}
                       </p>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-store-subtle text-sm">
                         {t("payment.support_desc")}
                       </p>
                     </div>
@@ -158,14 +158,14 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
             </Card>
 
             {orderId && (
-              <Card className="bg-zinc-900 border-zinc-800">
+              <Card className="bg-store-muted border-store-border">
                 <CardContent className="p-6">
                   <h3 className="mb-4 font-semibold text-xl">
                     {t("payment.order_title")}
                   </h3>
 
-                  <div className="bg-zinc-800 p-4 rounded-lg">
-                    <p className="text-gray-400 text-sm">
+                  <div className="bg-store-muted p-4 rounded-lg">
+                    <p className="text-store-subtle text-sm">
                       {t("payment.order_number")}
                     </p>
                     <p className="font-semibold">{orderId}</p>
@@ -174,7 +174,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
                       {t("payment.failed_status")}
                     </span>
 
-                    <p className="mt-3 text-gray-400 text-sm">
+                    <p className="mt-3 text-store-subtle text-sm">
                       {t("payment.order_notice")}
                     </p>
                   </div>
@@ -184,7 +184,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
           </div>
 
           <div className="space-y-4">
-            <Card className="bg-zinc-900 border-zinc-800">
+            <Card className="bg-store-muted border-store-border">
               <CardContent className="space-y-3 p-6">
                 <Button onClick={handleRetry} className="w-full">
                   {t("payment.retry_button")}

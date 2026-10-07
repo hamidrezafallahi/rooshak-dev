@@ -15,7 +15,7 @@ export default async function ProductSpecs({ id }: { id: number }) {
     result.ok && result.data?.isSuccess !== false ? result.data?.data : null;
 
   if (!specs || !specs.specifications?.length) {
-    return <p className="text-gray-400 text-sm">{t('product.noSpecs')}</p>;
+    return <p className="text-store-subtle text-sm">{t('product.noSpecs')}</p>;
   }
 
   return (
@@ -23,9 +23,9 @@ export default async function ProductSpecs({ id }: { id: number }) {
       {specs.specifications.map((s, i) => (
         <li
           key={i}
-          className="flex justify-between gap-4 pb-2 border-b w-fit"
+          className="flex justify-between gap-6 pb-2 border-b border-store-border max-w-md"
         >
-          <span className="text-gray-500">{s.key} :</span>
+          <span className="text-store-subtle">{s.key} :</span>
           <span className="font-medium">{s.value}</span>
         </li>
       ))}

@@ -66,14 +66,14 @@ export default function FinalizeOrder({
 
   if (redirecting || isLoading) {
     return (
-      <Card className="bg-zinc-900 px-4 border-none rounded-lg w-full max-w-md">
+      <Card className="bg-store-muted px-4 border-none rounded-lg w-full max-w-md">
         <RedirectToPayment paymentMethodTitle={snapshot.paymentMethodTitle} />
       </Card>
     );
   }
 
   return (
-    <Card className="bg-zinc-900 px-4 border-none rounded-lg w-full max-w-md">
+    <Card className="bg-store-muted px-4 border-none rounded-lg w-full max-w-md">
       <CardHeader>
         <CardTitle>{t('payment.final_confirm_title')}</CardTitle>
         <CardDescription>{t('payment.final_confirm_desc')}</CardDescription>
@@ -81,17 +81,17 @@ export default function FinalizeOrder({
 
       <CardContent className="space-y-3 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-500">{t('payment.shipping_address')}</span>
+          <span className="text-store-subtle">{t('payment.shipping_address')}</span>
           <span className="font-medium">{snapshot.addressName}</span>
         </div>
 
         <div className="flex justify-between">
-          <span className="text-gray-500">{t('payment.shipping_method')}</span>
+          <span className="text-store-subtle">{t('payment.shipping_method')}</span>
           <span className="font-medium">{snapshot.shippingMethodTitle}</span>
         </div>
 
         <div className="flex justify-between">
-          <span className="text-gray-500">{t('payment.payment_method')}</span>
+          <span className="text-store-subtle">{t('payment.payment_method')}</span>
           <span className="font-medium">{snapshot.paymentMethodTitle}</span>
         </div>
 
@@ -141,7 +141,7 @@ export default function FinalizeOrder({
         <button
           onClick={handleFinalizeOrder}
           disabled={isLoading}
-          className="flex-1 bg-primary disabled:opacity-60 px-4 py-2 rounded-xl text-white text-sm"
+          className="flex-1 bg-primary disabled:opacity-60 px-4 py-2 rounded-xl text-primary-foreground text-sm"
         >
           {isLoading
             ? t('payment.connecting_gateway')

@@ -32,20 +32,20 @@ export default function StoreBreadcrumbs({ locale, items }: Props) {
     <>
       <JsonLd data={breadcrumbLd} />
       <nav aria-label="Breadcrumb" className="mb-4 overflow-x-auto">
-        <ol className="flex min-w-max items-center gap-1.5 text-sm text-white/65">
+        <ol className="flex min-w-max items-center gap-1.5 text-xs sm:text-sm text-store-subtle">
           {crumbs.map((item, index) => {
             const isLast = index === crumbs.length - 1;
             return (
               <li key={`${item.name}-${index}`} className="flex items-center gap-1.5">
-                {index > 0 && <span className="text-white/35" aria-hidden>/</span>}
+                {index > 0 && <span className="text-store-border" aria-hidden>/</span>}
                 {isLast || item.path == null ? (
-                  <span className="max-w-[14rem] truncate text-white/90" aria-current="page">
+                  <span className="max-w-[14rem] truncate text-store-text" aria-current="page">
                     {item.name}
                   </span>
                 ) : (
                   <Link
                     href={`/${locale}${item.path ? `/${item.path}` : ''}`}
-                    className="max-w-[14rem] truncate transition-colors hover:text-white"
+                    className="max-w-[14rem] truncate transition-colors hover:text-store-text hover:underline underline-offset-4"
                   >
                     {item.name}
                   </Link>

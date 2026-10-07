@@ -29,7 +29,7 @@ interface Props {
   spacialOffers: SpecialOffer[];
 }
 
-const CARD_W = 200;
+const CARD_W = 240;
 const GAP = 12;
 const STEP = CARD_W + GAP;
 
@@ -129,7 +129,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
 
   if (!items || items.length === 0) {
     return (
-      <div className="flex justify-center items-center w-full h-full text-white/90 text-sm">
+      <div className="flex justify-center items-center w-full h-full text-white/80 text-sm">
         {t('landing.noOffers')}
       </div>
     );
@@ -143,7 +143,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
             type="button"
             onClick={handlePrev}
             aria-label={t('common.previous')}
-            className="top-1/2 left-1 z-30 absolute flex justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
+            className="top-1/2 left-1 z-30 absolute flex justify-center items-center bg-white hover:bg-black text-black hover:text-white w-9 h-9 -translate-y-1/2 transition-colors"
           >
             <ChevronLeftIcon config={{ size: 14 }} />
           </button>
@@ -152,7 +152,7 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
             type="button"
             onClick={handleNext}
             aria-label={t('common.next')}
-            className="top-1/2 right-1 z-30 absolute flex justify-center items-center bg-white/70 hover:bg-white shadow rounded-full w-8 h-8 text-rose-600 -translate-y-1/2"
+            className="top-1/2 right-1 z-30 absolute flex justify-center items-center bg-white hover:bg-black text-black hover:text-white w-9 h-9 -translate-y-1/2 transition-colors"
           >
             <ChevronRightIcon config={{ size: 14 }} />
           </button>
@@ -161,13 +161,13 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
 
       <div
         ref={containerRef}
-        className="hidden-show-scrollbar flex items-center gap-[12px] w-full h-full overflow-x-auto select-none"
+        className="hidden-show-scrollbar flex items-stretch gap-[12px] w-full h-full overflow-x-auto select-none"
       >
         {items.map((s, idx) => (
           <div
             key={`${s.id}-${idx}`}
             style={{ minWidth: `${CARD_W}px`, width: `${CARD_W}px` }}
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-full"
           >
             <CompactOfferCard offer={s} onAdd={() => handleAdd(s)} />
           </div>
@@ -188,37 +188,36 @@ function CompactOfferCard({
   const target = new Date(offer.endDate).getTime();
 
   return (
-    <article className="relative bg-white/95 dark:bg-gray-800 shadow-sm rounded-xl !h-full aspect-auto overflow-hidden">
-      <div className="relative w-full h-64 overflow-hidden hover:scale-125">
+    <article className="flex flex-col bg-white h-full text-black">
+      <div className="relative flex-1 min-h-0 overflow-hidden">
         <MediaImage
-          src={toMediaUrl(offer.product.mainImage) || "https://picsum.photos/seed/p/300/300"}
+          src={toMediaUrl(offer.product.mainImage)}
           alt={offer.product.name}
           fill
           className="object-cover"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 412px"
+          sizes="240px"
+          loading="lazy"
         />
         {offer.product.discountId > 0 && (
-          <div className="top-2 absolute bg-yellow-400 px-2 py-1 rounded text-rose-700 text-xs end-2">
-            <span>{offer.product.discountAmount}</span>
-            <span className="text-xs">{t('common.tomanShort')}</span>
+          <div className="top-2 absolute bg-black px-2 py-1 text-white text-xs end-2">
+            <span>{offer.product.discountAmount}</span>{' '}
+            <span>{t('common.tomanShort')}</span>
           </div>
         )}
-      </div>
-      <div className="z-10 absolute inset-0 flex flex-col justify-end items-end p-2 text-[12px]">
-        <div className="font-medium line-clamp-1">{offer.product.name}</div>
-
-        <div className="top-2 absolute rounded text-[11px] text-white start-2">
+        <div className="bottom-0 absolute inset-x-0 bg-black/60 px-2 py-1 text-[11px] text-white text-center">
           <CountdownDisplayClient targetTime={target} />
         </div>
-
-        <div className="flex justify-between items-center gap-2 w-full">
-          <div className="bg-white bg-opacity-70 p-1 rounded w-full font-semibold text-rose-600 text-sm">
+      </div>
+      <div className="flex flex-col gap-2 p-3">
+        <h3 className="font-normal text-sm line-clamp-1">{offer.product.name}</h3>
+        <div className="flex justify-between items-center gap-2">
+          <span className="font-medium text-sm">
             {t('common.priceColon', { price: offer.product.finalPrice })}
-          </div>
+          </span>
           <button
             type="button"
             onClick={onAdd}
-            className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 px-2 py-1 rounded text-white text-xs"
+            className="inline-flex items-center gap-1 bg-black hover:bg-white px-3 py-1.5 border border-black text-white hover:text-black text-xs transition-colors"
           >
             <ShoppingCartIcon />
             {t('common.add')}

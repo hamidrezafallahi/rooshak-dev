@@ -36,7 +36,7 @@ export default async function ProductRate({ id, average, count }: Props) {
   return (
     <div className="flex items-center gap-2">
       <Rate value={resolvedAverage ?? 0} />
-      <span className="text-gray-200 text-sm">
+      <span className="text-store-subtle text-sm">
         ({t('common.reviewsCount', { count: resolvedCount ?? 0 })})
       </span>
     </div>

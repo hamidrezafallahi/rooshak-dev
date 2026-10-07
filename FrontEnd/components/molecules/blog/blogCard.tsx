@@ -42,9 +42,9 @@ export async function BlogCard({ blog }: { blog: IBlog }) {
   return (
     <Link
       href={`/${locale}/blog/${blog.slug}`}
-      className="store-card group h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--primary-color)_45%,transparent)] focus-visible:ring-offset-2"
+      className="group flex flex-col h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-store-strong focus-visible:ring-offset-2"
     >
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[color-mix(in_srgb,var(--primary-color)_8%,var(--store-surface-muted))]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-store-muted">
         {hasThumbnail ? (
           <MediaImage
             src={blog.thumbnailFile}
@@ -54,20 +54,19 @@ export async function BlogCard({ blog }: { blog: IBlog }) {
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-[color-mix(in_srgb,var(--store-text)_45%,transparent)]">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-store-subtle">
             {t('title')}
           </div>
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/35 to-transparent opacity-80" />
       </div>
 
       <div
-        className={`flex flex-1 flex-col gap-3 p-5 sm:p-6 ${
+        className={`flex flex-1 flex-col gap-2 pt-4 ${
           isRtl ? 'text-right' : 'text-left'
         }`}
       >
         {dateLabel ? (
-          <div className="inline-flex items-center gap-1.5 text-xs text-[color-mix(in_srgb,var(--store-text)_58%,transparent)]">
+          <div className="inline-flex items-center gap-1.5 text-xs text-store-subtle">
             <CalendarIcon />
             <time dateTime={String(blog.updatedAt || blog.createdAt)}>
               {dateLabel}
@@ -75,19 +74,19 @@ export async function BlogCard({ blog }: { blog: IBlog }) {
           </div>
         ) : null}
 
-        <h2 className="text-lg sm:text-xl font-bold leading-snug text-[var(--store-text)] transition-colors group-hover:text-[var(--primary-color)] line-clamp-2">
+        <h2 className="text-lg sm:text-xl font-normal leading-snug text-store-text underline-offset-4 group-hover:underline line-clamp-2">
           {title}
         </h2>
 
         {excerpt ? (
-          <p className="text-sm leading-relaxed text-[color-mix(in_srgb,var(--store-text)_72%,transparent)] line-clamp-3">
+          <p className="text-sm leading-relaxed text-store-subtle line-clamp-3">
             {excerpt}
           </p>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-2 border-t border-[color-mix(in_srgb,var(--store-border)_80%,transparent)]">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-3">
           {blog.authorName ? (
-            <div className="inline-flex min-w-0 items-center gap-1.5 text-xs text-[color-mix(in_srgb,var(--store-text)_60%,transparent)]">
+            <div className="inline-flex min-w-0 items-center gap-1.5 text-xs text-store-subtle">
               <UserIcon />
               <span className="truncate">{blog.authorName}</span>
             </div>
@@ -95,7 +94,7 @@ export async function BlogCard({ blog }: { blog: IBlog }) {
             <span />
           )}
 
-          <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[var(--primary-color)]">
+          <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-store-text">
             {t('readMore')}
             {isRtl ? (
               <ArrowLongLeft

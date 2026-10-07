@@ -46,11 +46,11 @@ export default async function Page({ params }: Props) {
         <FaqAccordion
           items={faqs}
           withJsonLd
-          className="mx-auto w-full max-w-3xl"
+          className="mx-auto w-full max-w-6xl"
         />
       )}
 
-      <div className="flex flex-col items-center gap-3 mx-auto p-5 sm:p-6 w-full max-w-3xl text-center store-panel">
+      <div className="flex flex-col items-center gap-3 mx-auto p-5 sm:p-6 w-full max-w-6xl text-center store-panel">
         <p className="text-sm sm:text-base">{t('contactHint')}</p>
         <Link
           href={`/${locale}/cooperation`}

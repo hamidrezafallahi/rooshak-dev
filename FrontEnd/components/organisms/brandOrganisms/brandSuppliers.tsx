@@ -24,15 +24,15 @@ export async function BrandSuppliers({ id }: { id: number }) {
 
   return (
     <div className="my-10">
-      <h2 className="mb-4 font-bold text-xl">{t('product.brandSuppliers')}</h2>
+      <h2 className="mb-6 font-normal text-2xl">{t('product.brandSuppliers')}</h2>
       <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {suppliers.map((s) => (
           <Link
             key={s.id}
             href={`/${locale}/suppliers/${s.slug || s.id}`}
-            className="flex flex-col items-center bg-white shadow-sm hover:shadow-lg p-4 rounded-2xl transition"
+            className="flex flex-col items-center bg-store-surface border border-store-border hover:border-store-strong p-4 transition-colors"
           >
-            <div className="relative flex justify-center items-center bg-gray-50 mb-3 rounded-full w-24 h-24 overflow-hidden">
+            <div className="relative flex justify-center items-center bg-store-muted mb-3 rounded-full w-24 h-24 overflow-hidden">
               <MediaImage
                 src={s.userImage}
                 alt={s.fullName}
@@ -41,11 +41,11 @@ export async function BrandSuppliers({ id }: { id: number }) {
                 priority
               />
             </div>
-            <h3 className="font-semibold text-gray-900 text-center">
+            <h3 className="font-normal text-center">
               {s.fullName}
             </h3>
-            <span className="mt-1 text-gray-400 text-xs">{s.email}</span>
-            <span className="mt-1 text-gray-400 text-xs">{s.phoneNumber}</span>
+            <span className="mt-1 text-store-subtle text-xs">{s.email}</span>
+            <span className="mt-1 text-store-subtle text-xs">{s.phoneNumber}</span>
           </Link>
         ))}
       </div>

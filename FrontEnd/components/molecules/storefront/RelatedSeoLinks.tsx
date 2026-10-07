@@ -18,8 +18,8 @@ export default async function RelatedSeoLinks({ locale, title, links }: Props) {
   if (!items.length) return null;
 
   return (
-    <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-      <h2 className="mb-3 text-lg font-semibold text-white">
+    <section className="mt-10 border-t border-store-border pt-8">
+      <h2 className="mb-4 text-lg font-normal text-store-text">
         {title || t('relatedLinks')}
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -27,7 +27,7 @@ export default async function RelatedSeoLinks({ locale, title, links }: Props) {
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-white/85 transition hover:border-white/35 hover:bg-white/10"
+            className="border border-store-border px-3.5 py-1.5 text-sm text-store-text transition-colors hover:border-store-strong hover:bg-store-muted"
           >
             {item.label}
           </Link>

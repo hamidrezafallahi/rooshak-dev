@@ -24,7 +24,7 @@ function Header({ ...props }) {
         <h1 className="font-semibold text-xl">
           {t("shoppingCart.ShoppingCart")}
         </h1>
-        <span className="text-gray-400 text-sm">
+        <span className="text-store-subtle text-sm">
           {ShoppingCart.products.length} {t("shoppingCart.ItemsInYourCart")}
         </span>
       </div>

@@ -80,20 +80,20 @@ const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
           </div>
           <textarea
             ref={textAreaRef}
-            className="p-3 border rounded-xl w-full text-sm resize-none"
+            className="p-3 border border-store-border bg-store-surface text-store-text focus:border-store-strong outline-none w-full text-sm resize-none"
             placeholder={t('product.writeCommentPlaceholder')}
           />
           <button
             onClick={handleSubmitComment}
             disabled={isLoading}
-            className="bg-primary mt-2 px-6 py-2 rounded-xl text-white"
+            className="bg-primary mt-2 px-6 py-3 border border-primary text-primary-foreground text-sm hover:bg-transparent hover:text-store-text transition-colors"
           >
             {isLoading ? <SpinnerIcon /> : <span>{t('product.submitComment')}</span>}
           </button>
         </>
       ) : (
         <Link
-          className="bg-primary p-2 px-3 rounded-lg text-white"
+          className="inline-block bg-primary px-6 py-3 border border-primary text-primary-foreground text-sm hover:bg-transparent hover:text-store-text transition-colors"
           href={`/${locale}/register?redirect=${redirectUrl}`}
         >
           {t("general.loginFirst")}

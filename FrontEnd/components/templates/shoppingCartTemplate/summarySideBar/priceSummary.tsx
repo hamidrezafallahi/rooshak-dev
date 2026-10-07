@@ -22,30 +22,30 @@ function PriceSummary() {
       (ShoppingCart?.finalTotal ?? 0) +
       (ShoppingCart?.shippingMethod?.price ?? 0);
   return (
-         <div className="space-y-2 py-2 border-gray-700 border-b">
+         <div className="space-y-2 py-2 border-store-border border-b">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">{t("shoppingCart.subTotal")}</span>
+          <span className="text-store-subtle">{t("shoppingCart.subTotal")}</span>
           <span className="flex gap-2 font-medium">
             <span className='relative end-4'>{ShoppingCart.totalPrice.toFixed()}</span>
             <RialIcon />
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">{t("shoppingCart.totalDiscount")}</span>
+          <span className="text-store-subtle">{t("shoppingCart.totalDiscount")}</span>
           <span className="flex items-center gap-2 font-medium">
             {ShoppingCart.totalDiscount.toFixed()}<MinusIcon config={{className:"stroke-rose-800"}}/>
             <RialIcon />
           </span>
         </div>
         {ShoppingCart.discountCodeAmount > 0 &&<div className="flex justify-between text-sm">
-          <span className="text-gray-400">{t("shoppingCart.discountCodeAmount")} </span>
+          <span className="text-store-subtle">{t("shoppingCart.discountCodeAmount")} </span>
           <span className="flex items-center gap-2 font-medium">
             {ShoppingCart.discountCodeAmount.toFixed()}<MinusIcon config={{className:"stroke-rose-800"}}/>
             <RialIcon />
           </span>
         </div>}
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">{t("shoppingCart.shipping")}</span>
+          <span className="text-store-subtle">{t("shoppingCart.shipping")}</span>
           <span className="flex items-center gap-2 font-medium">
             {ShoppingCart?.products?.length > 0
               ? (ShoppingCart?.shippingMethod?.price ?? 0).toFixed()

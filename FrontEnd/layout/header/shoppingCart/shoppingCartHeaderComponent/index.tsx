@@ -64,17 +64,17 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
       className="top-full z-50 absolute mt-0 end-0"
       onMouseLeave={() => setIsOpen(false)}
     >
-      <div className="bg-[#1a1a1a] bg-opacity-90 shadow-2xl p-4 rounded-2xl w-[300px] text-white">
+      <div className="bg-store-surface shadow-2xl p-4 border border-store-border w-[300px] text-store-text">
         <div className="flex justify-between items-center mb-1">
-          <h2 className="font-semibold text-xl">
+          <h2 className="font-normal text-xl">
             {t("shoppingCart.header.yourCart")}
           </h2>
-          <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs">
+          <span className="bg-store-muted px-2 py-0.5 rounded-full text-xs">
             {ShoppingCart?.products.length} {t("shoppingCart.header.items")}
           </span>
         </div>
 
-        <p className="mb-3 text-gray-400 text-xs">
+        <p className="mb-3 text-store-subtle text-xs">
           {t("shoppingCart.header.reviewBeforeCheckout")}
         </p>
 
@@ -89,9 +89,9 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
           ))}
         </div>
 
-        <div className="space-y-2 mb-4 pt-3 border-white/10 border-t">
+        <div className="space-y-2 mb-4 pt-3 border-store-border border-t">
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">
+            <span className="text-store-subtle">
               {t("shoppingCart.header.totalDiscount")}
             </span>
             <span className="flex gap-2 font-medium">
@@ -100,7 +100,7 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
             </span>
           </div>
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">
+            <span className="text-store-subtle">
               {t("shoppingCart.header.shipping")}
             </span>
             {ShoppingCart.products.length !== 0 && (
@@ -113,7 +113,7 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
               </div>
             )}
           </div>
-          <div className="flex justify-between pt-2 border-white/10 border-t font-semibold text-base">
+          <div className="flex justify-between pt-2 border-store-border border-t font-semibold text-base">
             <span>{t("shoppingCart.header.total")}</span>
             <span className="flex gap-2">
               {ShoppingCart?.products?.length > 0 ? kol : 0}
@@ -122,7 +122,7 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
           </div>
         </div>
 
-        <div className="flex justify-center items-center gap-1 mb-3 text-[10px] text-gray-400 text-center">
+        <div className="flex justify-center items-center gap-1 mb-3 text-[10px] text-store-subtle text-center">
           <span className="flex justify-center items-center border border-gray-400 rounded-full w-3 h-3 text-[8px]">
             ✓
           </span>
@@ -130,13 +130,13 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Button className="bg-white hover:bg-gray-200 w-full h-9 font-medium text-black text-sm">
+          <Button className="bg-primary hover:bg-primary/90 rounded-none w-full h-10 font-medium text-primary-foreground text-sm">
             <CreditCardIcon />
             {t("shoppingCart.header.checkout")}
           </Button>
           <Link
             // variant="ghost"
-            className="hover:bg-white/10 w-full h-8 text-white text-xs"
+            className="flex justify-center items-center hover:bg-store-muted w-full h-8 text-store-text text-xs"
             href={`/${locale}/shoppingCart`}
           >
             {t("shoppingCart.header.viewCart")} →

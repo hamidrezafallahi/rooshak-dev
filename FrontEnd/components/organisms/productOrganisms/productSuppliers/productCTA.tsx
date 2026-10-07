@@ -40,13 +40,13 @@ export default function ProductCTA({
       <button
         type="button"
         onClick={handleAddToCart}
-        className="flex-1 min-w-0 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-white text-sm text-center transition-colors"
+        className="flex-1 min-w-0 bg-primary hover:bg-transparent px-4 py-3 border border-primary font-medium text-primary-foreground hover:text-store-text text-sm text-center transition-colors"
       >
         {t('common.addToCart')}
       </button>
       <button
         type="button"
-        className="flex-1 min-w-0 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium text-gray-700 text-sm text-center transition-colors"
+        className="flex-1 min-w-0 hover:bg-store-text px-4 py-3 border border-store-strong font-medium text-store-text hover:text-store-surface text-sm text-center transition-colors"
       >
         {t('common.wishlist')}
       </button>

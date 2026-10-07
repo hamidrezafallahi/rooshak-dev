@@ -33,14 +33,15 @@ function ShoppingCart() {
     <>
       <div className="relative">
         <Button
-          aria-label={t("header.register")}
-          className="relative flex justify-center items-center bg-white/30 hover:bg-white/40 shadow-black/20 shadow-lg hover:shadow-black/30 hover:shadow-xl backdrop-blur-md border border-white/20 rounded-md xs:rounded-full w-10 h-10 transition-all duration-300"
+          aria-label={t("header.shopping cart")}
+          variant="ghost"
+          className="relative flex justify-center items-center rounded-none w-10 h-10 hover:opacity-60 hover:bg-transparent text-inherit transition-opacity"
           onMouseEnter={() => setIsOpen(true)}
           onClick={() => setIsOpen(!isOpen)}
         >
           <ShoppingCartIcon config={{ size: 20 }} />
           {ShoppingCart?.products.length > 0 && (
-            <span className="-z-10 absolute bg-rose-600 rounded-full w-4 text-xs -translate-y-2 translate-x-2">
+            <span className="top-0 end-0 absolute flex justify-center items-center bg-primary rounded-full min-w-4 h-4 px-1 text-[0.625rem] text-primary-foreground leading-none">
               {ShoppingCart?.products.length}
             </span>
           )}

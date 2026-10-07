@@ -9,7 +9,7 @@ export async function SubCategories({ sub }: { sub?: ICategory[] }) {
   const t = await getTranslations();
   return (
     <div className="p-4">
-      <div className="text-white text-center">
+      <div className="text-store-text text-center">
         {t("category.subCategories")}
       </div>
       <div className="gap-6 grid grid-cols-1 sm:grid-cols-3 py-10">

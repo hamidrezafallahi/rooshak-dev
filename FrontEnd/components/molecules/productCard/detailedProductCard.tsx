@@ -35,7 +35,7 @@ export function DetailedProductCard({
   const imageSrc = product.mainImage || product.imageUrl;
 
   return (
-    <div className="group relative bg-white shadow-sm hover:shadow-2xl border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300">
+    <div className="group relative bg-store-surface shadow-sm hover:shadow-2xl border border-store-border rounded-2xl overflow-hidden transition-all duration-300">
       {/* تخفیف */}
       {hasDiscount && (
         <div className="top-3 left-3 z-10 absolute bg-red-500 px-2 py-1 rounded-full font-bold text-white text-xs">
@@ -58,7 +58,7 @@ export function DetailedProductCard({
       {/* تصویر محصول */}
       <Link
         href={`/${locale}/products/${product.slug || product.id}`}
-        className="block relative bg-gray-50 h-64 overflow-hidden"
+        className="block relative bg-store-muted h-64 overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -84,7 +84,7 @@ export function DetailedProductCard({
         {(product.categoryName || product.brandName) && (
           <div className="flex items-center gap-2 mb-2">
             {product.categoryName && (
-              <span className="bg-gray-100 px-2 py-1 rounded-full text-gray-500 text-xs">
+              <span className="bg-store-muted px-2 py-1 rounded-full text-store-subtle text-xs">
                 {product.categoryName}
               </span>
             )}
@@ -98,13 +98,13 @@ export function DetailedProductCard({
 
         {/* نام محصول */}
         <Link href={`/${locale}/products/${product.slug || product.id}`}>
-          <h3 className="mb-2 font-semibold text-gray-800 hover:text-primary line-clamp-1 transition-colors">
+          <h3 className="mb-2 font-semibold text-store-text hover:text-primary line-clamp-1 transition-colors">
             {product.name}
           </h3>
         </Link>
 
         {/* توضیحات کوتاه */}
-        <p className="mb-3 min-h-[2.5rem] text-gray-600 text-sm line-clamp-2">
+        <p className="mb-3 min-h-[2.5rem] text-store-subtle text-sm line-clamp-2">
           {product.description.trim()}
         </p>
 
@@ -113,7 +113,7 @@ export function DetailedProductCard({
           <div className="flex items-center gap-2">
             {/* قیمت اصلی اگر تخفیف داشته باشد */}
             {hasDiscount && (
-              <span className="text-gray-400 text-sm line-through">
+              <span className="text-store-subtle text-sm line-through">
                 {product.price?.toLocaleString()}
               </span>
             )}
@@ -121,14 +121,14 @@ export function DetailedProductCard({
             {/* قیمت نهایی */}
             <span
               className={`text-xl font-bold ${
-                hasDiscount ? "text-red-600" : "text-gray-800"
+                hasDiscount ? "text-red-600" : "text-store-text"
               }`}
             >
               {finalPrice?.toLocaleString()}
             </span>
 
             {/* واحد پول */}
-            <span className="text-gray-500 text-sm">{t('currency')}</span>
+            <span className="text-store-subtle text-sm">{t('currency')}</span>
           </div>
 
           {/* رتبه‌بندی (اختیاری) */}
@@ -145,7 +145,7 @@ export function DetailedProductCard({
                   </svg>
                 ))}
               </div>
-              <span className="text-gray-500 text-xs">
+              <span className="text-store-subtle text-xs">
                 {product.rating.toFixed(1)}
               </span>
             </div>
@@ -156,7 +156,7 @@ export function DetailedProductCard({
         <div className="flex gap-2">
           <Link
             href={`/${locale}/products/${product.slug || product.id}`}
-            className="flex-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-white text-center transition-colors"
+            className="flex-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-primary-foreground text-center transition-colors"
           >
             {t('view')}
           </Link>
@@ -169,8 +169,8 @@ export function DetailedProductCard({
             }}
             className={`flex-1 text-center py-2 px-4 rounded-lg font-medium transition-colors ${
               isOutOfStock
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-store-muted text-store-subtle cursor-not-allowed"
+                : "bg-store-muted text-store-text hover:bg-store-muted"
             }`}
           >
             {t('addToCart')}

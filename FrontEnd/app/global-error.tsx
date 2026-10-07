@@ -38,8 +38,8 @@ export default function GlobalError({ error, reset }: Props) {
           display: 'grid',
           placeItems: 'center',
           fontFamily: 'Tahoma, sans-serif',
-          background: '#07140e',
-          color: '#f4f7f5',
+          background: '#ffffff',
+          color: '#000000',
           padding: 24,
         }}
       >

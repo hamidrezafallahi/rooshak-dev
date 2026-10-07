@@ -13,15 +13,27 @@ type LandingProductsEnvelope = {
   error?: string | null;
 };
 
-export async function getSlides<T>(): Promise<T[]> {
+export type LandingSlide = {
+  id?: number;
+  bannerUrl: string;
+  videoUrl?: string;
+  firstUrl: string;
+  secondUrl?: string;
+  bannerTitle?: string;
+  bannerDescription?: string;
+  isHero?: boolean;
+  isActive?: boolean;
+};
+
+export async function getSlides<T = LandingSlide>(): Promise<T[]> {
   const url = requireAbsoluteUrl(
-    `${serverApiBaseUrl}/Landing/slide`,
+    `${serverApiBaseUrl}/Landing/slide?OnlyActives=true`,
     'getSlides URL',
   );
-   try {
-    const url = `${serverApiBaseUrl}/Landing/slide`;
- 
-    const res = await fetch(url, { next: { revalidate: 60, tags: ['Landing/slide'] } });
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60, tags: ['Landing/slide'] },
+    });
 
     if (!res.ok) {
       logger.error('getSlides HTTP error', {
@@ -39,6 +51,23 @@ export async function getSlides<T>(): Promise<T[]> {
     logger.error('getSlides failed', { scope: 'landing', source: 'server', url }, err);
     return [];
   }
+}
+
+/**
+ * Splits active slides into the full-bleed hero (the slide flagged `isHero`, else
+ * the first slide that has a video, else the first slide) and the remaining
+ * slides that feed the editorial banner section below the hero.
+ */
+export function splitHeroSlide(slides: LandingSlide[]): {
+  hero: LandingSlide | null;
+  rest: LandingSlide[];
+} {
+  if (!slides.length) return { hero: null, rest: [] };
+  const hero =
+    slides.find((s) => s.isHero) ??
+    slides.find((s) => Boolean(s.videoUrl)) ??
+    slides[0];
+  return { hero, rest: slides.filter((s) => s !== hero) };
 }
 
 /**

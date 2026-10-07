@@ -25,26 +25,18 @@ export default async function ProductInfo({ product }: { product: IDetailedProdu
   };
 
   return (
-    <div className="flex flex-col gap-4 max-w-xl">
-      <h1 className="font-semibold text-2xl md:text-3xl">{product.name}</h1>
+    <div className="flex flex-col gap-5 lg:sticky lg:top-[calc(var(--store-header-h)+1.5rem)] max-w-xl">
+      {product.brandName && (
+        <p className="text-store-subtle text-xs uppercase ltr:tracking-[0.14em]">{product.brandName}</p>
+      )}
+      <h1 className="font-normal text-2xl md:text-4xl leading-tight">{product.name}</h1>
 
-      {(product.brandName || product.categoryName) && (
-        <div className="flex flex-wrap gap-2">
-          {product.brandName && (
-            <span className="rounded-full bg-sky-500/15 px-3 py-1 text-xs text-sky-200">
-              {product.brandName}
-            </span>
-          )}
-          {product.categoryName && (
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">
-              {product.categoryName}
-            </span>
-          )}
-        </div>
+      {product.categoryName && (
+        <p className="text-store-subtle text-sm">{product.categoryName}</p>
       )}
 
       {product.description && (
-        <p className="text-gray-300 line-clamp-3">{product.description}</p>
+        <p className="text-store-subtle leading-relaxed line-clamp-4">{product.description}</p>
       )}
 
       <ProductPrice
@@ -63,7 +55,7 @@ export default async function ProductInfo({ product }: { product: IDetailedProdu
       />
 
       {product.dimensions && (
-        <div className="flex flex-wrap gap-4 text-sm text-white/75">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 pt-5 border-t border-store-border text-store-subtle text-sm">
           {product.dimensions.width ? (
             <p>{t('product.width')}: {formatLength(product.dimensions.width)}</p>
           ) : null}

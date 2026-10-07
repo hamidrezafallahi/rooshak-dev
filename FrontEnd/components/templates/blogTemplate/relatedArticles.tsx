@@ -7,15 +7,15 @@ export async function RelatedArticles() {
   const t = await getTranslations({ locale, namespace: 'blog' });
 
   return (
-    <section className="store-section" aria-labelledby="related-articles-title">
-      <div className="store-panel mx-auto px-4 sm:px-6 py-10 max-w-6xl">
+    <section className="py-14 md:py-20" aria-labelledby="related-articles-title">
+      <div className="mx-auto px-4 sm:px-6 pt-10 border-t border-store-border max-w-6xl">
         <h2
           id="related-articles-title"
-          className="store-section-title mb-8"
+          className="mb-8 font-normal text-2xl sm:text-3xl tracking-tight"
         >
           {t('title')}
         </h2>
-        <p className="text-[var(--store-text-muted)] text-sm">
+        <p className="text-store-subtle text-sm">
           {t('emptyHint')}
         </p>
       </div>

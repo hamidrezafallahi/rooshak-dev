@@ -37,7 +37,7 @@ export async function HeroSection({ ...props }: IProps) {
             }).format(new Date(blog.createdAt))}
           </time>
         </div>
-        <h1 className="mb-4 font-bold text-3xl md:text-5xl leading-tight">
+        <h1 className="mb-4 font-normal text-3xl md:text-5xl leading-tight">
           {isRTL ? blog.titleFa : blog.titleEn}
         </h1>
         <p className="opacity-90 text-xl line-clamp-2">{isRTL ? blog.excerptFa : blog.excerptEn}</p>

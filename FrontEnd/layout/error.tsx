@@ -21,7 +21,7 @@ export default function Error({ error, reset }: ErrorProps) {
       {process.env.NODE_ENV === 'development' ? (
         <p className="max-w-md text-sm break-words">{error.message}</p>
       ) : null}
-      <button type="button" className="store-btn store-btn-primary" onClick={reset}>
+      <button type="button" className="bg-primary hover:bg-transparent px-8 py-3 border border-primary text-primary-foreground hover:text-store-text text-sm transition-colors" onClick={reset}>
         تلاش مجدد
       </button>
     </div>

@@ -98,7 +98,7 @@ function SubmitButton(_: IProps) {
   return (
     <>
       <Button
-        className="flex justify-center items-center gap-2 bg-white hover:bg-gray-100 py-3 w-full font-medium text-black"
+        className="flex justify-center items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-none py-3 w-full font-medium text-primary-foreground"
         onClick={handleSetOrder}
         disabled={!canPlaceOrder || isLoading}
       >

@@ -10,6 +10,9 @@ namespace Application.Common.Interfaces
         Task<string?> UploadAsJpeg(UploadDTO request);
         Task<string?> UploadAsJpg(UploadDTO request);
 
+        /// <summary>Stores an mp4/webm video as-is (no transcoding). Returns relative path or null on failure.</summary>
+        Task<string?> UploadVideo(UploadDTO request);
+
         Task DeleteFile(DeleteDTO request);
 
         /// <summary>

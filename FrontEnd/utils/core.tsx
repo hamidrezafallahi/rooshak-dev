@@ -42,6 +42,8 @@ export const getTokens = (Name: string): { val: string; valid: boolean } => {
   return { val: "", valid: false };
 };
 export const getCookie = (Name: string): string => {
+  // Storefront components are server-rendered too; there is no cookie jar there.
+  if (typeof document === "undefined") return "";
   const cookies = document.cookie.split(";");
   const cookie = cookies.find((x) => x.includes(`${Name}=`));
   if (cookie) {

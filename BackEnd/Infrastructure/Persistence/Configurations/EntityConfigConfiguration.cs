@@ -1719,6 +1719,7 @@ namespace OnlineShop.Infrastructure.Configurations
                     new JsonDefinition {Header="توضیح بنر",Accessor="bannerDescription",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس اول",Accessor="firstUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس دوم",Accessor="secondUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
+                    new JsonDefinition {Header="ویدیو",Accessor="videoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="نمایش بنر",Accessor="isHero",Type ="bool",Sortable =false,Filterable =false,Options =null},
 
                 }),
@@ -1782,6 +1783,24 @@ namespace OnlineShop.Infrastructure.Configurations
                         Type = "text",
                         PlaceHolder ="آدرس صفحه دوم",
                         Help = "با کلیک بر روی دکمه دوم به چه آدرسی برود ؟ (اختیاری)",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="videoUrl",
+                        Caption ="ویدیوی هیرو (اختیاری)",
+                        Type = "video",
+                        PlaceHolder ="انتخاب ویدیو (mp4 یا webm)",
+                        Help = "ویدیوی کوتاه بی‌صدا، حداکثر ۳۰ مگابایت، ترجیحاً ۱۶:۹ و حدود ۱۵ ثانیه. عکس بنر به‌عنوان پوستر و جایگزین نمایش داده می‌شود.",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="removeVideo",
+                        Caption ="حذف ویدیو فعلی",
+                        Type = "checkbox",
+                        PlaceHolder ="",
+                        Help = "در ویرایش: برای حذف ویدیوی ثبت‌شده فعال کنید.",
                         Rules = new List<ValidationRule>()
                     }
                    

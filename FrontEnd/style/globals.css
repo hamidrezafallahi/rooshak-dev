@@ -2,25 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================== Default Theme — Sapphire Crystal ================== */
+/* ================== Default Theme — Maison Crystal (Swarovski-inspired mono) ================== */
 :root {
-  --primary-color: #1c39bb;   /* آبی یاقوتی / سافایر */
-  --secondary-color: #6ec6ff; /* بازتاب یخ و بلور */
-  --highlight-color: #c9a84c; /* طلای شامپاین لوکس */
-  --neutral-color: #f0f4fa;   /* خاکستری آبی روشن */
-  --success-color: #0d9488;   /* سبز-فیروزه‌ای */
-  --error-color: #e11d48;     /* قرمز کریستالی */
-  --warning-color: #d97706;   /* کهربایی */
-  --info-color: #38bdf8;      /* آبی یخی اطلاع */
+  --primary-color: #000000;   /* مشکی لوکس — دکمه‌ها و تیترها */
+  --secondary-color: #f2f2f2; /* خاکستری بلور */
+  --highlight-color: #a38a52; /* طلای مات */
+  --neutral-color: #f7f7f7;
+  --success-color: #0d9488;
+  --error-color: #c8102e;
+  --warning-color: #b45309;
+  --info-color: #3b82f6;
 }
 
-/* ================== Dark Theme — Midnight Crystal ================== */
+/* ================== Dark Theme — Onyx ================== */
 [data-theme="dark"] {
-  --primary-color: #5b7cfa;   /* سافایر روشن روی پس‌زمینه تیره */
-  --secondary-color: #38bdf8; /* درخشش یخ */
-  --highlight-color: #e8c547; /* طلای شامپاین */
-  --neutral-color: #0b1220;   /* سرمه‌ای شب */
+  --primary-color: #ffffff;
+  --secondary-color: #1a1a1a;
+  --highlight-color: #d4b66a;
+  --neutral-color: #0b0b0b;
   --success-color: #14b8a6;
+  --error-color: #fb7185;
+  --warning-color: #fbbf24;
+  --info-color: #7dd3fc;
+}
+
+/* ================== Admin keeps its original sapphire palette ==================
+   The storefront is re-skinned (mono / Swarovski style); the admin panel and its
+   --admin-* tokens stay on the previous blue palette. */
+html:not([data-theme]) [data-surface="admin"] {
+  --primary-color: #1c39bb;
+  --secondary-color: #6ec6ff;
+  --highlight-color: #c9a84c;
+  --neutral-color: #f0f4fa;
+  --error-color: #e11d48;
+  --warning-color: #d97706;
+  --info-color: #38bdf8;
+}
+
+html[data-theme="dark"] [data-surface="admin"] {
+  --primary-color: #5b7cfa;
+  --secondary-color: #38bdf8;
+  --highlight-color: #e8c547;
+  --neutral-color: #0b1220;
   --error-color: #fb7185;
   --warning-color: #fbbf24;
   --info-color: #7dd3fc;
@@ -101,7 +124,6 @@
     @apply bg-background text-foreground;
   }
 }
-
 
 .hidden-show-scrollbar::-webkit-scrollbar {
   display: none;
@@ -463,39 +485,63 @@ html {
   }
 }
 
-/* ================== Storefront Design System ================== */
+/* ================== Storefront Design System (Swarovski-inspired) ==================
+   White canvas, black type, hairline borders, square corners, quiet motion.
+   NOTE: never add letter-spacing to Persian text (breaks letter joining);
+   in Tailwind use the `ltr:` variant, e.g. `ltr:tracking-[0.14em]`. */
 :root {
-  --store-surface: rgba(255, 255, 255, 0.94);
-  --store-surface-muted: rgba(255, 255, 255, 0.78);
+  --store-surface: #ffffff;
+  --store-surface-muted: #f7f7f7;
   --store-surface-solid: #ffffff;
-  --store-border: color-mix(in srgb, var(--primary-color) 16%, transparent);
-  --store-text: #14221a;
-  --store-text-muted: #4a5a50;
-  --store-text-on-dark: #f4f7f5;
-  --store-shadow: 0 12px 36px color-mix(in srgb, var(--primary-color) 12%, transparent);
-  --store-radius: 1.25rem;
-  --store-radius-sm: 0.875rem;
-  --store-hero-overlay: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--primary-color) 88%, #0a2e18) 0%,
-    color-mix(in srgb, var(--secondary-color) 55%, var(--primary-color)) 100%
-  );
+  --store-border: #e3e3e3;
+  --store-border-strong: #000000;
+  --store-text: #000000;
+  --store-text-muted: #6b6b6b;
+  --store-text-on-dark: #ffffff;
+  --store-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --store-shadow-lift: 0 14px 40px rgba(0, 0, 0, 0.10);
+  --store-radius: 0;
+  --store-radius-sm: 0;
+  --store-announce-h: 2.25rem;
+  --store-nav-h: 4rem;
+  --store-header-h: calc(var(--store-announce-h) + var(--store-nav-h));
 }
 
 [data-theme="dark"] {
-  --store-surface: rgba(17, 24, 39, 0.92);
-  --store-surface-muted: rgba(31, 41, 55, 0.88);
-  --store-surface-solid: #111827;
-  --store-border: rgba(255, 255, 255, 0.1);
-  --store-text: #f3f4f6;
-  --store-text-muted: #9ca3af;
-  --store-text-on-dark: #f9fafb;
-  --store-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  --store-surface: #111111;
+  --store-surface-muted: #181818;
+  --store-surface-solid: #0b0b0b;
+  --store-border: #2a2a2a;
+  --store-border-strong: #ffffff;
+  --store-text: #f5f5f5;
+  --store-text-muted: #a1a1a1;
+  --store-text-on-dark: #ffffff;
+  --store-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --store-shadow-lift: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Square corners across the storefront (admin opts out below). */
+@layer utilities {
+  .rounded-3xl,
+  .rounded-2xl,
+  .rounded-xl {
+    border-radius: 0;
+  }
+  .rounded-lg,
+  .rounded-md {
+    border-radius: 2px;
+  }
+  [data-surface="admin"] .rounded-3xl { border-radius: 1.5rem; }
+  [data-surface="admin"] .rounded-2xl { border-radius: 1rem; }
+  [data-surface="admin"] .rounded-xl { border-radius: 0.75rem; }
+  [data-surface="admin"] .rounded-lg { border-radius: 0.5rem; }
+  [data-surface="admin"] .rounded-md { border-radius: 0.375rem; }
 }
 
 @layer components {
+
   .store-page {
-    @apply flex flex-col gap-6 md:gap-8 mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 w-full max-w-7xl min-h-[60vh];
+    @apply flex flex-col gap-8 md:gap-10 mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 w-full max-w-[1440px] min-h-[60vh];
     color: var(--store-text);
   }
 
@@ -503,27 +549,11 @@ html {
     @apply mb-2;
   }
 
-  .store-eyebrow {
-    @apply text-xs sm:text-sm font-semibold tracking-wide uppercase;
-    color: var(--primary-color);
-  }
-
-  .store-page-title {
-    @apply font-bold text-2xl sm:text-3xl md:text-4xl tracking-tight;
-    color: var(--store-text-on-dark);
-  }
-
-  .store-page-subtitle {
-    @apply max-w-2xl text-sm sm:text-base leading-relaxed;
-    color: color-mix(in srgb, var(--store-text-on-dark) 78%, transparent);
-  }
-
   .store-panel {
     background: var(--store-surface);
     border: 1px solid var(--store-border);
     border-radius: var(--store-radius);
     box-shadow: var(--store-shadow);
-    backdrop-filter: blur(10px);
     color: var(--store-text);
   }
 
@@ -537,51 +567,46 @@ html {
   }
 
   .store-card:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
+    border-color: var(--store-border-strong);
   }
 
+  /* Buttons - Swarovski style: rectangular, thin outline, black fill for primary */
   .store-btn {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200;
-    border: 1px solid var(--store-border);
-    background: var(--store-surface-solid);
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium transition-colors duration-200;
+    border: 1px solid var(--store-border-strong);
+    background: transparent;
     color: var(--store-text);
+    border-radius: 0;
   }
 
   .store-btn:hover {
-    background: color-mix(in srgb, var(--primary-color) 8%, white);
+    background: var(--store-text);
+    color: var(--store-surface-solid);
   }
 
   .store-btn-primary {
     background: var(--primary-color);
     border-color: var(--primary-color);
-    color: #fff;
+    color: var(--store-surface-solid);
   }
 
   .store-btn-primary:hover {
-    filter: brightness(1.06);
-  }
-
-  .store-btn-ghost {
     background: transparent;
-    border-color: color-mix(in srgb, var(--store-text-on-dark) 35%, transparent);
-    color: var(--store-text-on-dark);
+    color: var(--store-text);
   }
 
-  .store-btn-ghost:hover {
-    background: color-mix(in srgb, white 12%, transparent);
-  }
+  /* Buttons that sit on top of photos / video (hero, banners) */
 
   .store-empty {
     @apply flex flex-col justify-center items-center gap-2 px-6 py-16 text-center store-panel;
   }
 
   .store-empty-icon {
-    color: color-mix(in srgb, var(--primary-color) 55%, var(--store-text-muted));
+    color: var(--store-text-muted);
   }
 
   .store-empty-title {
-    @apply font-semibold text-lg;
+    @apply font-medium text-lg;
     color: var(--store-text);
   }
 
@@ -590,75 +615,15 @@ html {
     color: var(--store-text-muted);
   }
 
-  .store-section {
-    @apply py-12 md:py-16;
-  }
+  /* Hero (video / image, full-bleed) */
 
-  .store-section-title {
-    @apply mb-2 font-bold text-2xl sm:text-3xl tracking-tight;
-    color: var(--store-text);
-  }
+  /* Top announcement strip */
 
-  .store-hero {
-    @apply relative overflow-hidden;
-    background: var(--store-hero-overlay);
-    color: var(--store-text-on-dark);
-  }
-
-  .store-hero-inner {
-    @apply relative z-10 flex flex-col md:flex-row items-center justify-between gap-10 mx-auto px-4 sm:px-8 lg:px-16 py-16 md:py-24 w-full max-w-7xl min-h-[72vh];
-  }
-
-  .store-nav {
-    @apply z-50 fixed inset-x-0 top-0 flex justify-center px-3 sm:px-6 pt-3 sm:pt-4;
-  }
-
-  .store-nav-bar {
-    @apply flex justify-between items-center gap-3 px-3 sm:px-5 w-full max-w-7xl h-16 sm:h-[4.5rem] transition-all duration-300;
-    background: color-mix(in srgb, var(--store-surface-solid) 72%, transparent);
-    border: 1px solid var(--store-border);
-    border-radius: var(--store-radius-sm);
-    box-shadow: var(--store-shadow);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    color: var(--store-text);
-  }
-
-  .store-nav-link {
-    @apply inline-flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors;
-    color: var(--store-text-muted);
-  }
-
-  .store-nav-link:hover {
-    color: var(--primary-color);
-    background: color-mix(in srgb, var(--primary-color) 8%, transparent);
-  }
-
-  .store-icon-btn {
-    @apply inline-flex justify-center items-center rounded-xl w-10 h-10 transition-all duration-200;
-    border: 1px solid var(--store-border);
-    background: var(--store-surface-muted);
-    color: var(--store-text);
-  }
-
-  .store-icon-btn:hover {
-    color: var(--primary-color);
-    border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
-  }
-
-  .store-footer {
-    @apply mt-auto pt-14 pb-8;
-    background: color-mix(in srgb, var(--primary-color) 92%, #06140c);
-    color: color-mix(in srgb, white 82%, transparent);
-  }
-
-  .store-footer a:hover {
-    color: #fff;
-  }
+  /* Header - transparent over the hero, solid once scrolled / on inner pages */
 
   .store-meta-row {
     @apply flex flex-wrap items-center justify-between gap-3 text-sm;
-    color: color-mix(in srgb, var(--store-text-on-dark) 75%, transparent);
+    color: var(--store-text-muted);
   }
 
   .admin-dock {
@@ -668,38 +633,38 @@ html {
 
   .admin-dock-bar {
     @apply pointer-events-auto flex items-stretch gap-1 sm:gap-1.5 p-1.5 sm:p-2 w-full max-w-md;
-    background: color-mix(in srgb, var(--store-surface-solid) 82%, transparent);
+    background: color-mix(in srgb, var(--store-surface-solid) 90%, transparent);
     border: 1px solid var(--store-border);
-    border-radius: 1.25rem;
-    box-shadow: var(--store-shadow);
+    border-radius: 0;
+    box-shadow: var(--store-shadow-lift);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     color: var(--store-text);
   }
 
   .admin-dock-item {
-    @apply flex flex-1 flex-col sm:flex-row justify-center items-center gap-0.5 sm:gap-1.5 min-w-0 px-1.5 sm:px-3 py-2 rounded-xl text-[0.65rem] sm:text-xs font-medium transition-colors;
+    @apply flex flex-1 flex-col sm:flex-row justify-center items-center gap-0.5 sm:gap-1.5 min-w-0 px-1.5 sm:px-3 py-2 text-[0.65rem] sm:text-xs font-medium transition-colors;
     color: var(--store-text-muted);
   }
 
   .admin-dock-item:hover {
-    color: var(--primary-color);
-    background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+    color: var(--store-text);
+    background: var(--store-surface-muted);
   }
 
   .admin-dock-item-primary {
-    color: #fff;
+    color: var(--store-surface-solid);
     background: var(--primary-color);
   }
 
   .admin-dock-item-primary:hover {
-    color: #fff;
-    background: color-mix(in srgb, var(--primary-color) 88%, black);
+    color: var(--store-surface-solid);
+    background: color-mix(in srgb, var(--primary-color) 85%, #888);
   }
 
   .admin-dock-item-primary .admin-dock-icon svg {
-    stroke: #fff !important;
-    color: #fff;
+    stroke: currentColor !important;
+    color: inherit;
   }
 
   .admin-dock-icon {
@@ -728,6 +693,34 @@ html {
     width: 100%;
     max-width: 1200px;
     background: #000;
+  }
+
+  /* Exhibition pages keep their original look: the share buttons below use the
+     shared .store-btn classes, which were re-skinned for the storefront. */
+  .exhibit-root .store-btn {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid rgba(28, 57, 187, 0.16);
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #14221a;
+    font-weight: 600;
+  }
+
+  .exhibit-root .store-btn:hover {
+    background: color-mix(in srgb, #1c39bb 8%, white);
+    color: #14221a;
+  }
+
+  .exhibit-root .store-btn-primary {
+    border-color: #1c39bb;
+    background: #1c39bb;
+    color: #ffffff;
+  }
+
+  .exhibit-root .store-btn-primary:hover {
+    background: #1c39bb;
+    color: #ffffff;
+    filter: brightness(1.06);
   }
 
   .exhibit-photo {
@@ -873,5 +866,19 @@ html {
   }
 }
 
-
  
+/* Brand logo: opaque white-canvas image blended into any surface */
+.brand-logo {
+  mix-blend-mode: multiply;
+}
+[data-theme="dark"] .brand-logo[data-on-dark="false"] {
+  filter: invert(1) hue-rotate(180deg) brightness(2.6) contrast(1.15);
+  mix-blend-mode: screen;
+}
+/* Over a photo (transparent header) the blend can't reach the image: use a plate */
+.brand-logo[data-on-dark="true"] {
+  mix-blend-mode: normal;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 0.5rem;
+  padding: 0.125rem 0.5rem;
+}

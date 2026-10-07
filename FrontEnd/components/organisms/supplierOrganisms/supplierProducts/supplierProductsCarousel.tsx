@@ -118,7 +118,7 @@ dispatch(addToCart({
     }
   };
   return (
-    <article className="flex-shrink-0 bg-white shadow-sm hover:shadow-lg rounded-2xl w-64 overflow-hidden transition-shadow">
+    <article className="flex-shrink-0 bg-store-surface shadow-sm hover:shadow-lg rounded-2xl w-64 overflow-hidden transition-shadow">
       <div className="relative w-full h-56 overflow-hidden">
         <img
           src={toMediaUrl(product.productImage)}
@@ -135,13 +135,13 @@ dispatch(addToCart({
       </div>
       <div className="p-4">
         <h4 className="font-medium text-sm line-clamp-2">{product.productName}</h4>
-        {/* <p className="text-gray-500 text-xs">{product.?.name}</p> */}
+        {/* <p className="text-store-subtle text-xs">{product.?.name}</p> */}
 
         <div className="flex justify-between items-end gap-2 mt-3">
           <div>
             <div className="font-semibold text-sm">{product.finalPrice}$</div>
 
-            <div className="text-gray-400 text-xs line-through">
+            <div className="text-store-subtle text-xs line-through">
               {product.basePrice}$
             </div>
           </div>
@@ -149,7 +149,7 @@ dispatch(addToCart({
           <div className="flex items-center gap-2">
             <Link
               href={`/${locale}/products/${product.productSlug || product.slug || product.productId}`}
-              className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-xs"
+              className="bg-store-muted hover:bg-store-muted px-3 py-2 rounded-lg text-xs"
             >
               {t('common.view')}
             </Link>
@@ -157,7 +157,7 @@ dispatch(addToCart({
               onClick={() => {
                 handleAddToCart(product);
               }}
-              className="bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-lg text-white text-xs"
+              className="bg-primary hover:bg-primary/90 px-3 py-2 rounded-lg text-primary-foreground text-xs"
             >
               {t('common.add')}
             </button>

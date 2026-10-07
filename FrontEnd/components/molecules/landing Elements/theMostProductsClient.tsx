@@ -46,28 +46,32 @@ export default function TheMostProductsClient({
 
   return (
     <>
-      <div className="flex sm:flex-row flex-col flex-wrap sm:justify-between sm:items-center gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.key}
-              active={activeTab === tab.key}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </TabButton>
-          ))}
+      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-5 mb-8 md:mb-12">
+        <div>
+          <h2 className="mb-5 font-normal text-2xl sm:text-3xl md:text-4xl tracking-tight">
+            {t('landing.selectedProducts')}
+          </h2>
+          <div role="tablist" className="flex gap-6 border-b border-store-border">
+            {tabs.map((tab) => (
+              <TabButton
+                key={tab.key}
+                active={activeTab === tab.key}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                {tab.label}
+              </TabButton>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href={`/${locale}/products`} className="text-sm underline">
-            {t('common.viewAllProducts')}
-          </Link>
-        </div>
+        <Link
+          href={`/${locale}/products`}
+          className="self-start sm:self-auto pb-0.5 border-current border-b font-medium text-sm hover:opacity-60 whitespace-nowrap transition-opacity"
+        >
+          {t('common.viewAllProducts')}
+        </Link>
       </div>
 
-      <div>
-        <ProductsCarousel items={items} Loading={false} />
-      </div>
+      <ProductsCarousel items={items} Loading={false} />
     </>
   );
 }
@@ -84,13 +88,14 @@ function TabButton({
   return (
     <button
       type="button"
+      role="tab"
       onClick={onClick}
-      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+      aria-selected={active}
+      className={`-mb-px pb-3 text-sm font-medium border-b-2 transition-colors ${
         active
-          ? 'bg-primary text-white shadow'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          ? 'border-store-strong text-store-text'
+          : 'border-transparent text-store-subtle hover:text-store-text'
       }`}
-      aria-pressed={active}
     >
       {children}
     </button>
