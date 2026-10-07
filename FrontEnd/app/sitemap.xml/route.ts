@@ -2,7 +2,11 @@ import { serverApiBaseUrl, siteBaseUrl } from '@lib/api';
 import { absoluteUrl, DEFAULT_LOCALE, LOCALES } from '@lib/seo';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
-export const revalidate = 3600;
+// Must be rendered per request: the backend is unreachable during `next build`,
+// so a prerendered sitemap would be frozen with only the static paths.
+export const dynamic = 'force-dynamic';
+
+const revalidate = 3600;
 
 type ChangeFreq =
   | 'always'
@@ -242,11 +246,16 @@ export async function GET() {
 ${chunks.join('\n')}
 </urlset>`;
 
+  // Don't let a CDN/proxy cache a sitemap built while the backend was down.
+  const backendOk = products.length > 0 || blogs.length > 0;
+
   return new Response(xml, {
     status: 200,
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      'Cache-Control': backendOk
+        ? 'public, s-maxage=3600, stale-while-revalidate=86400'
+        : 'no-store',
     },
   });
 }
