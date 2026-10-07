@@ -31,29 +31,21 @@ const SADAF_PHOTOS: SadafPhoto[] = [
   { src: '/exhibition/sadaf/1000046092.webp', width: 960, height: 1280 },
   { src: '/exhibition/sadaf/1000046093.webp', width: 960, height: 1280 },
   { src: '/exhibition/sadaf/1000046094.webp', width: 960, height: 1280 },
+  { src: '/exhibition/sadaf/price-list.webp', width: 707, height: 1000 },
 ];
 
 /**
- * Price-list flyer closing the roll. Set to the image under
- * /public/exhibition/sadaf once it is added (null = not shown yet).
- */
-const SADAF_PRICE_LIST: SadafPhoto | null = null;
-
-/**
- * Full Sadaf roll: every product photo in order, then the
- * price-list flyer at the very end.
+ * Full Sadaf roll: the intro photo, then every photo in
+ * SADAF_PHOTOS (the price list is the last entry).
  */
 function sadafExhibitionPhotos() {
-  const productPhotos = SADAF_PHOTOS.map((photo, index) => ({
-    ...photo,
-    alt: `صدف — عکس ${index + 1}`,
-  }));
-
-  const roll = SADAF_PRICE_LIST
-    ? [...productPhotos, { ...SADAF_PRICE_LIST, alt: 'لیست قیمت صدف' }]
-    : productPhotos;
-
-  return [EXHIBITION_INTRO_PHOTO, ...roll];
+  return [
+    EXHIBITION_INTRO_PHOTO,
+    ...SADAF_PHOTOS.map((photo, index) => ({
+      ...photo,
+      alt: `صدف — عکس ${index + 1}`,
+    })),
+  ];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

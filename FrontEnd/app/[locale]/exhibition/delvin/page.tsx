@@ -26,6 +26,12 @@ const DELVIN_PHOTOS: DelvinPhoto[] = [
   { src: '/exhibition/delvin/IMG_20261005_120111_101.webp', width: 960, height: 1280 },
   { src: '/exhibition/delvin/IMG_20261005_120111_293.webp', width: 1195, height: 896 },
   { src: '/exhibition/delvin/IMG_20261005_120111_359.webp', width: 1195, height: 896 },
+  { src: '/exhibition/delvin/product-1.webp', width: 1280, height: 960 },
+  { src: '/exhibition/delvin/product-2.webp', width: 1280, height: 853 },
+  { src: '/exhibition/delvin/product-3.webp', width: 1280, height: 960 },
+  { src: '/exhibition/delvin/product-4.webp', width: 1280, height: 960 },
+  { src: '/exhibition/delvin/product-5.webp', width: 1280, height: 960 },
+  { src: '/exhibition/delvin/product-6.webp', width: 1280, height: 960 },
 ];
 
 /** A4-ratio price-list flyer closing the roll. */
