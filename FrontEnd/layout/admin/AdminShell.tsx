@@ -15,7 +15,6 @@ import { usePathname } from 'next/navigation';
 
 import { MenuIcon } from '@components/atoms/iconComponents';
 import LangSwitcher from '@components/molecules/lang';
-import ThemeSwitcher from '@components/molecules/theme';
 import { menuResponse } from '@models/config';
 
 import Sidebar from './sidebar';
@@ -74,7 +73,6 @@ export default function AdminShell({ menu, children }: AdminShellProps) {
         </Link>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <ThemeSwitcher />
           <LangSwitcher />
         </div>
       </header>

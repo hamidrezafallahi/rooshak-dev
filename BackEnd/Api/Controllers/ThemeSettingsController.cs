@@ -28,9 +28,11 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        // GET: api/themesettings  (ادمین)
+        // GET: api/themesettings
+        // عمومی مثل بقیه‌ی لیست‌های پنل: صفحه‌ی ادمین لیست را سمت سرور و بدون توکن می‌گیرد
+        // (getAll در فرانت)، پس Authorize اینجا باعث خطای «بارگذاری لیست ناموفق بود» می‌شد.
+        // ویرایش/ایجاد/حذف همچنان فقط برای ادمین است.
         [HttpGet]
-        [Authorize(Roles = AdminRoles)]
         public async Task<ActionResult<ListDto<ThemeSettingDto>>> GetAll([FromQuery] GetAllThemeSettingsQuery query)
         {
             var result = await _mediator.Send(query);

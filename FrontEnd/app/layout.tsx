@@ -3,7 +3,6 @@ import '../style/globals.css';
 import { ReactNode } from 'react';
 
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 
 import { siteBaseUrl } from '@lib/api';
 import { getActiveTheme, themeToCss } from '@lib/theme';
@@ -57,10 +56,6 @@ export const metadata: Metadata = {
   },
 };
 
-// The storefront palette comes from the database (ThemeSettings). The light/dark
-// switch that remains is admin-only, so the saved choice is applied on /admin routes only.
-const ADMIN_THEME_BOOTSTRAP = `(function(){try{if(location.pathname.split('/')[2]!=='admin')return;var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):'';if(t&&t!=='default')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
-
 export default async function RootLayout({ children }: Props) {
   const themeCss = themeToCss(await getActiveTheme());
 
@@ -70,9 +65,6 @@ export default async function RootLayout({ children }: Props) {
         {themeCss ? (
           <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
         ) : null}
-        <Script id="theme-bootstrap" strategy="beforeInteractive">
-          {ADMIN_THEME_BOOTSTRAP}
-        </Script>
       </head>
       <body className="min-h-screen bg-store-surface text-store-text antialiased">
         {children}
