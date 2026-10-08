@@ -19,6 +19,8 @@ namespace OnlineShop.Infrastructure.Persistence
         public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+        public DbSet<ProductModel3D> ProductModels3D => Set<ProductModel3D>();
+        public DbSet<ProductScanSource> ProductScanSources => Set<ProductScanSource>();
         public DbSet<Blog> Blogs => Set<Blog>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

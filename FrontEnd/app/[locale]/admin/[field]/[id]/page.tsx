@@ -1,4 +1,5 @@
 import FormGenerator from '@components/organisms/formGenerator';
+import Product3DAdminPanel from '@components/organisms/productOrganisms/product3DAdminPanel';
 import {
   getById,
   getFormConfigByEntityName,
@@ -15,5 +16,16 @@ export default async function Page({
   const { field, id } = await params;
   const defaultValues: Record<string, unknown> = await getById(field, id);
   const res = await getFormConfigByEntityName(field);
-  return <FormGenerator entityFormConfig={res} defaultValues={defaultValues} />;
+  const productId = Number(id);
+  const isProduct = field.toLowerCase() === 'products' && Number.isInteger(productId) && productId > 0;
+  return (
+    <>
+      <FormGenerator entityFormConfig={res} defaultValues={defaultValues} />
+      {isProduct && (
+        <div className="admin-page">
+          <Product3DAdminPanel productId={productId} />
+        </div>
+      )}
+    </>
+  );
 }

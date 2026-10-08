@@ -14,7 +14,8 @@ public class ProductQueryHandler(IProductRepository _repo,
         ISpecialOfferRepository _specialOfferRepo,
         ICommentRepository _commentRepository,
         IRateRepository _rateRepository,
-        IEntityConfigRepository _configRepo)
+        IEntityConfigRepository _configRepo,
+        IProductModel3DRepository _model3DRepo)
     : IRequestHandler<GetAllProductsQuery, ServiceResult<ListDto<ProductDto>>>,
     IRequestHandler<GetProducts4selectOptionQuery, ServiceResult<ListDto<SelectOptionDto>>>,
     IRequestHandler<GetAllProductsByDetailQuery, ServiceResult<IEnumerable<ProductByDetailDto>>>,
@@ -211,6 +212,8 @@ public class ProductQueryHandler(IProductRepository _repo,
             .FirstOrDefaultAsync(cancellationToken);
         if (product == null) return ServiceResult<ProductByDetailDto?>.Failed("product not found");
 
+        var model3D = await _model3DRepo.GetByProductIdAsync(product.Id);
+
         var rate = await _rateRepository.GetAverageRateAsync(EnumTargetType.Product, product.Id);
 
         var activeOffers = product.ProductOffers
@@ -280,6 +283,11 @@ public class ProductQueryHandler(IProductRepository _repo,
             SeoTitleEn = product.SeoTitleEn,
             MetaDescriptionFa = product.MetaDescriptionFa,
             MetaDescriptionEn = product.MetaDescriptionEn,
+            Model3D = model3D == null ? null : new ProductModel3DPublicDto
+            {
+                ModelUrl = model3D.ModelUrl.TrimStart('/'),
+                UsdzUrl = model3D.UsdzUrl?.TrimStart('/'),
+            },
         };
 
         return ServiceResult<ProductByDetailDto?>.Ok(dto);

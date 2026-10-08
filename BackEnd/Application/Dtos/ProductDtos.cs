@@ -65,6 +65,9 @@ namespace Application.Dtos
         public string? MetaDescriptionEn { get; set; }
         public string? BrandSlug { get; set; }
         public string? CategorySlug { get; set; }
+
+        /// <summary>3D model for the storefront viewer / AR; null when the product has none.</summary>
+        public ProductModel3DPublicDto? Model3D { get; set; }
     }
 
     public class ProductCardDto

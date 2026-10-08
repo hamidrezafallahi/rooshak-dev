@@ -16,6 +16,6 @@ export const config = {
   // Exclude SEO files, static assets, and Next/API proxies from locale middleware.
   // Without this, /robots.txt and /sitemap.xml get rewritten to /fa/... and 404.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots\\.txt|sitemap\\.xml|feeds/.*|llms\\.txt|manifest\\.json|uploads/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|xml|json|mp4|webm|woff2?)$|api|auth|health).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots\\.txt|sitemap\\.xml|feeds/.*|llms\\.txt|manifest\\.json|uploads/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|xml|json|mp4|webm|glb|gltf|usdz|woff2?)$|api|auth|health).*)',
   ],
 };
