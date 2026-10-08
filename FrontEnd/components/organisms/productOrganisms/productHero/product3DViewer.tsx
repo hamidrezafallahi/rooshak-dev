@@ -21,6 +21,8 @@ interface Props {
   arRequest?: number;
   /** Called when AR cannot start on this device (desktop / unsupported phone). */
   onArUnavailable?: () => void;
+  /** Model size in metres once loaded (x = width, y = height, z = depth). */
+  onModelLoad?: (size: { x: number; y: number; z: number }) => void;
 }
 
 /**
@@ -38,6 +40,7 @@ export default function Product3DViewer({
   alt,
   arRequest = 0,
   onArUnavailable,
+  onModelLoad,
 }: Props) {
   const t = useTranslations('model3d');
   const ref = useRef<ModelViewerElement | null>(null);
@@ -79,16 +82,19 @@ export default function Product3DViewer({
   useEffect(() => {
     const el = ref.current;
     if (!ready || !el) return;
-    const onLoad = () => setLoaded(true);
+    const onLoad = () => {
+      setLoaded(true);
+      onModelLoad?.(el.getDimensions());
+    };
     const onError = () => setFailed(true);
     el.addEventListener('load', onLoad);
     el.addEventListener('error', onError);
-    if (el.loaded) setLoaded(true);
+    if (el.loaded) onLoad();
     return () => {
       el.removeEventListener('load', onLoad);
       el.removeEventListener('error', onError);
     };
-  }, [ready]);
+  }, [ready, onModelLoad]);
 
   // Run a pending AR request as soon as the model is loaded.
   useEffect(() => {

@@ -5,6 +5,7 @@ export interface ModelViewerElement extends HTMLElement {
   canActivateAR: boolean;
   loaded: boolean;
   activateAR: () => Promise<void>;
+  getDimensions: () => { x: number; y: number; z: number };
 }
 
 type ModelViewerAttributes = {

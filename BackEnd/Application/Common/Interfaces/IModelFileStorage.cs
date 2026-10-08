@@ -22,6 +22,9 @@ namespace Application.Common.Interfaces
         /// <summary>Phone capture used as photogrammetry input (jpg/png/webp/heic or mp4/mov/webm).</summary>
         Task<StoredFileResult> SaveScanSourceAsync(IFormFile file, string relativeDirectory);
 
+        /// <summary>Writes a copy of a stored glb/gltf uniformly scaled by <paramref name="factor"/> (real-size fix).</summary>
+        Task<StoredFileResult> RescaleModelAsync(string storedPath, double factor, string relativeDirectory);
+
         /// <summary>Kind of a stored scan file: "image" or "video".</summary>
         string ScanKind(string fileName);
     }

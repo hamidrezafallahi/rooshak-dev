@@ -15,6 +15,14 @@ namespace Application.Commands
         public bool RemoveUsdz { get; set; }
     }
 
+    /// <summary>Uniformly scales the stored GLB so it matches the real product size.</summary>
+    public class RescaleProductModel3DCommand : IRequest<ServiceResult<ProductModel3DAdminDto>>
+    {
+        public int ProductId { get; set; }
+        /// <summary>Multiplier applied to the model (target size / current size).</summary>
+        public double Factor { get; set; }
+    }
+
     public class DeleteProductModel3DCommand : IRequest<ServiceResult<IdDto>>
     {
         public int ProductId { get; set; }

@@ -63,6 +63,36 @@ namespace Services.Services.Uploader
             return await WriteAsync(input, relativeDirectory, ext);
         }
 
+        public async Task<StoredFileResult> RescaleModelAsync(string storedPath, double factor, string relativeDirectory)
+        {
+            var normalized = UploadPaths.Normalize(storedPath);
+            var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length == 0 || segments.Any(x => x == ".."))
+                return Fail("مسیر مدل نامعتبر است.");
+
+            var absolute = Path.Combine(new[] { ResolveWwwRoot() }.Concat(segments).ToArray());
+            if (!File.Exists(absolute))
+                return Fail("فایل مدل روی سرور پیدا نشد.");
+
+            var ext = Path.GetExtension(absolute).TrimStart('.').ToLowerInvariant();
+            var bytes = await File.ReadAllBytesAsync(absolute);
+            var scaled = ext == "glb"
+                ? GltfScaler.ScaleGlb(bytes, factor, out var error)
+                : ext == "gltf"
+                    ? GltfScaler.ScaleGltf(bytes, factor, out error)
+                    : Fail2(out error);
+            if (scaled == null)
+                return Fail(error ?? "تغییر اندازه ممکن نشد.");
+
+            return await WriteAsync(new MemoryStream(scaled, writable: false), relativeDirectory, ext);
+        }
+
+        private static byte[]? Fail2(out string? error)
+        {
+            error = "فقط GLB و glTF قابل تغییر اندازه‌اند.";
+            return null;
+        }
+
         public string ScanKind(string fileName)
         {
             var ext = Path.GetExtension(fileName).TrimStart('.');
