@@ -35,6 +35,15 @@ public class ProductModels3DController : BaseController
         return Ok(result);
     }
 
+    [HttpPost("{productId:int}/rescale")]
+    public async Task<IActionResult> Rescale(int productId, [FromBody] RescaleProductModel3DCommand command)
+    {
+        command.ProductId = productId;
+        var result = await _mediator.Send(command);
+        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        return Ok(result);
+    }
+
     [HttpDelete("{productId:int}")]
     public async Task<IActionResult> Delete(int productId)
     {

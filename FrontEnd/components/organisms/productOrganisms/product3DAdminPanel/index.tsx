@@ -23,6 +23,8 @@ const Product3DViewer = dynamic(
 const ENDPOINT = `${browserApiBaseUrl}/ProductModels3D`;
 
 type Envelope<T> = { isSuccess: boolean; data: T | null; error?: string | null };
+type Axis = 'height' | 'width' | 'depth';
+type SizeCm = { width?: number | null; height?: number | null; depth?: number | null };
 
 function formatSize(bytes?: number | null) {
   if (!bytes) return '';
@@ -40,11 +42,21 @@ async function call<T>(url: string, init?: RequestInit): Promise<Envelope<T>> {
   }
 }
 
+const toCm = (meters: number) => Math.round(meters * 1000) / 10;
+
 /**
- * Admin section on the product edit page: upload the GLB / USDZ, preview it, and collect
- * phone captures (photos / video) that are fed to a scanning tool to build the GLB.
+ * Admin section on the product edit page, designed to be used entirely from a phone:
+ * upload the GLB (made with any scanning app), preview it, set its real size, and
+ * collect phone captures (photos / video) as raw scan input.
  */
-export default function Product3DAdminPanel({ productId }: { productId: number }) {
+export default function Product3DAdminPanel({
+  productId,
+  productSize,
+}: {
+  productId: number;
+  /** Product dimensions in cm, used to pre-fill the real-size field. */
+  productSize?: SizeCm;
+}) {
   const t = useTranslations('model3dAdmin');
   const tv = useTranslations('model3d');
 
@@ -52,9 +64,11 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
   const [loadFailed, setLoadFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [pageUrl, setPageUrl] = useState('');
+  const [modelSize, setModelSize] = useState<{ x: number; y: number; z: number } | null>(null);
+  const [axis, setAxis] = useState<Axis>('height');
+  const [targetCm, setTargetCm] = useState('');
 
   const modelInput = useRef<HTMLInputElement>(null);
   const usdzInput = useRef<HTMLInputElement>(null);
@@ -77,6 +91,14 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
     setPageUrl(window.location.href);
   }, [refresh]);
 
+  // Pre-fill the real-size field from the product's own dimension for the chosen axis.
+  useEffect(() => {
+    const fromProduct = productSize?.[axis];
+    setTargetCm(fromProduct && fromProduct > 0 ? String(fromProduct) : '');
+  }, [axis, productSize]);
+
+  const onModelLoad = useCallback((s: { x: number; y: number; z: number }) => setModelSize(s), []);
+
   const report = (res: Envelope<unknown>, okText = t('uploaded')) =>
     setMessage(res.isSuccess ? { ok: true, text: okText } : { ok: false, text: res.error || 'Error' });
 
@@ -93,6 +115,7 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
     report(res);
     if (res.isSuccess && res.data) {
       setInfo(res.data);
+      setModelSize(null);
       if (modelInput.current) modelInput.current.value = '';
       if (usdzInput.current) usdzInput.current.value = '';
     }
@@ -115,8 +138,35 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
     const res = await call<unknown>(`${ENDPOINT}/${productId}`, { method: 'DELETE' });
     setBusy(false);
     report(res);
-    setShowPreview(false);
+    setModelSize(null);
     await refresh();
+  };
+
+  const currentAxisCm = modelSize
+    ? toCm(axis === 'height' ? modelSize.y : axis === 'width' ? modelSize.x : modelSize.z)
+    : 0;
+  const targetNumber = Number(targetCm);
+  const canResize = !!modelSize && currentAxisCm > 0 && targetNumber > 0;
+
+  const applySize = async () => {
+    if (!canResize) return;
+    const factor = targetNumber / currentAxisCm;
+    if (Math.abs(factor - 1) < 0.005) {
+      setMessage({ ok: true, text: t('sizeAlreadyOk') });
+      return;
+    }
+    setBusy(true);
+    const res = await call<IProductModel3DAdmin>(`${ENDPOINT}/${productId}/rescale`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ factor }),
+    });
+    setBusy(false);
+    report(res, t('sizeApplied'));
+    if (res.isSuccess && res.data) {
+      setModelSize(null);
+      setInfo(res.data);
+    }
   };
 
   const uploadCaptures = async (files: FileList | null) => {
@@ -145,8 +195,7 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
     await refresh();
   };
 
-  const btn =
-    'admin-btn disabled:opacity-50 disabled:cursor-not-allowed';
+  const btn = 'admin-btn disabled:opacity-50 disabled:cursor-not-allowed';
   const btnPrimary = `${btn} admin-btn-primary`;
 
   return (
@@ -157,6 +206,27 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
         </h2>
         <p className="mt-1 text-sm opacity-70">{t('subtitle')}</p>
       </header>
+
+      {/* ── Phone-first guide ─────────────────────────────────── */}
+      <details className="border border-store-border p-3 text-sm">
+        <summary className="cursor-pointer font-semibold">{t('guideTitle')}</summary>
+        <ol className="mt-3 list-decimal space-y-2 ps-5 leading-6">
+          <li>{t('guide1')}</li>
+          <li>{t('guide2')}</li>
+          <li>{t('guide3')}</li>
+          <li>{t('guide4')}</li>
+          <li>{t('guide5')}</li>
+        </ol>
+        <p className="mt-3 text-xs opacity-80" dir="ltr">
+          <a className="underline" href="https://www.unrealengine.com/realityscan" target="_blank" rel="noreferrer">RealityScan</a>
+          {' · '}
+          <a className="underline" href="https://poly.cam" target="_blank" rel="noreferrer">Polycam</a>
+          {' · '}
+          <a className="underline" href="https://www.kiriengine.app" target="_blank" rel="noreferrer">KIRI Engine</a>
+          {' · '}
+          <a className="underline" href="https://scaniverse.com" target="_blank" rel="noreferrer">Scaniverse</a>
+        </p>
+      </details>
 
       {loadFailed && <p className="text-sm text-error">{t('loadError')}</p>}
 
@@ -170,7 +240,7 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold">{t('currentModel')}</h3>
         {info?.modelUrl ? (
-          <div className="flex flex-col gap-2 text-sm">
+          <div className="flex flex-col gap-3 text-sm">
             <div className="flex flex-wrap items-center gap-2">
               <a href={toMediaUrl(info.modelUrl)} target="_blank" rel="noreferrer" className="underline" dir="ltr">
                 GLB · {formatSize(info.modelSizeBytes)}
@@ -181,10 +251,61 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
                 </a>
               )}
             </div>
+
+            <div className="relative aspect-square w-full max-w-md overflow-hidden bg-store-muted">
+              <Product3DViewer
+                key={info.modelUrl}
+                modelUrl={info.modelUrl}
+                usdzUrl={info.usdzUrl}
+                alt="3D preview"
+                onArUnavailable={() => setQrOpen(true)}
+                onModelLoad={onModelLoad}
+              />
+            </div>
+
+            {/* Real size: makes "view on table" show the product at its true size. */}
+            <div className="flex flex-col gap-2 border border-store-border p-3">
+              <h4 className="font-semibold">{t('sizeTitle')}</h4>
+              <p className="text-xs leading-5 opacity-80">{t('sizeHelp')}</p>
+              {modelSize && (
+                <p className="text-xs" dir="ltr">
+                  {t('sizeCurrent')}: {toCm(modelSize.x)} × {toCm(modelSize.y)} × {toCm(modelSize.z)} cm
+                  {' '}({t('sizeOrder')})
+                </p>
+              )}
+              <div className="flex flex-wrap items-end gap-2">
+                <label className="flex flex-col gap-1 text-xs">
+                  <span>{t('sizeAxis')}</span>
+                  <select
+                    value={axis}
+                    onChange={(e) => setAxis(e.target.value as Axis)}
+                    className="border border-store-border bg-transparent px-2 py-2 text-sm"
+                  >
+                    <option value="height">{t('axisHeight')}</option>
+                    <option value="width">{t('axisWidth')}</option>
+                    <option value="depth">{t('axisDepth')}</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-xs">
+                  <span>{t('sizeTarget')}</span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min="0.1"
+                    step="0.1"
+                    value={targetCm}
+                    onChange={(e) => setTargetCm(e.target.value)}
+                    className="w-28 border border-store-border bg-transparent px-2 py-2 text-sm"
+                    dir="ltr"
+                  />
+                </label>
+                <button type="button" className={btnPrimary} onClick={applySize} disabled={busy || !canResize}>
+                  {t('sizeApply')}
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-2">
-              <button type="button" className={btn} onClick={() => setShowPreview((v) => !v)}>
-                {t('preview')}
-              </button>
               {info.usdzUrl && (
                 <button type="button" className={btn} onClick={removeUsdz} disabled={busy}>
                   {t('removeUsdz')}
@@ -194,16 +315,6 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
                 {t('deleteModel')}
               </button>
             </div>
-            {showPreview && (
-              <div className="relative aspect-square max-w-md overflow-hidden bg-store-muted">
-                <Product3DViewer
-                  modelUrl={info.modelUrl}
-                  usdzUrl={info.usdzUrl}
-                  alt="3D preview"
-                  onArUnavailable={() => setQrOpen(true)}
-                />
-              </div>
-            )}
           </div>
         ) : (
           <p className="text-sm opacity-70">{t('noModel')}</p>
@@ -212,17 +323,23 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-1 text-sm">
             <span>{t('modelFile')}</span>
+            {/* octet-stream: Android pickers often label .glb files with that generic type. */}
             <input
               ref={modelInput}
               type="file"
-              accept=".glb,.gltf,model/gltf-binary,model/gltf+json"
+              accept=".glb,.gltf,model/gltf-binary,model/gltf+json,application/octet-stream"
               className="text-sm"
             />
             <span className="text-xs opacity-70">{t('modelHelp')}</span>
           </label>
           <label className="flex flex-col gap-1 text-sm">
             <span>{t('usdzFile')}</span>
-            <input ref={usdzInput} type="file" accept=".usdz,model/vnd.usdz+zip" className="text-sm" />
+            <input
+              ref={usdzInput}
+              type="file"
+              accept=".usdz,model/vnd.usdz+zip,application/octet-stream"
+              className="text-sm"
+            />
             <span className="text-xs opacity-70">{t('usdzHelp')}</span>
           </label>
         </div>
@@ -233,7 +350,7 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
         </div>
       </div>
 
-      {/* ── Phone scan ────────────────────────────────────────── */}
+      {/* ── Phone capture ─────────────────────────────────────── */}
       <div className="flex flex-col gap-3 border-t border-store-border pt-5">
         <h3 className="text-sm font-semibold">{t('scanTitle')}</h3>
         <p className="text-sm leading-6 opacity-80">{t('scanIntro')}</p>
@@ -284,13 +401,6 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
           <li>{t('tip3')}</li>
           <li>{t('tip4')}</li>
         </ul>
-        <p className="text-xs opacity-80" dir="ltr">
-          <a className="underline" href="https://www.unrealengine.com/realityscan" target="_blank" rel="noreferrer">RealityScan</a>
-          {' · '}
-          <a className="underline" href="https://poly.cam" target="_blank" rel="noreferrer">Polycam</a>
-          {' · '}
-          <a className="underline" href="https://www.kiriengine.app" target="_blank" rel="noreferrer">KIRI Engine</a>
-        </p>
 
         <h4 className="text-sm font-semibold">{t('captures')}</h4>
         {info && info.scanSources.length > 0 ? (
@@ -307,7 +417,7 @@ export default function Product3DAdminPanel({ productId }: { productId: number }
                 </a>
                 <span className="flex items-center justify-between gap-1">
                   <span dir="ltr">{formatSize(s.sizeBytes)}</span>
-                  <button type="button" className="underline" onClick={() => deleteCapture(s.id)} disabled={busy}>
+                  <button type="button" className="px-2 underline" onClick={() => deleteCapture(s.id)} disabled={busy} aria-label={t('confirmDelete')}>
                     ✕
                   </button>
                 </span>

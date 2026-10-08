@@ -19,6 +19,7 @@ namespace Application.Handler.CommandHandler
         IUploaderService _uploader,
         IHttpContextAccessor _accessor) :
         IRequestHandler<UpsertProductModel3DCommand, ServiceResult<ProductModel3DAdminDto>>,
+        IRequestHandler<RescaleProductModel3DCommand, ServiceResult<ProductModel3DAdminDto>>,
         IRequestHandler<DeleteProductModel3DCommand, ServiceResult<IdDto>>,
         IRequestHandler<AddProductScanSourcesCommand, ServiceResult<ProductModel3DAdminDto>>,
         IRequestHandler<DeleteProductScanSourceCommand, ServiceResult<IdDto>>,
@@ -90,6 +91,29 @@ namespace Application.Handler.CommandHandler
             if (oldUsdz != null) await _uploader.DeleteStoredFile(oldUsdz, dir);
 
             return ServiceResult<ProductModel3DAdminDto>.Ok(await BuildAdminDto(product.Id));
+        }
+
+        public async Task<ServiceResult<ProductModel3DAdminDto>> Handle(RescaleProductModel3DCommand request, CancellationToken ct)
+        {
+            var userId = _accessor.HttpContext.GetUserId();
+            if (userId == null)
+                return ServiceResult<ProductModel3DAdminDto>.Failed("Unauthorized");
+
+            var existing = await _models.GetByProductIdAsync(request.ProductId);
+            if (existing == null)
+                return ServiceResult<ProductModel3DAdminDto>.Failed("مدل سه‌بعدی پیدا نشد");
+
+            var dir = UploadPaths.ProductModels(request.ProductId);
+            var scaled = await _storage.RescaleModelAsync(existing.ModelUrl, request.Factor, dir);
+            if (!scaled.Ok)
+                return ServiceResult<ProductModel3DAdminDto>.Failed(scaled.Error ?? "تغییر اندازه ممکن نشد.");
+
+            var oldUrl = existing.ModelUrl;
+            existing.SetModel(scaled.Path!, scaled.SizeBytes, userId.Value);
+            await _models.SaveChangesAsync(ct);
+            await _uploader.DeleteStoredFile(oldUrl, dir);
+
+            return ServiceResult<ProductModel3DAdminDto>.Ok(await BuildAdminDto(request.ProductId));
         }
 
         public async Task<ServiceResult<IdDto>> Handle(DeleteProductModel3DCommand request, CancellationToken ct)
