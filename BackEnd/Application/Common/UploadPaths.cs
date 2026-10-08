@@ -13,6 +13,8 @@ public static class UploadPaths
     public static string Brands(int id) => $"{Root}/brands/{id}";
     public static string Categories(int id) => $"{Root}/categories/{id}";
     public static string Products(int id) => $"{Root}/products/{id}";
+    public static string ProductModels(int id) => $"{Root}/products/{id}/models";
+    public static string ProductScans(int id) => $"{Root}/products/{id}/scans";
     public static string Blogs(int id) => $"{Root}/blogs/{id}";
     public static string Users(int id) => $"{Root}/users/{id}";
     public static string LandingSlides(int id) => $"{Root}/landingslides/{id}";

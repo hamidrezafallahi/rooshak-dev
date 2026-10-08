@@ -160,7 +160,12 @@ public class Program
         }
 
         app.InitializeDatabase();
-        app.UseStaticFiles();
+        // ASP.NET refuses to serve unknown extensions: register the 3D formats (GLB/glTF/USDZ).
+        var staticContentTypes = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+        staticContentTypes.Mappings[".glb"] = "model/gltf-binary";
+        staticContentTypes.Mappings[".gltf"] = "model/gltf+json";
+        staticContentTypes.Mappings[".usdz"] = "model/vnd.usdz+zip";
+        app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = staticContentTypes });
         app.UseMiddleware<BlacklistMiddleware>();
         app.UseMiddleware<WhitelistMiddleware>();
         app.UseMiddleware<SuspiciousClientMiddleware>();

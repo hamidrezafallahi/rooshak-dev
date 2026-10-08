@@ -42,6 +42,28 @@ export interface IDetailedProduct {
     metaDescriptionEn?: string | null;
     brandSlug?: string | null;
     categorySlug?: string | null;
+    model3D?: IProductModel3D | null;
+}
+export interface IProductModel3D {
+    /** GLB / glTF (web viewer + Android AR). */
+    modelUrl: string;
+    /** Optional USDZ for iOS AR Quick Look. */
+    usdzUrl?: string | null;
+}
+export interface IProductScanSource {
+    id: number;
+    fileUrl: string;
+    kind: 'image' | 'video';
+    sizeBytes: number;
+}
+export interface IProductModel3DAdmin {
+    productId: number;
+    modelId?: number | null;
+    modelUrl?: string | null;
+    modelSizeBytes?: number | null;
+    usdzUrl?: string | null;
+    usdzSizeBytes?: number | null;
+    scanSources: IProductScanSource[];
 }
 export interface IDetailedProductOffer {
     id: number;
