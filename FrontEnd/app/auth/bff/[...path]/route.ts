@@ -42,6 +42,30 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
   }
 
   const method = req.method.toUpperCase();
+
+  // Backup restore uploads can be hundreds of MB: stream the body straight through
+  // instead of buffering it in memory. A streamed body cannot be replayed, so there
+  // is no refresh-and-retry here (the admin page refreshes the session first).
+  if (method === 'POST' && path === 'Backup/restore') {
+    const streamed = await fetch(targetUrl, {
+      method,
+      headers,
+      body: req.body,
+      // Node's fetch requires this when the request body is a stream.
+      duplex: 'half',
+      cache: 'no-store',
+    } as RequestInit & { duplex: 'half' });
+    const streamedHeaders = new Headers();
+    const streamedType = streamed.headers.get('content-type');
+    if (streamedType) {
+      streamedHeaders.set('content-type', streamedType);
+    }
+    return new NextResponse(streamed.body, {
+      status: streamed.status,
+      headers: streamedHeaders,
+    });
+  }
+
   const body =
     method === 'GET' || method === 'HEAD' ? undefined : await req.arrayBuffer();
 

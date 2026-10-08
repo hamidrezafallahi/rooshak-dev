@@ -14,7 +14,69 @@ type BackupFile = {
   fileName: string;
   sizeBytes: number;
   createdAtUtc: string;
+  kind: 'database' | 'full' | 'auto' | 'pre-restore';
 };
+
+type BackupSettings = {
+  autoEnabled: boolean;
+  hourUtc: number;
+  keepCount: number;
+  lastAutoBackupUtc?: string | null;
+  lastDownloadedUtc?: string | null;
+};
+
+type RestoreResult = {
+  safetyBackupFileName: string;
+  restoredFileCount: number;
+};
+
+const KIND_LABEL_KEY: Record<BackupFile['kind'], string> = {
+  database: 'admin.backupKindDatabase',
+  full: 'admin.backupKindFull',
+  auto: 'admin.backupKindAuto',
+  'pre-restore': 'admin.backupKindPreRestore',
+};
+
+const DOWNLOAD_REMINDER_DAYS = 7;
+const RESTORE_CONFIRM_WORD = 'RESTORE';
+const inputClass =
+  'rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text)]';
+
+/** Upload with progress (fetch cannot report upload progress). */
+function uploadRestore(
+  file: File,
+  onProgress: (percent: number) => void,
+  onSent: () => void,
+): Promise<ApiEnvelope<RestoreResult>> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('confirm', RESTORE_CONFIRM_WORD);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${browserApiBaseUrl}/Backup/restore`);
+    xhr.withCredentials = true;
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+    xhr.upload.onload = onSent;
+    xhr.onerror = () => reject(new Error('NETWORK'));
+    xhr.onload = () => {
+      if (xhr.status === 401 || xhr.status === 403) {
+        reject(new Error('UNAUTHORIZED'));
+        return;
+      }
+      try {
+        resolve(JSON.parse(xhr.responseText) as ApiEnvelope<RestoreResult>);
+      } catch {
+        reject(new Error(`HTTP ${xhr.status}`));
+      }
+    };
+    xhr.send(form);
+  });
+}
 
 type ApiEnvelope<T> = {
   isSuccess: boolean;
@@ -102,6 +164,28 @@ export default function AdminBackupPanel() {
   const [creating, setCreating] = useState(false);
   const [seedStatus, setSeedStatus] = useState<SeedStatus | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [creatingFull, setCreatingFull] = useState(false);
+  const [settings, setSettings] = useState<BackupSettings | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [restoreConfirm, setRestoreConfirm] = useState('');
+  const [restoreStage, setRestoreStage] = useState<
+    'idle' | 'uploading' | 'processing'
+  >('idle');
+  const [restorePercent, setRestorePercent] = useState(0);
+
+  const loadSettings = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const result = await apiRequest<BackupSettings>('Backup/settings');
+        if (result.isSuccess && result.data) {
+          setSettings(result.data);
+        }
+      } catch {
+        // Settings are optional; the backup list still works.
+      }
+    });
+  }, []);
 
   const loadSeedStatus = useCallback(() => {
     startTransition(async () => {
@@ -137,7 +221,8 @@ export default function AdminBackupPanel() {
   useEffect(() => {
     loadBackups();
     loadSeedStatus();
-  }, [loadBackups, loadSeedStatus]);
+    loadSettings();
+  }, [loadBackups, loadSeedStatus, loadSettings]);
 
   const handleApplySeed = async (clean: boolean) => {
     const ok = window.confirm(
@@ -181,6 +266,100 @@ export default function AdminBackupPanel() {
     }
   };
 
+  const handleCreateFull = async () => {
+    setCreatingFull(true);
+    try {
+      const result = await apiRequest<BackupFile>('Backup/full', {
+        method: 'POST',
+      });
+      if (!result.isSuccess) {
+        showErrorToast(result.error || t('admin.backupCreateError'));
+        return;
+      }
+      showSuccessToast(t('admin.backupFullCreateSuccess'));
+      loadBackups();
+    } catch {
+      showErrorToast(t('admin.backupCreateError'));
+    } finally {
+      setCreatingFull(false);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    if (!settings) return;
+    setSavingSettings(true);
+    try {
+      const result = await apiRequest<BackupSettings>('Backup/settings', {
+        method: 'PUT',
+        body: JSON.stringify({
+          autoEnabled: settings.autoEnabled,
+          hourUtc: settings.hourUtc,
+          keepCount: settings.keepCount,
+        }),
+      });
+      if (!result.isSuccess || !result.data) {
+        showErrorToast(result.error || t('admin.backupAutoSaveError'));
+        return;
+      }
+      setSettings(result.data);
+      showSuccessToast(t('admin.backupAutoSaved'));
+    } catch {
+      showErrorToast(t('admin.backupAutoSaveError'));
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const restoreBusy = restoreStage !== 'idle';
+  const canRestore =
+    !!restoreFile && restoreConfirm.trim() === RESTORE_CONFIRM_WORD && !restoreBusy;
+
+  const handleRestore = async () => {
+    if (!restoreFile || !canRestore) return;
+    setRestoreStage('uploading');
+    setRestorePercent(0);
+    try {
+      // The upload is streamed and cannot be retried on 401, so refresh the session first.
+      await apiRequest<BackupSettings>('Backup/settings');
+      const result = await uploadRestore(
+        restoreFile,
+        setRestorePercent,
+        () => setRestoreStage('processing'),
+      );
+      if (!result.isSuccess) {
+        showErrorToast(result.error || t('admin.backupRestoreError'));
+        return;
+      }
+      showSuccessToast(
+        t('admin.backupRestoreSuccess', {
+          file: result.data?.safetyBackupFileName ?? '',
+        }),
+      );
+      setRestoreFile(null);
+      setRestoreConfirm('');
+      loadBackups();
+      loadSettings();
+    } catch (error) {
+      showErrorToast(
+        error instanceof Error && error.message === 'UNAUTHORIZED'
+          ? t('admin.backupRestoreSuperAdminOnly')
+          : t('admin.backupRestoreError'),
+      );
+    } finally {
+      setRestoreStage('idle');
+    }
+  };
+
+  const lastDownloadDays = settings?.lastDownloadedUtc
+    ? Math.floor(
+        (Date.now() - new Date(settings.lastDownloadedUtc).getTime()) /
+          86_400_000,
+      )
+    : null;
+  const showDownloadReminder =
+    settings !== null &&
+    (lastDownloadDays === null || lastDownloadDays >= DOWNLOAD_REMINDER_DAYS);
+
   const handleDownload = async (fileName: string) => {
     setBusyFile(fileName);
     try {
@@ -206,6 +385,7 @@ export default function AdminBackupPanel() {
       anchor.remove();
       URL.revokeObjectURL(url);
       showSuccessToast(t('admin.backupDownloadSuccess'));
+      loadSettings();
     } catch {
       showErrorToast(t('admin.backupDownloadError'));
     } finally {
@@ -243,15 +423,38 @@ export default function AdminBackupPanel() {
           <h1 className="admin-page-title">{t('admin.backupTitle')}</h1>
           <p className="admin-page-subtitle">{t('admin.backupSubtitle')}</p>
         </div>
-        <button
-          type="button"
-          className="admin-btn admin-btn-primary w-full sm:w-auto justify-center"
-          onClick={handleCreate}
-          disabled={creating || isPending}
-        >
-          {creating ? t('admin.backupCreating') : t('admin.backupCreate')}
-        </button>
+        <div className="flex sm:flex-row flex-col gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            className="admin-btn admin-btn-primary justify-center w-full sm:w-auto"
+            onClick={handleCreateFull}
+            disabled={creatingFull || creating || restoreBusy || isPending}
+          >
+            {creatingFull
+              ? t('admin.backupFullCreating')
+              : t('admin.backupFullCreate')}
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-ghost justify-center w-full sm:w-auto"
+            onClick={handleCreate}
+            disabled={creating || creatingFull || restoreBusy || isPending}
+          >
+            {creating ? t('admin.backupCreating') : t('admin.backupCreate')}
+          </button>
+        </div>
       </header>
+
+      {showDownloadReminder && (
+        <div
+          role="alert"
+          className="admin-panel px-4 py-3 border-[var(--warning-color)] text-[var(--admin-text)] text-sm leading-relaxed"
+        >
+          {lastDownloadDays === null
+            ? t('admin.backupNeverDownloaded')
+            : t('admin.backupDownloadReminder', { days: lastDownloadDays })}
+        </div>
+      )}
 
       <section className="gap-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <div className="admin-stat-card">
@@ -317,6 +520,9 @@ export default function AdminBackupPanel() {
                     {t('admin.backupFileName')}
                   </th>
                   <th className="px-4 py-3 font-medium text-start">
+                    {t('admin.backupKind')}
+                  </th>
+                  <th className="px-4 py-3 font-medium text-start">
                     {t('admin.backupCreatedAt')}
                   </th>
                   <th className="px-4 py-3 font-medium text-start">
@@ -337,6 +543,19 @@ export default function AdminBackupPanel() {
                     >
                       <td className="px-4 py-3 text-[var(--admin-text)] font-medium">
                         {item.fileName}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`admin-badge ${
+                            item.kind === 'pre-restore'
+                              ? 'admin-badge-warning'
+                              : item.kind === 'database'
+                                ? ''
+                                : 'admin-badge-success'
+                          }`}
+                        >
+                          {t(KIND_LABEL_KEY[item.kind] ?? KIND_LABEL_KEY.database)}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-[var(--admin-text-muted)]">
                         {formatDate(item.createdAtUtc, locale)}
@@ -371,6 +590,170 @@ export default function AdminBackupPanel() {
             </table>
           </div>
         )}
+      </section>
+
+      <section className="admin-panel overflow-hidden">
+        <div className="admin-toolbar">
+          <div>
+            <h2 className="font-semibold text-[var(--admin-text)] text-base">
+              {t('admin.backupAutoTitle')}
+            </h2>
+            <p className="text-[var(--admin-text-muted)] text-sm">
+              {t('admin.backupAutoSubtitle')}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="admin-btn admin-btn-primary"
+            onClick={handleSaveSettings}
+            disabled={!settings || savingSettings}
+          >
+            {t('admin.backupAutoSave')}
+          </button>
+        </div>
+        {settings && (
+          <div className="gap-4 grid grid-cols-1 sm:grid-cols-3 px-4 py-4">
+            <label className="flex items-center gap-2 sm:col-span-3 text-[var(--admin-text)] text-sm">
+              <input
+                type="checkbox"
+                checked={settings.autoEnabled}
+                onChange={(event) =>
+                  setSettings({ ...settings, autoEnabled: event.target.checked })
+                }
+              />
+              {t('admin.backupAutoEnabled')}
+            </label>
+            <div className="admin-field">
+              <label className="admin-field-label" htmlFor="backup-hour">
+                {t('admin.backupAutoHour')}
+              </label>
+              <input
+                id="backup-hour"
+                type="number"
+                min={0}
+                max={23}
+                className={inputClass}
+                value={settings.hourUtc}
+                onChange={(event) =>
+                  setSettings({
+                    ...settings,
+                    hourUtc: Math.min(23, Math.max(0, Number(event.target.value) || 0)),
+                  })
+                }
+              />
+              <span className="text-[var(--admin-text-muted)] text-xs">
+                {t('admin.backupAutoHourHint')}
+              </span>
+            </div>
+            <div className="admin-field">
+              <label className="admin-field-label" htmlFor="backup-keep">
+                {t('admin.backupAutoKeep')}
+              </label>
+              <input
+                id="backup-keep"
+                type="number"
+                min={1}
+                max={60}
+                className={inputClass}
+                value={settings.keepCount}
+                onChange={(event) =>
+                  setSettings({
+                    ...settings,
+                    keepCount: Math.min(60, Math.max(1, Number(event.target.value) || 1)),
+                  })
+                }
+              />
+            </div>
+            <div className="admin-field">
+              <span className="admin-field-label">{t('admin.backupAutoLast')}</span>
+              <span className="text-[var(--admin-text-muted)] text-sm">
+                {settings.lastAutoBackupUtc
+                  ? formatDate(settings.lastAutoBackupUtc, locale)
+                  : t('admin.backupNever')}
+              </span>
+              <span className="text-[var(--admin-text-muted)] text-xs">
+                {t('admin.backupLastDownloaded')}:{' '}
+                {settings.lastDownloadedUtc
+                  ? formatDate(settings.lastDownloadedUtc, locale)
+                  : t('admin.backupNever')}
+              </span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="admin-panel overflow-hidden">
+        <div className="admin-toolbar">
+          <div>
+            <h2 className="font-semibold text-[var(--admin-text)] text-base">
+              {t('admin.backupRestoreTitle')}
+            </h2>
+            <p className="text-[var(--admin-text-muted)] text-sm">
+              {t('admin.backupRestoreSubtitle')}
+            </p>
+          </div>
+        </div>
+        <div className="space-y-4 px-4 py-4">
+          <p className="text-[var(--error-color)] text-sm leading-relaxed">
+            {t('admin.backupRestoreWarning')}
+          </p>
+          <div className="admin-field">
+            <label className="admin-field-label" htmlFor="backup-restore-file">
+              {t('admin.backupRestoreChoose')}
+            </label>
+            <input
+              id="backup-restore-file"
+              type="file"
+              accept=".zip,application/zip"
+              className={inputClass}
+              disabled={restoreBusy}
+              onChange={(event) =>
+                setRestoreFile(event.target.files?.[0] ?? null)
+              }
+            />
+          </div>
+          <div className="admin-field">
+            <label className="admin-field-label" htmlFor="backup-restore-confirm">
+              {t('admin.backupRestoreConfirmLabel')}
+            </label>
+            <input
+              id="backup-restore-confirm"
+              type="text"
+              dir="ltr"
+              autoComplete="off"
+              className={inputClass}
+              value={restoreConfirm}
+              disabled={restoreBusy}
+              onChange={(event) => setRestoreConfirm(event.target.value)}
+            />
+          </div>
+          {restoreStage === 'uploading' && (
+            <div className="space-y-1">
+              <div className="bg-[var(--admin-border)] rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[var(--admin-text)] h-full transition-all"
+                  style={{ width: `${restorePercent}%` }}
+                />
+              </div>
+              <p className="text-[var(--admin-text-muted)] text-xs">
+                {t('admin.backupRestoreUploading', { percent: restorePercent })}
+              </p>
+            </div>
+          )}
+          {restoreStage === 'processing' && (
+            <p className="text-[var(--admin-text-muted)] text-sm">
+              {t('admin.backupRestoreProcessing')}
+            </p>
+          )}
+          <button
+            type="button"
+            className="admin-btn admin-btn-primary"
+            onClick={handleRestore}
+            disabled={!canRestore}
+          >
+            {t('admin.backupRestoreButton')}
+          </button>
+        </div>
       </section>
 
       <section className="admin-panel overflow-hidden">
