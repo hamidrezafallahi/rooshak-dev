@@ -33,13 +33,6 @@ Desktop.ini
 logs/
 *.pid
 
-# ─── Docker ───────────────────────────────────────────────────────────────
-docker/nginx/conf.d/*.conf
-!docker/nginx/nginx.conf
-!docker/nginx/conf.d/default.conf
-docker/certbot/conf/
-docker/certbot/www/
-
 # ─── Backend ──────────────────────────────────────────────────────────────
 BackEnd/**/bin/
 BackEnd/**/obj/
