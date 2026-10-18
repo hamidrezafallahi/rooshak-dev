@@ -51,6 +51,11 @@ export interface DataTableProps<TData> {
   data: TData[];
   entity: string;
   pageSize: number;
+  /** Extra toolbar buttons (e.g. Excel import/export) that need the grid's selection/search. */
+  toolbarActions?: (state: {
+    selectedIds: (string | number)[];
+    search: string;
+  }) => React.ReactNode;
 }
 
 function isAccessorFunction<TData>(
@@ -78,6 +83,7 @@ export function DataTable<TData extends { id: number | string }>({
   data,
   entity,
   pageSize,
+  toolbarActions,
 }: DataTableProps<TData>) {
   const [selectedRows, setSelectedRows] = useState<(string | number)[]>([]);
   const [search, setSearch] = useState<string>('');
@@ -143,6 +149,7 @@ export function DataTable<TData extends { id: number | string }>({
             {t('general.new')}
           </Link>
         )}
+        {toolbarActions?.({ selectedIds: selectedRows, search })}
         {selectedRows.length > 0 && (
           <span className="text-[var(--admin-text-muted)] text-sm">
             {t('admin.selectedCount', { count: selectedRows.length })}

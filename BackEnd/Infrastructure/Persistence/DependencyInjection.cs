@@ -58,6 +58,8 @@ namespace OnlineShop.Infrastructure
             services.AddScoped<IProductOfferDiscountRepository, ProductOfferDiscountRepository>();
             services.AddScoped<IProductOfferRepository, ProductOfferRepository>();
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+            services.AddScoped<IBulkOperationSession, EfBulkOperationSession>();
+            services.AddSingleton<IExcelWorkbookService, OnlineShop.Infrastructure.Services.Excel.ClosedXmlWorkbookService>();
             services.AddScoped<IProductOfferTagRepository, ProductOfferTagRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
