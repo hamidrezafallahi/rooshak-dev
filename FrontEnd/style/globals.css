@@ -921,3 +921,160 @@ html {
   border-radius: 0.5rem;
   padding: 0.125rem 0.5rem;
 }
+
+/* ─── Admin dialog (Excel import) ─────────────────────────────────── */
+.admin-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  animation: admin-fade-in 0.15s ease-out;
+}
+
+.admin-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 44rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  background: var(--admin-surface-elevated);
+  color: var(--admin-text);
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  animation: admin-pop-in 0.18s ease-out;
+}
+
+.admin-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-dialog-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid var(--admin-border);
+  background: var(--admin-surface-elevated);
+}
+
+.admin-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 1.75rem 1rem;
+  border: 2px dashed var(--admin-border);
+  border-radius: 0.875rem;
+  color: var(--admin-text);
+  background: color-mix(in srgb, var(--primary-color) 3%, transparent);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.admin-dropzone:hover,
+.admin-dropzone-active {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
+.admin-alert {
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.admin-alert-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.admin-alert-warning {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+
+[data-theme="dark"] .admin-alert-success { color: #6ee7b7; }
+[data-theme="dark"] .admin-alert-warning { color: #fcd34d; }
+
+/* Spinner + progress */
+.admin-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 9999px;
+  animation: admin-spin 0.7s linear infinite;
+}
+
+.admin-spinner-lg {
+  width: 3rem;
+  height: 3rem;
+  border-width: 4px;
+  color: var(--primary-color);
+  border-color: color-mix(in srgb, var(--primary-color) 18%, transparent);
+  border-top-color: var(--primary-color);
+}
+
+.admin-progress {
+  position: relative;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+
+.admin-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary-color);
+  transition: width 0.2s ease-out;
+}
+
+.admin-progress-indeterminate {
+  position: absolute;
+  width: 40%;
+  animation: admin-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes admin-indeterminate {
+  0% { inset-inline-start: -40%; }
+  100% { inset-inline-start: 100%; }
+}
+
+@keyframes admin-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes admin-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-spinner,
+  .admin-progress-indeterminate,
+  .admin-dialog,
+  .admin-dialog-overlay {
+    animation-duration: 2s;
+  }
+}
