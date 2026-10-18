@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
@@ -29,6 +29,8 @@ type ExcelToolbarProps = {
   filters?: ExcelExportParams['filters'];
 };
 
+const CLOSE_ANIMATION_MS = 300;
+
 type Busy = 'export' | 'template' | 'import' | null;
 
 /**
@@ -41,6 +43,7 @@ export default function ExcelToolbar({ entity, selectedIds, search, filters }: E
   const [info, setInfo] = useState<ExcelEntityInfo | null>(null);
   const [busy, setBusy] = useState<Busy>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const closeImport = useCallback(() => setImportOpen(false), []);
 
   useEffect(() => {
     let alive = true;
@@ -120,7 +123,7 @@ export default function ExcelToolbar({ entity, selectedIds, search, filters }: E
         <ImportDialog
           entity={entity}
           info={info}
-          onClose={() => setImportOpen(false)}
+          onClose={closeImport}
           onCommitted={() => router.refresh()}
           onDownloadTemplate={() => run('template', () => downloadExcelTemplate(entity))}
         />
@@ -153,10 +156,32 @@ function ImportDialog({
   const [result, setResult] = useState<ExcelImportResult | null>(null);
   const submitting = progress !== null;
 
+  // Same open/close animation as the storefront mobile drawer: slide in on the next
+  // frame, slide out, then unmount after the transition.
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setIsOpen(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+  useEffect(() => {
+    if (!isClosing) return;
+    const timeout = window.setTimeout(onClose, CLOSE_ANIMATION_MS);
+    return () => window.clearTimeout(timeout);
+  }, [isClosing, onClose]);
+  const requestClose = () => {
+    if (submitting) return;
+    setIsOpen(false);
+    setIsClosing(true);
+  };
+
   // Close on Escape (not while a request is running) and lock page scroll.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !submitting) onClose();
+      if (e.key === 'Escape' && !submitting) {
+        setIsOpen(false);
+        setIsClosing(true);
+      }
     };
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -165,7 +190,7 @@ function ImportDialog({
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = overflow;
     };
-  }, [submitting, onClose]);
+  }, [submitting]);
 
   // Elapsed-seconds counter while the request is running.
   useEffect(() => {
@@ -207,7 +232,7 @@ function ImportDialog({
 
   // Portal: an ancestor (.admin-panel) uses backdrop-filter, which would trap position:fixed.
   return createPortal(
-    <div className="admin-dialog-overlay" onClick={() => !submitting && onClose()}>
+    <div className="admin-dialog-overlay" data-state={isOpen ? 'open' : 'closed'} onClick={requestClose}>
       <div
         className="admin-dialog"
         role="dialog"
@@ -216,6 +241,8 @@ function ImportDialog({
         dir="rtl"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Grab handle: shown only when the dialog is a bottom drawer (mobile). */}
+        <span className="admin-dialog-handle" aria-hidden />
         <header className="admin-dialog-header">
           <div>
             <h2 id="excel-import-title" className="font-semibold text-lg">
@@ -236,7 +263,7 @@ function ImportDialog({
           <button
             type="button"
             className="admin-icon-btn shrink-0"
-            onClick={onClose}
+            onClick={requestClose}
             disabled={submitting}
             aria-label={t('close')}
           >
@@ -362,7 +389,7 @@ function ImportDialog({
         </div>
 
         <footer className="admin-dialog-footer">
-          <button type="button" className="admin-btn admin-btn-ghost" onClick={onClose} disabled={submitting}>
+          <button type="button" className="admin-btn admin-btn-ghost" onClick={requestClose} disabled={submitting}>
             {t('close')}
           </button>
           <button type="button" className="admin-btn admin-btn-primary" onClick={submit} disabled={!file || submitting}>
