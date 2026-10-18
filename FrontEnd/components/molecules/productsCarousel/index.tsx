@@ -139,8 +139,7 @@ function ProductCard({ product }: { product: ILandingProduct }) {
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
-          sizes="(max-width: 639px) 62vw, (max-width: 1023px) 34vw, min(24vw, 376px)"
-          optimize
+          sizes="(max-width: 640px) 62vw, (max-width: 1024px) 34vw, 24vw"
           loading="lazy"
         />
         {hasDiscount && (

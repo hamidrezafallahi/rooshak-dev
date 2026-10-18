@@ -28,9 +28,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const catalog = findExhibitionCatalog(slug);
   const t = await getTranslations({ locale, namespace: 'exhibition' });
 
-  // Also here, not only in the page: metadata resolves before the response starts
-  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
-  if (!catalog) notFound();
+  if (!catalog) {
+    return buildPageMetadata({
+      locale,
+      path: `exhibition/${slug}`,
+      title: t('indexTitle'),
+      description: t('indexDescription'),
+      noIndex: true,
+    });
+  }
 
   const name = exhibitionCatalogName(catalog, locale);
 

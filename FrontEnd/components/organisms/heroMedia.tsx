@@ -15,7 +15,7 @@ export type HeroMediaSet = {
 
 type Props = {
   desktop: HeroMediaSet;
-  /** Phone version (< 768px). Only the image is used: phones never get a video. */
+  /** Phone version (< 768px). Missing parts fall back to the desktop ones (and vice versa for video). */
   mobile?: Partial<HeroMediaSet>;
   alt: string;
   playLabel: string;
@@ -29,12 +29,11 @@ type NetworkInformation = { saveData?: boolean; effectiveType?: string };
 const MOBILE_QUERY = '(max-width: 767px)';
 
 /**
- * Full-bleed hero media with separate desktop and mobile images. The image is a
- * <picture> (art-directed, so a phone never downloads the desktop image) and doubles
- * as the video poster. The video is desktop-only (phones show just the image, to save
- * their data and keep Speed Index low) and is only attached on the client when it is
- * safe: no reduced-motion preference, no data-saver and not on a 2G-class connection.
- * Users can always pause it (WCAG 2.2.2).
+ * Full-bleed hero media with separate desktop and mobile assets, each video with
+ * its own poster. The poster is a <picture> (art-directed, so a phone never downloads
+ * the desktop image); the video is only attached on the client, after choosing the
+ * right file for the viewport, and only when it is safe: no reduced-motion preference,
+ * no data-saver and not on a 2G-class connection. Users can always pause it (WCAG 2.2.2).
  */
 export default function HeroMedia({
   desktop,
@@ -51,8 +50,12 @@ export default function HeroMedia({
   const [playing, setPlaying] = useState(true);
 
   const mobileImage = mobile?.image || desktop.image;
+  // Each viewport falls back to the other one's video, so a single uploaded video is
+  // used everywhere (the poster still comes from that viewport's own image).
+  const mobileVideo = mobile?.video || desktop.video;
+  const desktopVideo = desktop.video || mobile?.video;
   const hasMobileArt = mobileImage !== desktop.image;
-  const anyVideo = Boolean(desktop.video);
+  const anyVideo = Boolean(desktopVideo || mobileVideo);
 
   useEffect(() => {
     const mq = window.matchMedia(MOBILE_QUERY);
@@ -70,7 +73,8 @@ export default function HeroMedia({
     setAllowVideo(!reduce && !slow);
   }, [anyVideo]);
 
-  const videoSrc = isMobile ? undefined : desktop.video;
+  const videoSrc = isMobile ? mobileVideo : desktopVideo;
+  const posterSrc = isMobile ? mobileImage : desktop.image;
 
   // A different file (viewport change) starts hidden again until it plays.
   useEffect(() => {
@@ -137,7 +141,7 @@ export default function HeroMedia({
           key={videoSrc}
           ref={videoRef}
           src={videoSrc}
-          poster={desktop.image}
+          poster={posterSrc}
           autoPlay
           muted
           loop

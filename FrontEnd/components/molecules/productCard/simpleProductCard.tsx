@@ -31,8 +31,7 @@ export async function SimpleProductCard({
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-700"
-          sizes="(max-width: 639px) 100vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
-          optimize
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
         {product.inventory != null && product.inventory <= 0 && (
           <span className="top-3 start-3 absolute bg-store-surface px-2.5 py-1 font-medium text-[0.7rem] text-store-text">

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import BrandTemplate from '@components/templates/brandTemplate';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson, throwIfUnavailable } from '@lib/safeFetch';
+import { safeFetchJson } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
@@ -25,7 +26,6 @@ async function fetchBrand(slug: string): Promise<IBrand | null> {
     { next: { revalidate: 300 } },
   );
 
-  throwIfUnavailable(result, `Brands/${slug}`);
   if (!result.ok || !result.data?.data) return null;
   if (result.data.isSuccess === false) return null;
   return result.data.data;
@@ -33,11 +33,18 @@ async function fetchBrand(slug: string): Promise<IBrand | null> {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
+  const tStore = await getTranslations({ locale, namespace: 'store' });
   const brand = await fetchBrand(slug);
 
-  // Also here, not only in the page: metadata resolves before the response starts
-  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
-  if (!brand) notFound();
+  if (!brand) {
+    return buildPageMetadata({
+      locale,
+      path: `brands/${slug}`,
+      title: tStore('notFound'),
+      description: tStore('notFoundHint'),
+      noIndex: true,
+    });
+  }
 
   const canonical = brand.slug || String(brand.id);
   const title =

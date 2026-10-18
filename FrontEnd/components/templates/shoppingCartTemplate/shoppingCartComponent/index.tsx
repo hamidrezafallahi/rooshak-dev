@@ -39,6 +39,7 @@ function ShoppingCartComponent({ ...props }: IProps) {
               <div className="flex-shrink-0 bg-store-muted rounded-lg w-24 h-24 overflow-hidden">
                 <MediaImage
                   src={item.mainImage}
+                  fallbackSrc="/images/default-product.jpg"
                   alt={item.name}
                   width={96}
                   height={96}
