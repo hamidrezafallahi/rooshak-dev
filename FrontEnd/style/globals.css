@@ -922,41 +922,63 @@ html {
   padding: 0.125rem 0.5rem;
 }
 
-/* ─── Admin dialog (Excel import) ─────────────────────────────────── */
+/* ─── Admin dialog (Excel import) ───────────────────────────────────
+   Mobile (< 640px): bottom drawer that slides up, like the storefront drawer.
+   Tablet / desktop (>= 640px): centred modal. Open/close is driven by
+   data-state="open|closed" on the overlay (300ms, matching the drawer). */
 .admin-dialog-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 1rem;
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(4px);
-  animation: admin-fade-in 0.15s ease-out;
+  transition: opacity 0.3s ease-out;
+}
+
+.admin-dialog-overlay[data-state="closed"] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .admin-dialog {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 44rem;
-  max-height: calc(100vh - 2rem);
+  max-height: 92dvh;
   overflow: auto;
+  overscroll-behavior: contain;
   background: var(--admin-surface-elevated);
   color: var(--admin-text);
   border: 1px solid var(--admin-border);
-  border-radius: 1rem;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
-  animation: admin-pop-in 0.18s ease-out;
+  border-bottom: 0;
+  border-radius: 1.25rem 1.25rem 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.admin-dialog-overlay[data-state="closed"] .admin-dialog {
+  transform: translateY(100%);
+}
+
+.admin-dialog-handle {
+  display: block;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 0.3125rem;
+  margin: 0.625rem auto 0;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--admin-text-muted) 40%, transparent);
 }
 
 .admin-dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.875rem;
   border-bottom: 1px solid var(--admin-border);
 }
 
@@ -964,11 +986,53 @@ html {
   position: sticky;
   bottom: 0;
   display: flex;
-  justify-content: flex-end;
   gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
   border-top: 1px solid var(--admin-border);
   background: var(--admin-surface-elevated);
+}
+
+.admin-dialog-footer .admin-btn {
+  flex: 1;
+  min-height: 2.75rem;
+}
+
+@media (min-width: 640px) {
+  .admin-dialog-overlay {
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  .admin-dialog {
+    max-width: 44rem;
+    max-height: calc(100dvh - 3rem);
+    border-bottom: 1px solid var(--admin-border);
+    border-radius: 1rem;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  }
+
+  .admin-dialog-overlay[data-state="closed"] .admin-dialog {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+
+  .admin-dialog-handle {
+    display: none;
+  }
+
+  .admin-dialog-header {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+
+  .admin-dialog-footer {
+    justify-content: flex-end;
+    padding: 0.875rem 1.25rem;
+  }
+
+  .admin-dialog-footer .admin-btn {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
 }
 
 .admin-dropzone {
@@ -978,10 +1042,11 @@ html {
   justify-content: center;
   gap: 0.625rem;
   width: 100%;
-  padding: 1.75rem 1rem;
+  padding: 1.5rem 1rem;
   border: 2px dashed var(--admin-border);
   border-radius: 0.875rem;
   color: var(--admin-text);
+  text-align: center;
   background: color-mix(in srgb, var(--primary-color) 3%, transparent);
   transition: border-color 0.15s, background 0.15s;
 }
@@ -1062,19 +1127,14 @@ html {
   100% { inset-inline-start: 100%; }
 }
 
-@keyframes admin-fade-in {
-  from { opacity: 0; }
-}
-
-@keyframes admin-pop-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .admin-dialog-overlay,
+  .admin-dialog {
+    transition: none;
+  }
+
   .admin-spinner,
-  .admin-progress-indeterminate,
-  .admin-dialog,
-  .admin-dialog-overlay {
+  .admin-progress-indeterminate {
     animation-duration: 2s;
   }
 }
