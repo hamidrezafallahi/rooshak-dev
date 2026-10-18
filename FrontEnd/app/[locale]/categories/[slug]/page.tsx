@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import FaqSection, { parseFaqJson } from '@components/molecules/storefront/FaqSection';
 import CategoryTemplate from '@components/templates/categoryTemplate';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { safeFetchJson, throwIfUnavailable } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
@@ -29,6 +28,7 @@ async function fetchCategory(slug: string): Promise<ICategory | null> {
     { next: { revalidate: 36 } },
   );
 
+  throwIfUnavailable(result, `Categories/${slug}`);
   if (!result.ok || !result.data?.data) return null;
   if (result.data.isSuccess === false) return null;
   return result.data.data;
@@ -36,18 +36,11 @@ async function fetchCategory(slug: string): Promise<ICategory | null> {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
   const category = await fetchCategory(slug);
 
-  if (!category) {
-    return buildPageMetadata({
-      locale,
-      path: `categories/${slug}`,
-      title: tStore('notFound'),
-      description: tStore('notFoundHint'),
-      noIndex: true,
-    });
-  }
+  // Also here, not only in the page: metadata resolves before the response starts
+  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
+  if (!category) notFound();
 
   const canonical = category.slug || String(category.id);
   const title =
@@ -70,18 +63,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
   const category = await fetchCategory(slug);
 
   if (!category) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('notFound')}</h1>
-          <p className="store-empty-desc">{tStore('notFoundHint')}</p>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   if (category.slug && category.slug !== slug && /^\d+$/.test(slug)) {

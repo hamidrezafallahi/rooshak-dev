@@ -57,3 +57,17 @@ export async function safeFetchJson<T>(
 
   return { ok: false, status: 0, data: null };
 }
+
+/**
+ * For detail pages. Call before treating a failed result as "missing": throws when
+ * the API is unavailable (5xx, rate limit, network), so the request ends as a 5xx
+ * error page and ISR keeps the last good copy. Only a real "not found" answer
+ * (HTTP 400/404 or an `isSuccess: false` envelope) should lead to notFound().
+ */
+export function throwIfUnavailable(
+  result: { ok: boolean; status: number },
+  label: string,
+): void {
+  if (result.ok || result.status === 400 || result.status === 404) return;
+  throw new Error(`${label}: API unavailable (status ${result.status || 'network'})`);
+}

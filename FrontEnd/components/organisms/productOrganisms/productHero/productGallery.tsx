@@ -9,7 +9,7 @@ import {
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
-import MediaImage from '@components/atoms/MediaImage';
+import MediaImage, { MEDIA_PLACEHOLDER } from '@components/atoms/MediaImage';
 import QrDialog from '@components/molecules/qrDialog';
 import { IDetailedProduct } from '@models/product';
 import { toMediaUrl } from '@utils/toMediaUrl';
@@ -50,7 +50,7 @@ export default function ProductGallery({ product }: { product: IDetailedProduct 
     setArRequest((n) => n + 1);
   };
 
-  const defaultImage = '/images/default-product.jpg';
+  const defaultImage = MEDIA_PLACEHOLDER;
   const thumbs = product.imageUrls ?? [];
 
   return (

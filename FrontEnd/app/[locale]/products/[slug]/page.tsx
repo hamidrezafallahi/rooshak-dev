@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
-import { permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import ProductBrand from '@components/organisms/productOrganisms/productBrand';
 import ProductCategory from '@components/organisms/productOrganisms/productCategory';
@@ -14,7 +12,7 @@ import RelatedSeoLinks from '@components/molecules/storefront/RelatedSeoLinks';
 import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import { serverApiBaseUrl, siteBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { safeFetchJson, throwIfUnavailable } from '@lib/safeFetch';
 import { absoluteUrl, buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
@@ -34,28 +32,24 @@ function toAbsoluteImage(url?: string | null) {
   return mediaPath ? `${siteBaseUrl}${mediaPath}` : undefined;
 }
 
-async function fetchProduct(
-  slug: string,
-): Promise<{ status: number; product: IDetailedProduct | null }> {
+/** null = the product does not exist; throws when the API is unavailable. */
+async function fetchProduct(slug: string): Promise<IDetailedProduct | null> {
   const result = await safeFetchJson<
     SimpleResponse<IDetailedProduct> | IDetailedProduct
   >(`${serverApiBaseUrl}/Products/${slug}`, {
     next: { revalidate: 36 },
   });
 
-  if (!result.ok) {
-    return { status: result.status || 500, product: null };
-  }
+  throwIfUnavailable(result, `Products/${slug}`);
+  if (!result.ok) return null;
 
   const envelope = result.data as SimpleResponse<IDetailedProduct>;
   if (envelope && typeof envelope === 'object' && 'data' in envelope) {
-    if (envelope.isSuccess === false) {
-      return { status: 404, product: null };
-    }
-    return { status: 200, product: envelope.data || null };
+    if (envelope.isSuccess === false) return null;
+    return envelope.data || null;
   }
 
-  return { status: 200, product: (result.data as IDetailedProduct) || null };
+  return (result.data as IDetailedProduct) || null;
 }
 
 export async function generateMetadata({
@@ -64,28 +58,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale?: string }>;
 }): Promise<Metadata> {
   const { slug, locale = 'fa' } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
-  const { status, product } = await fetchProduct(slug);
+  const product = await fetchProduct(slug);
 
-  if (!product || status === 404) {
-    return buildPageMetadata({
-      locale,
-      path: `products/${slug}`,
-      title: tStore('notFound'),
-      description: tStore('notFoundHint'),
-      noIndex: true,
-    });
-  }
-
-  if (status >= 400) {
-    return buildPageMetadata({
-      locale,
-      path: `products/${slug}`,
-      title: 'Product',
-      description: '',
-      noIndex: true,
-    });
-  }
+  // Also here, not only in the page: metadata resolves before the response starts
+  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
+  if (!product) notFound();
 
   const canonicalSlug = product.slug || slug;
   const seoTitle =
@@ -113,32 +90,10 @@ export default async function ProductPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
-  const { status, product } = await fetchProduct(slug);
-
-  if (!product && status === 404) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('notFound')}</h1>
-          <p className="store-empty-desc">{tStore('notFoundHint')}</p>
-          <Link href={`/${locale}/products`} className="store-btn store-btn-primary mt-4">
-            {tStore('backHome')}
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const product = await fetchProduct(slug);
 
   if (!product) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('loadError')}</h1>
-          <p className="store-empty-desc">{tStore('loadErrorHint')}</p>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   // Legacy numeric URLs → permanent SEO slug (must not be inside a broad try/catch).

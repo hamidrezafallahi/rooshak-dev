@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 import {
   BlogContent,
@@ -10,11 +9,8 @@ import JsonLd from '@components/molecules/storefront/JsonLd';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import { getBlogBySlug } from '@lib/blog';
 import { extractFaqFromHtml } from '@lib/blogFaq';
-import { serverApiBaseUrl } from '@lib/api';
 import { absoluteUrl, buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
-import { SimpleResponse } from '@models/base';
-import { IBlog } from '@models/Blog';
 
 export const revalidate = 60;
 
@@ -28,68 +24,35 @@ export async function generateStaticParams() {
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
+  // Throws notFound() for a missing post. Called here, not only in the page: metadata
+  // resolves before the response starts streaming (htmlLimitedBots), so this is what
+  // turns the status into a real 404.
+  const blog = await getBlogBySlug({ params: { slug } });
 
-  try {
-    const res = await fetch(`${serverApiBaseUrl}/Blogs/${slug}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) {
-      return buildPageMetadata({
-        locale,
-        path: `blog/${slug}`,
-        title: tStore('notFound'),
-        description: tStore('notFoundHint'),
-        noIndex: true,
-      });
-    }
+  const title =
+    locale === 'fa'
+      ? blog.titleFa || blog.titleEn
+      : blog.titleEn || blog.titleFa;
+  const description = (
+    (locale === 'fa' ? blog.metaDescriptionFa : blog.metaDescriptionEn) ||
+    (locale === 'fa' ? blog.excerptFa : blog.excerptEn) ||
+    ''
+  ).slice(0, 160);
 
-    const response: SimpleResponse<IBlog> = await res.json();
-
-    if (!response.isSuccess || !response.data) {
-      return buildPageMetadata({
-        locale,
-        path: `blog/${slug}`,
-        title: tStore('notFound'),
-        description: tStore('notFoundHint'),
-        noIndex: true,
-      });
-    }
-
-    const blog = response.data;
-    const title =
-      locale === 'fa'
-        ? blog.titleFa || blog.titleEn
-        : blog.titleEn || blog.titleFa;
-    const description = (
-      (locale === 'fa' ? blog.metaDescriptionFa : blog.metaDescriptionEn) ||
-      (locale === 'fa' ? blog.excerptFa : blog.excerptEn) ||
-      ''
-    ).slice(0, 160);
-
-    return buildPageMetadata({
-      locale,
-      path: `blog/${slug}`,
-      title,
-      description,
-      images: [blog.thumbnailFile],
-      type: 'article',
-      keywords: (
-        locale === 'fa' ? blog.metaKeywordsFa : blog.metaKeywordsEn
-      )
-        ?.split(',')
-        .map((k) => k.trim())
-        .filter(Boolean),
-    });
-  } catch {
-    return buildPageMetadata({
-      locale,
-      path: `blog/${slug}`,
-      title: tStore('loadError'),
-      description: '',
-      noIndex: true,
-    });
-  }
+  return buildPageMetadata({
+    locale,
+    path: `blog/${slug}`,
+    title,
+    description,
+    images: [blog.thumbnailFile],
+    type: 'article',
+    keywords: (
+      locale === 'fa' ? blog.metaKeywordsFa : blog.metaKeywordsEn
+    )
+      ?.split(',')
+      .map((k) => k.trim())
+      .filter(Boolean),
+  });
 }
 
 export default async function Page({ params }: Props) {

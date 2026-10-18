@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 import PageHeader from '@components/molecules/storefront/PageHeader';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { safeFetchJson, throwIfUnavailable } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
@@ -36,6 +36,7 @@ async function fetchDiscount(slug: string): Promise<DiscountItem | null> {
     { next: { revalidate: 60 } },
   );
 
+  throwIfUnavailable(result, `discounts/${slug}`);
   if (!result.ok || !result.data) return null;
   const envelope = result.data as SimpleResponse<DiscountItem>;
   if (envelope && typeof envelope === 'object' && 'data' in envelope) {
@@ -50,12 +51,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'discountsPage' });
   const item = await fetchDiscount(slug);
 
+  // Also here, not only in the page: metadata resolves before the response starts
+  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
+  if (!item) notFound();
+
   return buildPageMetadata({
     locale,
     path: `discounts/${slug}`,
-    title: item?.title || item?.name || t('title'),
-    description: item?.description || t('description'),
-    images: [item?.image || item?.banner],
+    title: item.title || item.name || t('title'),
+    description: item.description || t('description'),
+    images: [item.image || item.banner],
   });
 }
 

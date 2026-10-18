@@ -196,6 +196,7 @@ function CompactOfferCard({
           fill
           className="object-cover"
           sizes="240px"
+          optimize
           loading="lazy"
         />
         {offer.product.discountId > 0 && (

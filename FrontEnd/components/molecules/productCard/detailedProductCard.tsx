@@ -64,7 +64,6 @@ export function DetailedProductCard({
       >
         <MediaImage
           src={imageSrc}
-          fallbackSrc="/images/default-product.jpg"
           alt={product.name}
           fill
           className={`object-contain transition-transform duration-500 ${
@@ -72,6 +71,7 @@ export function DetailedProductCard({
           }`}
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           quality={85}
+          optimize
         />
 
         {/* افکت hover */}

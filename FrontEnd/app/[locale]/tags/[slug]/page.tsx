@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import TagTemplate from '@components/templates/tagTemplate';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { safeFetchJson, throwIfUnavailable } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
@@ -25,6 +24,7 @@ async function fetchTag(slug: string): Promise<ITag | null> {
     { next: { revalidate: 36 } },
   );
 
+  throwIfUnavailable(result, `Tags/${slug}`);
   if (!result.ok || !result.data?.data) return null;
   if (result.data.isSuccess === false) return null;
   return result.data.data;
@@ -32,18 +32,11 @@ async function fetchTag(slug: string): Promise<ITag | null> {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
   const tag = await fetchTag(slug);
 
-  if (!tag) {
-    return buildPageMetadata({
-      locale,
-      path: `tags/${slug}`,
-      title: tStore('notFound'),
-      description: tStore('notFoundHint'),
-      noIndex: true,
-    });
-  }
+  // Also here, not only in the page: metadata resolves before the response starts
+  // streaming (htmlLimitedBots), so this is what turns the status into a real 404.
+  if (!tag) notFound();
 
   const canonical = tag.slug || String(tag.id);
   return buildPageMetadata({

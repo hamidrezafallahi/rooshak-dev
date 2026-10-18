@@ -7,6 +7,17 @@
       "runtimeArgs": ["--prefix", "FrontEnd", "run", "dev"],
       "port": 3100,
       "autoPort": true
+    },
+    {
+      "name": "frontend-liveapi",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "FrontEnd", "run", "dev", "--", "--port", "3111"],
+      "port": 3111,
+      "env": {
+        "INTERNAL_SERVER_SIDE_API_URL": "https://rooshakshop.ir",
+        "NEXT_PUBLIC_INTERNAL_API_URL": "https://rooshakshop.ir",
+        "INTERNAL_UPLOADS_ORIGIN": "https://rooshakshop.ir"
+      }
     }
   ]
 }
