@@ -93,6 +93,7 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
       if (upstreamType) {
         responseHeaders.set('content-type', upstreamType);
       }
+      copyDownloadHeaders(upstream, responseHeaders);
 
       const res = new NextResponse(upstream.body, {
         status: upstream.status,
@@ -116,11 +117,20 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
   if (upstreamType) {
     responseHeaders.set('content-type', upstreamType);
   }
+  copyDownloadHeaders(upstream, responseHeaders);
 
   return new NextResponse(upstream.body, {
     status: upstream.status,
     headers: responseHeaders,
   });
+}
+
+/** Keeps the file name of downloads (e.g. Excel exports) when proxying. */
+function copyDownloadHeaders(upstream: Response, target: Headers) {
+  const disposition = upstream.headers.get('content-disposition');
+  if (disposition) {
+    target.set('content-disposition', disposition);
+  }
 }
 
 async function refreshTokens(

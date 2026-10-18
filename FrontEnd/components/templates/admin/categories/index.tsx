@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import Tree, { ITreeContext } from '@components/atoms/defaultElements/tree';
+import ExcelToolbar from '@components/organisms/excelToolbar';
 import FormGenerator from '@components/organisms/formGenerator';
 import { IFormConfig } from '@components/organisms/formGenerator/type';
 
@@ -42,13 +43,16 @@ export default function AdminCategoryTemplate({ ...props }: IProps) {
           </h1>
           <p className="admin-page-subtitle">{t('admin.listSubtitle')}</p>
         </div>
-        <button
-          type="button"
-          className="admin-btn admin-btn-primary w-full sm:w-auto"
-          onClick={() => setDefaultValues(undefined)}
-        >
-          {t('general.new')}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <ExcelToolbar entity={entityFormConfig.endPoint || 'categories'} />
+          <button
+            type="button"
+            className="admin-btn admin-btn-primary w-full sm:w-auto"
+            onClick={() => setDefaultValues(undefined)}
+          >
+            {t('general.new')}
+          </button>
+        </div>
       </header>
 
       <div className="gap-4 sm:gap-5 grid grid-cols-1 xl:grid-cols-2 items-start">

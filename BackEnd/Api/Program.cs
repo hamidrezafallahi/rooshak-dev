@@ -1,4 +1,5 @@
 ﻿using Api.Security;
+using Application.DataTransfer.Excel;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -53,6 +54,7 @@ public class Program
             });
         });
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddExcelDataTransfer();
         builder.Services.AddHealthChecks();
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {

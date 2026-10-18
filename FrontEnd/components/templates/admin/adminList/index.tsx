@@ -8,6 +8,7 @@ import {
   DataTable,
 } from '@components/atoms/defaultElements/table';
 import CustomPagination from '@components/molecules/pagination';
+import ExcelToolbar from '@components/organisms/excelToolbar';
 
 type AdminListProps = {
   list?: {
@@ -102,6 +103,9 @@ function AdminList({ list, entity }: AdminListProps) {
           data={optionalRecords as unknown as Array<Record<string, unknown> & { id: string | number }>}
           entity={entity}
           pageSize={recordsPerPage}
+          toolbarActions={({ selectedIds, search }) => (
+            <ExcelToolbar entity={entity} selectedIds={selectedIds} search={search} />
+          )}
         />
         <div className="admin-pagination-bar">
           <CustomPagination
