@@ -114,10 +114,19 @@ export function downloadExcelTemplate(entity: string) {
   return download(`${excelBase}/${encodeURIComponent(entity)}/template`, `${entity}-template.xlsx`);
 }
 
-export async function importExcel(
+export type ExcelImportProgress =
+  | { stage: 'uploading'; percent: number }
+  | { stage: 'processing' };
+
+/**
+ * Uploads the workbook with XHR (fetch cannot report upload progress) and reports
+ * "uploading n%" and then "processing" while the server validates and saves rows.
+ */
+export function importExcel(
   entity: string,
   file: File,
   options: ExcelImportOptions = {},
+  onProgress?: (progress: ExcelImportProgress) => void,
 ): Promise<ApiResult<ExcelImportResult>> {
   const query = new URLSearchParams({
     dryRun: String(options.dryRun ?? false),
@@ -126,19 +135,28 @@ export async function importExcel(
   const body = new FormData();
   body.append('file', file);
 
-  try {
-    const res = await fetch(`${excelBase}/${encodeURIComponent(entity)}/import?${query}`, {
-      method: 'POST',
-      body,
-      credentials: 'include',
-      cache: 'no-store',
-    });
-    try {
-      return (await res.json()) as ApiResult<ExcelImportResult>;
-    } catch {
-      return { isSuccess: false, error: `HTTP ${res.status}` };
-    }
-  } catch (error) {
-    return { isSuccess: false, error: error instanceof Error ? error.message : 'Upload failed' };
-  }
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${excelBase}/${encodeURIComponent(entity)}/import?${query}`);
+    xhr.withCredentials = true;
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable)
+        onProgress?.({ stage: 'uploading', percent: Math.round((event.loaded / event.total) * 100) });
+    };
+    xhr.upload.onload = () => onProgress?.({ stage: 'processing' });
+
+    xhr.onload = () => {
+      try {
+        resolve(JSON.parse(xhr.responseText) as ApiResult<ExcelImportResult>);
+      } catch {
+        resolve({ isSuccess: false, error: `HTTP ${xhr.status}` });
+      }
+    };
+    xhr.onerror = () => resolve({ isSuccess: false, error: 'Upload failed' });
+    xhr.ontimeout = () => resolve({ isSuccess: false, error: 'Timeout' });
+
+    onProgress?.({ stage: 'uploading', percent: 0 });
+    xhr.send(body);
+  });
 }
