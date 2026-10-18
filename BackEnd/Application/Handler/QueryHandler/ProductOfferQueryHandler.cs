@@ -300,9 +300,7 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
                 Id = g.Key,
                 Slug = g.First().Supplier.Slug,
                 FullName = g.First().Supplier.FullName,
-                Email = g.First().Supplier.Email,
                 Image = g.First().Supplier.Image,
-                PhoneNumber = g.First().Supplier.PhoneNumber,
                 UserDescription = g.First().Supplier.UserDescription
             });
 
@@ -348,9 +346,7 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
                 Id = g.Key,
                 Slug = g.First().Supplier.Slug,
                 FullName = g.First().Supplier.FullName,
-                Email = g.First().Supplier.Email,
                 Image = g.First().Supplier.Image,
-                PhoneNumber = g.First().Supplier.PhoneNumber,
                 UserDescription = g.First().Supplier.UserDescription
             });
 

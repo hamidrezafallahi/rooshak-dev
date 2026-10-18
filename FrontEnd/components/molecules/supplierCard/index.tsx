@@ -37,13 +37,9 @@ export default function SupplierCard({
           <h3 className="font-normal text-lg">
             {supplier.fullName}
           </h3>
-          <p className="text-store-subtle text-xs">
-            {supplier.email}
-          </p>
         </div>
 
         <div className="space-y-1 text-store-subtle text-xs">
-          <p>📞 {supplier.phoneNumber || '—'}</p>
           <p>
             {supplier.role
               ? t('roleLabel', { role: supplier.role })

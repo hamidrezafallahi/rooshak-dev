@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { permanentRedirect } from 'next/navigation';
 
-import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import FaqSection, { parseFaqJson } from '@components/molecules/storefront/FaqSection';
 import CategoryTemplate from '@components/templates/categoryTemplate';
@@ -90,11 +89,6 @@ export default async function Page({ params }: Props) {
 
   const title =
     locale === 'fa' ? category.persianName : category.englishName;
-  const seoTitle =
-    (locale === 'fa' ? category.seoTitleFa : category.seoTitleEn) || null;
-  const seoDescription =
-    (locale === 'fa' ? category.metaDescriptionFa : category.metaDescriptionEn) ||
-    null;
 
   const faqItems = parseFaqJson(category.faqJson);
   const fallbackFaq =
@@ -139,7 +133,6 @@ export default async function Page({ params }: Props) {
           { name: title },
         ]}
       />
-      <SeoHighlight locale={locale} title={seoTitle} description={seoDescription} />
       <CategoryTemplate category={category} />
       <FaqSection locale={locale} items={fallbackFaq} />
     </div>

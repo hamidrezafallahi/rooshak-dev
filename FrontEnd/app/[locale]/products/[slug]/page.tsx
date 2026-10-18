@@ -11,7 +11,6 @@ import { ProductSupplierExtended } from '@components/organisms/productOrganisms/
 import ProductTags from '@components/organisms/productOrganisms/productTags';
 import JsonLd from '@components/molecules/storefront/JsonLd';
 import RelatedSeoLinks from '@components/molecules/storefront/RelatedSeoLinks';
-import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import { serverApiBaseUrl, siteBaseUrl } from '@lib/api';
 import { safeFetchJson } from '@lib/safeFetch';
@@ -147,11 +146,6 @@ export default async function ProductPage({
   }
 
   const canonicalSlug = product?.slug || slug;
-  const seoTitle =
-    (locale === 'fa' ? product.seoTitleFa : product.seoTitleEn) || null;
-  const seoDescription =
-    (locale === 'fa' ? product.metaDescriptionFa : product.metaDescriptionEn) ||
-    null;
   const categoryKey = product.categorySlug || product.categoryId;
   const images = (product.imageUrls?.length
     ? product.imageUrls
@@ -180,11 +174,13 @@ export default async function ProductPage({
   };
 
   if (price != null && Number(price) >= 0) {
+    const currency = product.currency || 'IRR';
     productLd.offers = {
       '@type': 'Offer',
       url: productUrl,
-      priceCurrency: product.currency || 'IRR',
-      price: Number(price),
+      priceCurrency: currency,
+      // Stored "IRR" amounts are entered and shown as toman (see productPrice); schema needs rial.
+      price: currency === 'IRR' ? Number(price) * 10 : Number(price),
       availability,
       itemCondition: 'https://schema.org/NewCondition',
     };
@@ -222,7 +218,6 @@ export default async function ProductPage({
           { name: product.name || productsLabel },
         ]}
       />
-      <SeoHighlight locale={locale} title={seoTitle} description={seoDescription} />
       <ProductHero product={product} />
       <ProductBrand id={product.brandId} />
       <ProductCategory id={product.categoryId} />
