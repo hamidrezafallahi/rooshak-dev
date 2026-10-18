@@ -37,7 +37,6 @@ logs/
 docker/nginx/conf.d/*.conf
 !docker/nginx/nginx.conf
 !docker/nginx/conf.d/default.conf
-!docker/nginx/conf.d/production.conf
 docker/certbot/conf/
 docker/certbot/www/
 
@@ -85,4 +84,3 @@ secrets.txt
 credentials.json
 serviceAccountKey.json
 *.pem
-!nginx_configs/ssl-dhparams.pem
