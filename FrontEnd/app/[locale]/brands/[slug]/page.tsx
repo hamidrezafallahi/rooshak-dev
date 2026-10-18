@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 
-import SeoHighlight from '@components/molecules/storefront/SeoHighlight';
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import BrandTemplate from '@components/templates/brandTemplate';
 import { serverApiBaseUrl } from '@lib/api';
@@ -74,11 +73,6 @@ export default async function Page({ params }: Props) {
     permanentRedirect(`/${locale}/brands/${brand.slug}`);
   }
 
-  const seoTitle =
-    (locale === 'fa' ? brand.seoTitleFa : brand.seoTitleEn) || null;
-  const seoDescription =
-    (locale === 'fa' ? brand.metaDescriptionFa : brand.metaDescriptionEn) ||
-    null;
 
   return (
     <div className="store-page !pt-6">
@@ -90,7 +84,6 @@ export default async function Page({ params }: Props) {
           { name: brand.name || slug },
         ]}
       />
-      <SeoHighlight locale={locale} title={seoTitle} description={seoDescription} />
       <BrandTemplate brand={brand} />
     </div>
   );

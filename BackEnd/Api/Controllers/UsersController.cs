@@ -25,6 +25,13 @@ public class UsersController : BaseController
         if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
         if (!result.IsSuccess || result.Data is null) return NotFound(result);
 
+        // Public supplier pages read this endpoint anonymously; contact details are staff-only.
+        if (!(User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("ContentEditor")))
+        {
+            result.Data.Email = null!;
+            result.Data.PhoneNumber = null!;
+        }
+
         return Ok(result);
     }
 
@@ -37,7 +44,7 @@ public class UsersController : BaseController
     }
 
     [HttpGet]
-    //[Authorize(Policy = "AdminOnly")]
+    [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
     public async Task<ActionResult<List<UserDto>>> GetAll([FromQuery] GetUsersQuery query)
     {
         var result = await _mediator.Send(query);

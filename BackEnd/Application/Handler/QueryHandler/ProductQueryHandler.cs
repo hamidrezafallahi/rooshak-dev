@@ -554,8 +554,6 @@ public class ProductQueryHandler(IProductRepository _repo,
                  Id = g.Key,
                  UserImage = g.First().ProductOffers.First().Supplier.Image.TrimStart('/'),
                  FullName = g.First().ProductOffers.First().Supplier.FullName,
-                 PhoneNumber = g.First().ProductOffers.First().Supplier.PhoneNumber,
-                 Email = g.First().ProductOffers.First().Supplier.Email,
                  UserDescription = g.First().ProductOffers.First().Supplier.UserDescription,
 
              })

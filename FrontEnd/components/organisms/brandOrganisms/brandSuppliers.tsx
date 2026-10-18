@@ -44,8 +44,6 @@ export async function BrandSuppliers({ id }: { id: number }) {
             <h3 className="font-normal text-center">
               {s.fullName}
             </h3>
-            <span className="mt-1 text-store-subtle text-xs">{s.email}</span>
-            <span className="mt-1 text-store-subtle text-xs">{s.phoneNumber}</span>
           </Link>
         ))}
       </div>

@@ -39,12 +39,6 @@ export async function SimpleSupplierCard({
         {supplier.userDescription &&<div className="mb-4 text-store-subtle text-xs line-clamp-2 leading-5">
           {t("register.userDescription")}:{supplier.userDescription}
         </div>}
-       {supplier.email&& <div className="mb-4 text-store-subtle text-xs line-clamp-2 leading-5">
-         {t("register.email")} : {supplier.email}
-        </div>}
-        {supplier.phoneNumber && <div className="mb-4 text-store-subtle text-xs line-clamp-2 leading-5">
-          {t("register.phoneNumber")} : {supplier.phoneNumber}
-        </div>}
       </div>
     </Link>
   );
