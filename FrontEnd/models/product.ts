@@ -17,6 +17,8 @@ export interface IDetailedProduct {
     description: string;
     id: number;
     slug?: string | null;
+    /** Absent on older API builds; treat only an explicit false as inactive. */
+    isActive?: boolean;
     productOfferId?: number;
     bestOfferId?: number | null;
     mainImage: string;

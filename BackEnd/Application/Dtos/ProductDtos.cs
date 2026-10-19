@@ -34,6 +34,8 @@ namespace Application.Dtos
         public string Name { get; set; } = default!;
         public string Slug { get; set; } = default!;
         public string Description { get; set; } = default!;
+        /// <summary>False for deactivated products; the storefront answers 404 for them.</summary>
+        public bool IsActive { get; set; }
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public int? BrandId { get; set; }

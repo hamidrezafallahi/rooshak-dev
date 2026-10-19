@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
-import { permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import ProductBrand from '@components/organisms/productOrganisms/productBrand';
 import ProductCategory from '@components/organisms/productOrganisms/productCategory';
@@ -47,14 +46,19 @@ async function fetchProduct(
   }
 
   const envelope = result.data as SimpleResponse<IDetailedProduct>;
-  if (envelope && typeof envelope === 'object' && 'data' in envelope) {
-    if (envelope.isSuccess === false) {
-      return { status: 404, product: null };
-    }
-    return { status: 200, product: envelope.data || null };
+  const product =
+    envelope && typeof envelope === 'object' && 'data' in envelope
+      ? envelope.isSuccess === false
+        ? null
+        : envelope.data || null
+      : (result.data as IDetailedProduct) || null;
+
+  // Deactivated products stay readable by the admin API but are gone for the storefront.
+  if (!product || product.isActive === false) {
+    return { status: 404, product: null };
   }
 
-  return { status: 200, product: (result.data as IDetailedProduct) || null };
+  return { status: 200, product };
 }
 
 export async function generateMetadata({
@@ -115,18 +119,9 @@ export default async function ProductPage({
   const tStore = await getTranslations({ locale, namespace: 'store' });
   const { status, product } = await fetchProduct(slug);
 
-  if (!product && status === 404) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('notFound')}</h1>
-          <p className="store-empty-desc">{tStore('notFoundHint')}</p>
-          <Link href={`/${locale}/products`} className="store-btn store-btn-primary mt-4">
-            {tStore('backHome')}
-          </Link>
-        </div>
-      </div>
-    );
+  // A real 404 status, not a 200 "not found" page (soft 404).
+  if (status === 404) {
+    notFound();
   }
 
   if (!product) {

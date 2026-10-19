@@ -199,6 +199,13 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Permanent (308) so the default-locale entry point consolidates signals;
+      // config redirects run before the next-intl middleware's 307.
+      {
+        source: '/',
+        destination: '/fa',
+        permanent: true,
+      },
       {
         source: '/:locale/exhibition/sunshine-11',
         destination: '/:locale/exhibition/lab-tala',

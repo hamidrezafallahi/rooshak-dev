@@ -5,7 +5,6 @@ import { ReactNode } from 'react';
 import type { Metadata, Viewport } from 'next';
 
 import { siteBaseUrl } from '@lib/api';
-import { getActiveTheme, themeToCss } from '@lib/theme';
 import { SITE_NAME } from '@lib/seo';
 
 type Props = {
@@ -50,25 +49,10 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
 };
 
-export default async function RootLayout({ children }: Props) {
-  const themeCss = themeToCss(await getActiveTheme());
-
-  return (
-    <html lang="fa" suppressHydrationWarning>
-      <head>
-        {themeCss ? (
-          <style id="site-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
-        ) : null}
-      </head>
-      <body className="min-h-screen bg-store-surface text-store-text antialiased">
-        {children}
-      </body>
-    </html>
-  );
+// <html>/<body> live in app/[locale]/layout.tsx so lang/dir follow the URL locale.
+// The global 404 (app/not-found.tsx) renders its own document.
+export default function RootLayout({ children }: Props) {
+  return children;
 }
