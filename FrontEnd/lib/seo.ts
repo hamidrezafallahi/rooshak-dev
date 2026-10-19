@@ -10,6 +10,17 @@ export const DEFAULT_LOCALE = 'fa' as const;
 export const LOCALES = ['fa', 'en'] as const;
 export type AppLocale = (typeof LOCALES)[number];
 
+/**
+ * Locales offered to search engines. /en is only partly translated (H1, schema and
+ * body are still Persian), so it is noindex and left out of hreflang and the sitemap
+ * until the translation is complete. Add 'en' back here to re-enable it everywhere.
+ */
+export const INDEXED_LOCALES: readonly AppLocale[] = ['fa'];
+
+export function isIndexedLocale(locale: string): boolean {
+  return (INDEXED_LOCALES as readonly string[]).includes(locale);
+}
+
 export const SITE_NAME =
   process.env.NEXT_PUBLIC_SITE_NAME?.trim() || 'Rooshak';
 
@@ -32,11 +43,16 @@ export function absoluteUrl(locale: string, path = ''): string {
 }
 
 export function buildAlternates(locale: string, path = '') {
+  const canonical = absoluteUrl(locale, path);
+  // hreflang only makes sense between two or more indexable language versions.
+  if (INDEXED_LOCALES.length < 2) return { canonical };
+
   return {
-    canonical: absoluteUrl(locale, path),
+    canonical,
     languages: {
-      fa: absoluteUrl('fa', path),
-      en: absoluteUrl('en', path),
+      ...Object.fromEntries(
+        INDEXED_LOCALES.map((item) => [item, absoluteUrl(item, path)]),
+      ),
       'x-default': absoluteUrl(DEFAULT_LOCALE, path),
     },
   };
@@ -182,6 +198,7 @@ export async function buildPageMetadata({
     description?.trim() ||
     `${SITE_NAME} — online crystal store`;
   const resolvedCanonicalPath = seoOverride?.canonicalPath?.trim() || path;
+  const localeIndexed = isIndexedLocale(locale);
   const resolvedNoIndex = seoOverride?.robotsIndex === false ? true : resolvedNoIndexInput;
   const resolvedFollow = seoOverride?.robotsFollow ?? true;
   const resolvedKeywords = splitKeywords(seoOverride?.keywords ?? keywords);
@@ -202,7 +219,9 @@ export async function buildPageMetadata({
     alternates: buildAlternates(locale, resolvedCanonicalPath),
     robots: resolvedNoIndex
       ? { index: false, follow: false }
-      : { index: true, follow: resolvedFollow },
+      : localeIndexed
+        ? { index: true, follow: resolvedFollow }
+        : { index: false, follow: true },
     openGraph: {
       title: resolvedTitle,
       description: resolvedDescription,

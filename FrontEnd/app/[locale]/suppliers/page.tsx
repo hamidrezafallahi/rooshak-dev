@@ -26,6 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: 'suppliers',
     title: t('title'),
     description: t('description'),
+    // Supplier/user profiles are thin and include internal service accounts.
+    noIndex: true,
   });
 }
 

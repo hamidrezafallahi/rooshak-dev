@@ -1,5 +1,5 @@
 import { serverApiBaseUrl, siteBaseUrl } from '@lib/api';
-import { absoluteUrl, DEFAULT_LOCALE, LOCALES } from '@lib/seo';
+import { absoluteUrl, DEFAULT_LOCALE, INDEXED_LOCALES } from '@lib/seo';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
 // Must be rendered per request: the backend is unreachable during `next build`,
@@ -111,13 +111,20 @@ function buildUrlXml(
   path: string,
   priority: number,
   changeFrequency: ChangeFreq,
-  lastmod: string,
+  lastmod?: string,
   images: string[] = [],
 ) {
-  const links = LOCALES.map(
-    (locale) =>
-      `    <xhtml:link rel="alternate" hreflang="${locale}" href="${xmlEscape(absoluteUrl(locale, path))}" />`,
-  ).join('\n');
+  // hreflang only between two or more indexable locales (noindexed /en is excluded).
+  const links =
+    INDEXED_LOCALES.length > 1
+      ? [
+          ...INDEXED_LOCALES.map(
+            (locale) =>
+              `    <xhtml:link rel="alternate" hreflang="${locale}" href="${xmlEscape(absoluteUrl(locale, path))}" />`,
+          ),
+          `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(absoluteUrl(DEFAULT_LOCALE, path))}" />`,
+        ].join('\n')
+      : '';
 
   const imageXml = images
     .slice(0, 10)
@@ -128,13 +135,16 @@ function buildUrlXml(
     )
     .join('\n');
 
-  return LOCALES.map((locale) => {
+  return INDEXED_LOCALES.map((locale) => {
     const loc = absoluteUrl(locale, path);
+    const lines = [
+      `  <loc>${xmlEscape(loc)}</loc>`,
+      links,
+      // Omitted when unknown: a lastmod that is always "now" teaches Google to ignore it.
+      lastmod ? `  <lastmod>${xmlEscape(lastmod)}</lastmod>` : '',
+    ].filter(Boolean);
     return `<url>
-  <loc>${xmlEscape(loc)}</loc>
-${links}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(absoluteUrl(DEFAULT_LOCALE, path))}" />
-  <lastmod>${xmlEscape(lastmod)}</lastmod>
+${lines.join('\n')}
   <changefreq>${changeFrequency}</changefreq>
   <priority>${priority.toFixed(1)}</priority>
 ${imageXml}
@@ -143,15 +153,13 @@ ${imageXml}
 }
 
 export async function GET() {
-  const fallbackLastmod = new Date().toISOString();
-
-  const [products, blogs, brands, categories, suppliers, tags, discounts] =
+  // Supplier profiles are noindex (thin, include service accounts), so they are not listed.
+  const [products, blogs, brands, categories, tags, discounts] =
     await Promise.all([
       fetchRecords('products/getslugs'),
       fetchRecords('blogs/getslugs'),
       fetchRecordsWithFallback('brands/getslugs', 'brands/getids'),
       fetchRecordsWithFallback('categories/getslugs', 'categories/getids'),
-      fetchRecordsWithFallback('users/getslugs', 'productOffers/suppliersIds'),
       fetchRecordsWithFallback('tags/getslugs', 'tags/getids'),
       fetchRecordsWithFallback('discounts/getslugs', 'discounts/active'),
     ]);
@@ -162,7 +170,6 @@ export async function GET() {
     { path: 'blog', priority: 0.9, changeFrequency: 'weekly' },
     { path: 'brands', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'categories', priority: 0.8, changeFrequency: 'weekly' },
-    { path: 'suppliers', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'tags', priority: 0.7, changeFrequency: 'weekly' },
     { path: 'exhibition', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'discounts', priority: 0.8, changeFrequency: 'daily' },
@@ -172,14 +179,14 @@ export async function GET() {
 
   const chunks = [
     ...staticPaths.map((item) =>
-      buildUrlXml(item.path, item.priority, item.changeFrequency, fallbackLastmod),
+      buildUrlXml(item.path, item.priority, item.changeFrequency),
     ),
     ...products.map((item) =>
       buildUrlXml(
         `products/${item.key}`,
         0.7,
         'weekly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
         item.images,
       ),
     ),
@@ -188,7 +195,7 @@ export async function GET() {
         `blog/${item.key}`,
         0.6,
         'monthly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
         item.images,
       ),
     ),
@@ -197,7 +204,7 @@ export async function GET() {
         `brands/${item.key}`,
         0.6,
         'monthly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
         item.images,
       ),
     ),
@@ -206,16 +213,7 @@ export async function GET() {
         `categories/${item.key}`,
         0.6,
         'monthly',
-        item.lastmod || fallbackLastmod,
-        item.images,
-      ),
-    ),
-    ...suppliers.map((item) =>
-      buildUrlXml(
-        `suppliers/${item.key}`,
-        0.6,
-        'monthly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
         item.images,
       ),
     ),
@@ -224,19 +222,19 @@ export async function GET() {
         `tags/${item.key}`,
         0.5,
         'monthly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
       ),
     ),
     // Hard-coded exhibition photo sheets.
     ...['lab-tala', 'carameli', 'icy', 'smoky', 'saria', 'all'].map((slug) =>
-      buildUrlXml(`exhibition/${slug}`, 0.7, 'weekly', fallbackLastmod),
+      buildUrlXml(`exhibition/${slug}`, 0.7, 'weekly'),
     ),
     ...discounts.map((item) =>
       buildUrlXml(
         `discounts/${item.key}`,
         0.6,
         'weekly',
-        item.lastmod || fallbackLastmod,
+        item.lastmod,
       ),
     ),
   ];

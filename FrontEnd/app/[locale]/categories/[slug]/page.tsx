@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import StoreBreadcrumbs from '@components/molecules/storefront/StoreBreadcrumbs';
 import FaqSection, { parseFaqJson } from '@components/molecules/storefront/FaqSection';
@@ -22,21 +22,25 @@ export async function generateStaticParams() {
   return fetchStaticSlugParams('Categories/getslugs', 'Categories/getids');
 }
 
-async function fetchCategory(slug: string): Promise<ICategory | null> {
+async function fetchCategory(
+  slug: string,
+): Promise<{ status: number; category: ICategory | null }> {
   const result = await safeFetchJson<SimpleResponse<ICategory>>(
     `${serverApiBaseUrl}/Categories/${slug}`,
     { next: { revalidate: 36 } },
   );
 
-  if (!result.ok || !result.data?.data) return null;
-  if (result.data.isSuccess === false) return null;
-  return result.data.data;
+  if (!result.ok) return { status: result.status || 500, category: null };
+  if (result.data.isSuccess === false || !result.data.data) {
+    return { status: 404, category: null };
+  }
+  return { status: 200, category: result.data.data };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
-  const category = await fetchCategory(slug);
+  const { category } = await fetchCategory(slug);
 
   if (!category) {
     return buildPageMetadata({
@@ -70,14 +74,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { slug, locale } = await params;
   const tStore = await getTranslations({ locale, namespace: 'store' });
-  const category = await fetchCategory(slug);
+  const { status, category } = await fetchCategory(slug);
+
+  // A real 404 status, not a 200 "not found" page (soft 404).
+  if (status === 404) {
+    notFound();
+  }
 
   if (!category) {
     return (
       <div className="store-page">
         <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('notFound')}</h1>
-          <p className="store-empty-desc">{tStore('notFoundHint')}</p>
+          <h1 className="store-empty-title">{tStore('loadError')}</h1>
+          <p className="store-empty-desc">{tStore('loadErrorHint')}</p>
         </div>
       </div>
     );
