@@ -9,6 +9,7 @@ import {
   refreshCookieOptions,
   sessionFlagCookieOptions,
 } from './auth-cookies';
+import { clientIpHeaders } from './client-ip';
 
 /**
  * The only caller of /Identity/refresh-token. Used by middleware.ts (before a page
@@ -42,13 +43,15 @@ type CookieWriter = Pick<NextResponse['cookies'], 'set'>;
 // token is rotated once instead of once per request.
 const inFlight = new Map<string, Promise<TokenRefresh>>();
 
+/** `incoming` is the visitor's request, so the backend rate-limits the visitor (lib/client-ip.ts). */
 export function refreshTokens(
   accessToken: string | undefined,
   refreshToken: string,
+  incoming: Pick<Headers, 'get'>,
 ): Promise<TokenRefresh> {
   let pending = inFlight.get(refreshToken);
   if (!pending) {
-    pending = requestTokenRefresh(accessToken, refreshToken).finally(() =>
+    pending = requestTokenRefresh(accessToken, refreshToken, incoming).finally(() =>
       inFlight.delete(refreshToken),
     );
     inFlight.set(refreshToken, pending);
@@ -59,11 +62,12 @@ export function refreshTokens(
 async function requestTokenRefresh(
   accessToken: string | undefined,
   refreshToken: string,
+  incoming: Pick<Headers, 'get'>,
 ): Promise<TokenRefresh> {
   try {
     const response = await fetch(`${serverApiBaseUrl}/Identity/refresh-token`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...clientIpHeaders(incoming) },
       body: JSON.stringify({ accessToken, refreshToken }),
       cache: 'no-store',
     });
@@ -105,7 +109,7 @@ export async function refreshSessionIfNeeded(
   if (!refreshToken || !accessTokenExpiresSoon(accessToken)) {
     return { kind: 'none' };
   }
-  return refreshTokens(accessToken, refreshToken);
+  return refreshTokens(accessToken, refreshToken, req.headers);
 }
 
 export function writeSessionCookies(

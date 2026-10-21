@@ -1,6 +1,9 @@
 import 'server-only';
 
-import { cookies } from 'next/headers';
+import {
+  cookies,
+  headers as requestHeaders,
+} from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { requireAbsoluteUrl, serverApiBaseUrl } from './api';
@@ -9,6 +12,7 @@ import {
   LOGIN_PATH,
   REFRESH_COOKIE,
 } from './auth-cookies';
+import { clientIpHeaders } from './client-ip';
 import { logger } from './logger';
 import {
   clearSessionCookies,
@@ -34,6 +38,7 @@ export async function authenticatedFetch<T>({
   body,
 }: FetchOptions): Promise<T> {
   const cookieStore = await cookies();
+  const incoming = await requestHeaders();
 
   const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
   const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
@@ -46,7 +51,7 @@ export async function authenticatedFetch<T>({
   async function execute(token?: string) {
     return fetch(url, {
       method,
-      headers: getHeaders(body, token),
+      headers: { ...clientIpHeaders(incoming), ...getHeaders(body, token) },
       body: body instanceof FormData
         ? body
         : body
@@ -61,7 +66,7 @@ export async function authenticatedFetch<T>({
   // access token expired
   if (response.status === 401) {
     const refreshed = refreshToken
-      ? await refreshTokens(accessToken, refreshToken)
+      ? await refreshTokens(accessToken, refreshToken, incoming)
       : { kind: 'invalid' as const };
 
     if (refreshed.kind === 'invalid') {

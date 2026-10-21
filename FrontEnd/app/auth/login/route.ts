@@ -10,6 +10,7 @@ import {
   refreshCookieOptions,
   sessionFlagCookieOptions,
 } from '@lib/auth-cookies';
+import { clientIpHeaders } from '@lib/client-ip';
 import type { TokenPayload } from '@components/templates/register/type';
 
 export async function POST(req: Request) {
@@ -20,6 +21,7 @@ console.log("http://localhost:8080/api/Identity/login",`${serverApiBaseUrl}/Iden
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...clientIpHeaders(req.headers),
       },
       body: JSON.stringify(body),
     });

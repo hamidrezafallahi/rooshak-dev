@@ -63,9 +63,14 @@ public class Program
                 ForwardedHeaders.XForwardedProto |
                 ForwardedHeaders.XForwardedHost;
 
-            // چون Nginx داخل Docker است
-            options.KnownNetworks.Clear();
+            // Only nginx and the Next.js server (both inside Docker) may say who the
+            // client is. From anywhere else X-Forwarded-For is whatever the caller sent,
+            // and believing it would let one client spread itself over many rate-limit
+            // buckets or pass as an internal caller.
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
+            foreach (var network in InternalNetworks.All)
+                options.KnownIPNetworks.Add(network);
         });
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.GetName().Name.Contains("Application"))
@@ -74,14 +79,22 @@ public class Program
         {
             cfg.RegisterServicesFromAssemblies(assemblies);
         });
+        var internalPermitLimit = builder.Configuration.GetValue("RateLimiting:InternalPermitLimit", 1000);
         builder.Services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
-                var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                // After UseForwardedHeaders this is the visitor's IP, also for the calls
+                // the Next.js server makes for a visitor (BFF, login, token refresh).
+                var address = context.Connection.RemoteIpAddress;
+                // Still an internal address: a call from inside Docker with no visitor
+                // behind it (storefront ISR fetches, n8n, health checks). Its bucket is
+                // larger, as page renders for every crawler and visitor land in it.
+                var isInternal = address is not null && InternalNetworks.Contains(address);
+                var ip = address?.ToString() ?? "unknown";
                 return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 100,
+                    PermitLimit = isInternal ? internalPermitLimit : 100,
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 5
                 });

@@ -1,4 +1,7 @@
-import { cookies } from 'next/headers';
+import {
+  cookies,
+  headers,
+} from 'next/headers';
 import {
   NextRequest,
   NextResponse,
@@ -24,7 +27,7 @@ async function refreshFromCookies(): Promise<TokenRefresh> {
   if (!refreshToken) {
     return { kind: 'invalid' };
   }
-  return refreshTokens(cookieStore.get(ACCESS_COOKIE)?.value, refreshToken);
+  return refreshTokens(cookieStore.get(ACCESS_COOKIE)?.value, refreshToken, await headers());
 }
 
 /**

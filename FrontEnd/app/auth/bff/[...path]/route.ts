@@ -6,6 +6,7 @@ import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
 } from '@lib/auth-cookies';
+import { clientIpHeaders } from '@lib/client-ip';
 import {
   clearSessionCookies,
   refreshTokens,
@@ -29,7 +30,7 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
   let accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
   const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
 
-  const headers = new Headers();
+  const headers = new Headers(clientIpHeaders(req.headers));
   const contentType = req.headers.get('content-type');
   if (contentType) {
     headers.set('content-type', contentType);
@@ -79,7 +80,7 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
   });
 
   if (upstream.status === 401 && refreshToken) {
-    const refreshed = await refreshTokens(accessToken, refreshToken);
+    const refreshed = await refreshTokens(accessToken, refreshToken, req.headers);
     if (refreshed.kind === 'refreshed') {
       accessToken = refreshed.accessToken;
       headers.set('Authorization', `Bearer ${accessToken}`);

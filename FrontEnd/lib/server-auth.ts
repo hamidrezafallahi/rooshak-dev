@@ -12,12 +12,19 @@ import {
   LOGIN_PATH,
   REFRESH_COOKIE,
 } from './auth-cookies';
+import { clientIpHeaders } from './client-ip';
 import { CURRENT_PATH_HEADER } from './session-refresh';
 
-/** Authorization header from candyAccess, for backend calls made while rendering. */
+/**
+ * For backend calls made while rendering for the logged-in user: Authorization from
+ * candyAccess and the visitor's IP (lib/client-ip.ts).
+ */
 export async function authHeaders(): Promise<Record<string, string>> {
   const token = (await cookies()).get(ACCESS_COOKIE)?.value;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {
+    ...clientIpHeaders(await headers()),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 }
 
 /**
