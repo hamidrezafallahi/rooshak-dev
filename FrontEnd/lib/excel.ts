@@ -1,4 +1,9 @@
 import { browserApiBaseUrl } from '@lib/api';
+import {
+  fetchWithAuth,
+  forbiddenMessage,
+  withAuthRetry,
+} from '@lib/client-auth';
 
 /** Mirrors Application.DataTransfer.Excel.ExcelEntityInfoDto. */
 export type ExcelEntityInfo = {
@@ -45,7 +50,7 @@ let entitiesPromise: Promise<ExcelEntityInfo[]> | null = null;
 
 /** Entities that support Excel for the current admin (cached per page load). */
 export function getExcelEntities(): Promise<ExcelEntityInfo[]> {
-  entitiesPromise ??= fetch(excelBase, { credentials: 'include', cache: 'no-store' })
+  entitiesPromise ??= fetchWithAuth(excelBase, { cache: 'no-store' })
     .then(async (res) => {
       if (!res.ok) return [];
       const body = (await res.json()) as ApiResult<ExcelEntityInfo[]>;
@@ -77,7 +82,10 @@ function exportQuery(params: ExcelExportParams) {
 }
 
 async function download(url: string, fallbackName: string) {
-  const res = await fetch(url, { credentials: 'include', cache: 'no-store' });
+  const res = await fetchWithAuth(url, { cache: 'no-store' });
+  if (res.status === 403) {
+    throw new Error(forbiddenMessage());
+  }
   if (!res.ok) {
     let message: string | undefined;
     try {
@@ -134,10 +142,25 @@ export function importExcel(
   });
   const body = new FormData();
   body.append('file', file);
+  const url = `${excelBase}/${encodeURIComponent(entity)}/import?${query}`;
 
+  // On 401 the upload is sent again once the session is refreshed.
+  return withAuthRetry(
+    () => sendImport(url, body, onProgress),
+    (sent) => sent.status,
+  ).then((sent) =>
+    sent.status === 403 ? { isSuccess: false, error: forbiddenMessage() } : sent.result,
+  );
+}
+
+function sendImport(
+  url: string,
+  body: FormData,
+  onProgress?: (progress: ExcelImportProgress) => void,
+): Promise<{ status: number; result: ApiResult<ExcelImportResult> }> {
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${excelBase}/${encodeURIComponent(entity)}/import?${query}`);
+    xhr.open('POST', url);
     xhr.withCredentials = true;
 
     xhr.upload.onprogress = (event) => {
@@ -148,13 +171,13 @@ export function importExcel(
 
     xhr.onload = () => {
       try {
-        resolve(JSON.parse(xhr.responseText) as ApiResult<ExcelImportResult>);
+        resolve({ status: xhr.status, result: JSON.parse(xhr.responseText) as ApiResult<ExcelImportResult> });
       } catch {
-        resolve({ isSuccess: false, error: `HTTP ${xhr.status}` });
+        resolve({ status: xhr.status, result: { isSuccess: false, error: `HTTP ${xhr.status}` } });
       }
     };
-    xhr.onerror = () => resolve({ isSuccess: false, error: 'Upload failed' });
-    xhr.ontimeout = () => resolve({ isSuccess: false, error: 'Timeout' });
+    xhr.onerror = () => resolve({ status: 0, result: { isSuccess: false, error: 'Upload failed' } });
+    xhr.ontimeout = () => resolve({ status: 0, result: { isSuccess: false, error: 'Timeout' } });
 
     onProgress?.({ stage: 'uploading', percent: 0 });
     xhr.send(body);

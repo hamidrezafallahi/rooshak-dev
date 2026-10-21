@@ -6,6 +6,10 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { browserApiBaseUrl } from '@lib/api';
 import {
+  fetchWithAuth,
+  withAuthRetry,
+} from '@lib/client-auth';
+import {
   showErrorToast,
   showSuccessToast,
 } from '@utils/core';
@@ -43,16 +47,36 @@ const inputClass =
   'rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text)]';
 
 /** Upload with progress (fetch cannot report upload progress). */
-function uploadRestore(
+async function uploadRestore(
   file: File,
   onProgress: (percent: number) => void,
   onSent: () => void,
 ): Promise<ApiEnvelope<RestoreResult>> {
-  return new Promise((resolve, reject) => {
-    const form = new FormData();
-    form.append('file', file);
-    form.append('confirm', RESTORE_CONFIRM_WORD);
+  const form = new FormData();
+  form.append('file', file);
+  form.append('confirm', RESTORE_CONFIRM_WORD);
 
+  // The BFF streams this body and cannot replay it, so a 401 re-sends it from here.
+  const xhr = await withAuthRetry(
+    () => sendRestore(form, onProgress, onSent),
+    (sent) => sent.status,
+  );
+  if (xhr.status === 401 || xhr.status === 403) {
+    throw new Error('UNAUTHORIZED');
+  }
+  try {
+    return JSON.parse(xhr.responseText) as ApiEnvelope<RestoreResult>;
+  } catch {
+    throw new Error(`HTTP ${xhr.status}`);
+  }
+}
+
+function sendRestore(
+  form: FormData,
+  onProgress: (percent: number) => void,
+  onSent: () => void,
+): Promise<XMLHttpRequest> {
+  return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `${browserApiBaseUrl}/Backup/restore`);
     xhr.withCredentials = true;
@@ -63,17 +87,7 @@ function uploadRestore(
     };
     xhr.upload.onload = onSent;
     xhr.onerror = () => reject(new Error('NETWORK'));
-    xhr.onload = () => {
-      if (xhr.status === 401 || xhr.status === 403) {
-        reject(new Error('UNAUTHORIZED'));
-        return;
-      }
-      try {
-        resolve(JSON.parse(xhr.responseText) as ApiEnvelope<RestoreResult>);
-      } catch {
-        reject(new Error(`HTTP ${xhr.status}`));
-      }
-    };
+    xhr.onload = () => resolve(xhr);
     xhr.send(form);
   });
 }
@@ -128,9 +142,9 @@ async function apiRequest<T>(
   path: string,
   init?: RequestInit,
 ): Promise<ApiEnvelope<T>> {
-  const response = await fetch(`${browserApiBaseUrl}/${path}`, {
+  // 401 → refresh + retry (or login page); what is left here is a real 401/403.
+  const response = await fetchWithAuth(`${browserApiBaseUrl}/${path}`, {
     ...init,
-    credentials: 'include',
     headers: {
       ...(init?.headers ?? {}),
       ...(!(init?.body instanceof FormData)
@@ -319,7 +333,7 @@ export default function AdminBackupPanel() {
     setRestoreStage('uploading');
     setRestorePercent(0);
     try {
-      // The upload is streamed and cannot be retried on 401, so refresh the session first.
+      // Refresh the session first so a large upload is not sent twice after a 401.
       await apiRequest<BackupSettings>('Backup/settings');
       const result = await uploadRestore(
         restoreFile,
@@ -363,11 +377,8 @@ export default function AdminBackupPanel() {
   const handleDownload = async (fileName: string) => {
     setBusyFile(fileName);
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${browserApiBaseUrl}/Backup/${encodeURIComponent(fileName)}/download`,
-        {
-          credentials: 'include',
-        },
       );
 
       if (!response.ok) {

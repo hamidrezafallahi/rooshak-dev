@@ -5,11 +5,12 @@ import { serverApiBaseUrl } from '@lib/api';
 import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
-  SESSION_FLAG_COOKIE,
-  accessCookieOptions,
-  refreshCookieOptions,
-  sessionFlagCookieOptions,
 } from '@lib/auth-cookies';
+import {
+  clearSessionCookies,
+  refreshTokens,
+  writeSessionCookies,
+} from '@lib/session-refresh';
 
 export const dynamic = 'force-dynamic';
 /** Allow large banner/product image uploads through the BFF. */
@@ -45,7 +46,8 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
 
   // Backup restore uploads can be hundreds of MB: stream the body straight through
   // instead of buffering it in memory. A streamed body cannot be replayed, so there
-  // is no refresh-and-retry here (the admin page refreshes the session first).
+  // is no refresh-and-retry here (the admin page refreshes the session first and
+  // re-sends the upload itself after a 401).
   if (method === 'POST' && path === 'Backup/restore') {
     const streamed = await fetch(targetUrl, {
       method,
@@ -78,7 +80,7 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
 
   if (upstream.status === 401 && refreshToken) {
     const refreshed = await refreshTokens(accessToken, refreshToken);
-    if (refreshed.ok) {
+    if (refreshed.kind === 'refreshed') {
       accessToken = refreshed.accessToken;
       headers.set('Authorization', `Bearer ${accessToken}`);
       upstream = await fetch(targetUrl, {
@@ -88,30 +90,23 @@ async function proxyToBackend(req: NextRequest, pathParts: string[]) {
         cache: 'no-store',
       });
 
-      const responseHeaders = new Headers();
-      const upstreamType = upstream.headers.get('content-type');
-      if (upstreamType) {
-        responseHeaders.set('content-type', upstreamType);
-      }
-      copyDownloadHeaders(upstream, responseHeaders);
-
-      const res = new NextResponse(upstream.body, {
-        status: upstream.status,
-        headers: responseHeaders,
-      });
-      res.cookies.set(ACCESS_COOKIE, refreshed.accessToken, accessCookieOptions);
-      if (refreshed.refreshToken) {
-        res.cookies.set(
-          REFRESH_COOKIE,
-          refreshed.refreshToken,
-          refreshCookieOptions
-        );
-      }
-      res.cookies.set(SESSION_FLAG_COOKIE, '1', sessionFlagCookieOptions);
+      const res = toClientResponse(upstream);
+      writeSessionCookies(res.cookies, refreshed);
+      return res;
+    }
+    if (refreshed.kind === 'invalid') {
+      // Dead session: drop its cookies. The client then gets 401 from /auth/refresh
+      // too and goes to the login page.
+      const res = toClientResponse(upstream);
+      clearSessionCookies(res.cookies);
       return res;
     }
   }
 
+  return toClientResponse(upstream);
+}
+
+function toClientResponse(upstream: Response) {
   const responseHeaders = new Headers();
   const upstreamType = upstream.headers.get('content-type');
   if (upstreamType) {
@@ -130,31 +125,6 @@ function copyDownloadHeaders(upstream: Response, target: Headers) {
   const disposition = upstream.headers.get('content-disposition');
   if (disposition) {
     target.set('content-disposition', disposition);
-  }
-}
-
-async function refreshTokens(
-  accessToken: string | undefined,
-  refreshToken: string
-) {
-  try {
-    const response = await fetch(`${serverApiBaseUrl}/Identity/refresh-token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accessToken, refreshToken }),
-      cache: 'no-store',
-    });
-    const data = await response.json();
-    if (!response.ok || !data?.isSuccess || !data.data?.accessToken) {
-      return { ok: false as const };
-    }
-    return {
-      ok: true as const,
-      accessToken: data.data.accessToken as string,
-      refreshToken: (data.data.refreshToken as string | undefined) ?? null,
-    };
-  } catch {
-    return { ok: false as const };
   }
 }
 

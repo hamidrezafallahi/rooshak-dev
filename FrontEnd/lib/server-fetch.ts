@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -6,13 +6,15 @@ import { redirect } from 'next/navigation';
 import { requireAbsoluteUrl, serverApiBaseUrl } from './api';
 import {
   ACCESS_COOKIE,
+  LOGIN_PATH,
   REFRESH_COOKIE,
-  SESSION_FLAG_COOKIE,
-  accessCookieOptions,
-  refreshCookieOptions,
-  sessionFlagCookieOptions,
 } from './auth-cookies';
 import { logger } from './logger';
+import {
+  clearSessionCookies,
+  refreshTokens,
+  writeSessionCookies,
+} from './session-refresh';
 
 type FetchOptions = {
   endpoint: string;
@@ -20,6 +22,12 @@ type FetchOptions = {
   body?: FormData | Record<string, unknown> | null;
 };
 
+/**
+ * Backend call for Server Actions and Route Handlers, which may write cookies
+ * (Server Components may not: see lib/server-auth.ts). On 401 it gets new tokens,
+ * stores them and retries once; if the refresh token is rejected it clears the
+ * session and redirects to the login page. Throws on any other non-2xx answer.
+ */
 export async function authenticatedFetch<T>({
   endpoint,
   method = 'GET',
@@ -27,8 +35,8 @@ export async function authenticatedFetch<T>({
 }: FetchOptions): Promise<T> {
   const cookieStore = await cookies();
 
-  let accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
-  let refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
+  const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
+  const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
 
   const url = requireAbsoluteUrl(
     `${serverApiBaseUrl}/${endpoint.replace(/^\/+/, '')}`,
@@ -44,6 +52,7 @@ export async function authenticatedFetch<T>({
         : body
           ? JSON.stringify(body)
           : undefined,
+      cache: 'no-store',
     });
   }
 
@@ -51,30 +60,20 @@ export async function authenticatedFetch<T>({
 
   // access token expired
   if (response.status === 401) {
-    if (!refreshToken) {
-      clearTokens(cookieStore);
-      redirect('/fa/register');
+    const refreshed = refreshToken
+      ? await refreshTokens(accessToken, refreshToken)
+      : { kind: 'invalid' as const };
+
+    if (refreshed.kind === 'invalid') {
+      clearSessionCookies(cookieStore);
+      redirect(LOGIN_PATH);
     }
 
-    const refreshResult = await refreshTokens({
-      accessToken,
-      refreshToken,
-    });
-
-    if (!refreshResult.success) {
-      clearTokens(cookieStore);
-      redirect('/fa/register');
+    // On a temporary refresh failure the 401 below is thrown and the session kept.
+    if (refreshed.kind === 'refreshed') {
+      writeSessionCookies(cookieStore, refreshed);
+      response = await execute(refreshed.accessToken);
     }
-
-    accessToken = refreshResult.accessToken;
-    refreshToken = refreshResult.refreshToken;
-
-    cookieStore.set(ACCESS_COOKIE, accessToken!, accessCookieOptions);
-    cookieStore.set(REFRESH_COOKIE, refreshToken!, refreshCookieOptions);
-    cookieStore.set(SESSION_FLAG_COOKIE, '1', sessionFlagCookieOptions);
-
-    // retry
-    response = await execute(accessToken);
   }
 
   if (response.status === 403) {
@@ -117,57 +116,4 @@ function getHeaders(
   }
 
   return headers;
-}
-
-async function refreshTokens({
-  accessToken,
-  refreshToken,
-}: {
-  accessToken?: string;
-  refreshToken?: string;
-}) {
-  try {
-    const response = await fetch(
-      requireAbsoluteUrl(
-        `${serverApiBaseUrl}/Identity/refresh-token`,
-        'refreshTokens URL',
-      ),
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          accessToken,
-          refreshToken,
-          ip: 'string',
-          userAgent: 'string',
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      return { success: false };
-    }
-
-    const res = await response.json();
-
-    if (!res.isSuccess) {
-      return { success: false };
-    }
-
-    return {
-      success: true,
-      accessToken: res.data.accessToken,
-      refreshToken: res.data.refreshToken,
-    };
-  } catch {
-    return { success: false };
-  }
-}
-
-function clearTokens(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  cookieStore.delete(ACCESS_COOKIE);
-  cookieStore.delete(REFRESH_COOKIE);
-  cookieStore.delete(SESSION_FLAG_COOKIE);
 }

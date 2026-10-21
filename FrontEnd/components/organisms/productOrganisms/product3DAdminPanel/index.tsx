@@ -12,6 +12,10 @@ import dynamic from 'next/dynamic';
 
 import QrDialog from '@components/molecules/qrDialog';
 import { browserApiBaseUrl } from '@lib/api';
+import {
+  fetchWithAuth,
+  forbiddenMessage,
+} from '@lib/client-auth';
 import { IProductModel3DAdmin } from '@models/product';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
@@ -35,7 +39,11 @@ function formatSize(bytes?: number | null) {
 
 async function call<T>(url: string, init?: RequestInit): Promise<Envelope<T>> {
   try {
-    const res = await fetch(url, { credentials: 'include', cache: 'no-store', ...init });
+    // 401 → refresh + retry, or the login page when the session is over.
+    const res = await fetchWithAuth(url, { cache: 'no-store', ...init });
+    if (res.status === 403) {
+      return { isSuccess: false, data: null, error: forbiddenMessage() };
+    }
     return (await res.json()) as Envelope<T>;
   } catch (e) {
     return { isSuccess: false, data: null, error: e instanceof Error ? e.message : 'Network error' };

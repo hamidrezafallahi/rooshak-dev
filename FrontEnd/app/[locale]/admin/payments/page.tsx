@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import {
+  fetchWithAuth,
+  forbiddenMessage,
+} from '@lib/client-auth';
+
 type Payment = {
   id: number;
   orderId: number;
@@ -67,11 +72,13 @@ export default function AdminPaymentsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch('/auth/bff/admin/payments?page=1&pageSize=100', {
-          credentials: 'include',
+        const response = await fetchWithAuth('/auth/bff/admin/payments?page=1&pageSize=100', {
           cache: 'no-store',
           signal: controller.signal,
         });
+        // A framework 401/403 has an empty body, so check before parsing.
+        if (response.status === 403) throw new Error(forbiddenMessage());
+        if (response.status === 401) throw new Error('HTTP 401');
         const payload = (await response.json()) as PaymentsResponse;
         if (!response.ok || payload.isSuccess === false) {
           throw new Error(payload.error || `HTTP ${response.status}`);
