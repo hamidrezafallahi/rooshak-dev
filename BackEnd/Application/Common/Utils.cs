@@ -40,15 +40,10 @@ namespace Application.Common
     {
         public static string? GetClientIp(this HttpContext context)
         {
-            var ip = context.Connection.RemoteIpAddress?.ToString();
-
-            // اگر پشت پراکسی یا لود بالانسر باشی:
-            if (context.Request.Headers.ContainsKey("X-Forwarded-For"))
-            {
-                ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            }
-
-            return ip;
+            // UseForwardedHeaders (Api/Program.cs) already put the client's IP here when
+            // nginx or the Next.js server forwarded the request. Whatever is still left in
+            // X-Forwarded-For was written by the client itself, so it is not read.
+            return context.Connection.RemoteIpAddress?.ToString();
         }
 
         public static string? GetUserAgent(this HttpContext context)
