@@ -4,34 +4,33 @@ import {
   revalidatePath,
   revalidateTag,
 } from 'next/cache';
-import { cookies } from 'next/headers';
+import { unstable_rethrow } from 'next/navigation';
 
-import { serverApiBaseUrl } from './api';
+import { authenticatedFetch } from './server-fetch';
 
 export async function approveComment(field:string,formData: FormData) {
   const id = formData.get('id') as string;
   const isApprove = formData.get('isApproved') === 'true';
-    const cookieStore =await cookies();
-  const token = cookieStore.get('candyAccess')?.value;
-   const response = await fetch(`${serverApiBaseUrl}/${field}/approve`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json', 
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ 
-      Id: parseInt(id), 
-      IsApprove: !isApprove, 
-    }),
-  });
-  const data = await response.json();
-  if(data.isSuccess){
-    revalidatePath('/fa/admin/comments');
-    revalidatePath('/en/admin/comments');
-    revalidateTag('comments');
-    return true
-
-  }else{
-    return false
+  try {
+    // Refreshes the session on 401 and redirects to login if that fails.
+    const data = await authenticatedFetch<{ isSuccess?: boolean }>({
+      endpoint: `${field}/approve`,
+      method: 'PUT',
+      body: {
+        Id: parseInt(id),
+        IsApprove: !isApprove,
+      },
+    });
+    if (!data?.isSuccess) {
+      return false;
+    }
+  } catch (error) {
+    // Let the login redirect through; any other failure is just "not saved".
+    unstable_rethrow(error);
+    return false;
   }
+  revalidatePath('/fa/admin/comments');
+  revalidatePath('/en/admin/comments');
+  revalidateTag('comments');
+  return true
 }

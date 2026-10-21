@@ -1,7 +1,16 @@
 // middleware.ts
 import createMiddleware from 'next-intl/middleware';
+import type { NextRequest } from 'next/server';
 
-export default createMiddleware({
+import {
+  CURRENT_PATH_HEADER,
+  applySessionToRequest,
+  applySessionToResponse,
+  currentPath,
+  refreshSessionIfNeeded,
+} from '@lib/session-refresh';
+
+const intlMiddleware = createMiddleware({
   locales: ['fa', 'en'],
   defaultLocale: 'fa',
   // Always require /fa/... or /en/... — no unprefixed store routes
@@ -11,6 +20,19 @@ export default createMiddleware({
   localeDetection: false,
   localeCookie: false,
 });
+
+export default async function middleware(req: NextRequest) {
+  // Only does work when candyAccess is missing/expiring and candyRefresh exists,
+  // so normal page loads send no extra request and set no cookies.
+  const session = await refreshSessionIfNeeded(req);
+  // next-intl forwards req.headers (incl. the updated cookie) to the render.
+  applySessionToRequest(req, session);
+  // Lets a Server Component that still gets 401 come back here after /auth/refresh.
+  req.headers.set(CURRENT_PATH_HEADER, currentPath(req));
+  const res = intlMiddleware(req);
+  applySessionToResponse(res, session);
+  return res;
+}
 
 export const config = {
   // Exclude SEO files, static assets, and Next/API proxies from locale middleware.
