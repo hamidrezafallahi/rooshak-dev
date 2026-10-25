@@ -326,6 +326,188 @@
     "loginFirst": "Log in first"
   },
   "admin": {
+    "themeSettings": {
+      "eyebrow": "Storefront look",
+      "title": "Site theme",
+      "subtitle": "Build Rooshak's storefront palette, preview it before it goes out, and put it live in one click.",
+      "viewStore": "View store",
+      "newTheme": "New theme",
+      "liveNow": "Live on the site",
+      "liveShort": "Live",
+      "liveHint": "Shoppers see exactly these colours. Any change to this theme goes live once you save it.",
+      "edit": "Edit",
+      "editNamed": "Edit theme {name}",
+      "duplicate": "Duplicate",
+      "noActiveTitle": "No theme is active",
+      "noActiveHint": "The store is using the default “Maison Crystal” palette. Put one of the themes below live, or create a new one.",
+      "allThemes": "All themes",
+      "count": "{count, plural, one {# theme} other {# themes}}",
+      "themeId": "ID {id}",
+      "activate": "Put live",
+      "isLive": "Live now",
+      "working": "Please wait…",
+      "activated": "“{name}” is now live on the site.",
+      "deleted": "“{name}” was deleted.",
+      "actionFailed": "That didn't work. Please try again.",
+      "confirmDelete": "Delete this theme?",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "cannotDeleteActive": "The live theme can't be deleted; put another theme live first.",
+      "newTileTitle": "Create a theme",
+      "newTileHint": "Start from a ready-made palette and fine-tune it with the live preview.",
+      "loadError": "Couldn't load themes. Check the API connection.",
+      "retry": "Try again",
+      "createTitle": "New theme",
+      "editTitle": "Edit theme",
+      "studioSubtitle": "Change the colours; the store preview updates as you go.",
+      "unsaved": "Unsaved",
+      "back": "Back to themes",
+      "reset": "Reset",
+      "save": "Save",
+      "saving": "Saving…",
+      "saveShortcut": "Save (Ctrl+S)",
+      "saved": "Theme saved.",
+      "savedLive": "Theme saved and going live on the site.",
+      "saveFailed": "Couldn't save the theme.",
+      "copyName": "{name} (copy)",
+      "tabColors": "Colours",
+      "tabPreview": "Preview",
+      "nameLabel": "Theme name",
+      "namePlaceholder": "e.g. Crystal Autumn",
+      "nameHelp": "Only used to find it in the admin; shoppers never see it.",
+      "nameRequired": "A theme name is required.",
+      "presetsTitle": "Start from a palette",
+      "presetsHint": "Replaces every colour with the chosen palette; Reset brings yours back.",
+      "presets": {
+        "maison": "Maison Crystal",
+        "onyx": "Onyx (dark)",
+        "champagne": "Champagne & Sapphire",
+        "emerald": "Emerald",
+        "amethyst": "Amethyst",
+        "frost": "Frost"
+      },
+      "groups": {
+        "brand": {
+          "title": "Brand colours",
+          "hint": "Buttons, badges and the gold details that make Rooshak recognisable."
+        },
+        "canvas": {
+          "title": "Surfaces & text",
+          "hint": "Page background, product photo frames, lines and type."
+        },
+        "status": {
+          "title": "Status messages",
+          "hint": "Success, error, warning and info notices; the error colour also marks discounts."
+        }
+      },
+      "fields": {
+        "primaryColor": {
+          "label": "Primary",
+          "help": "Buttons, key links and emphasis"
+        },
+        "secondaryColor": {
+          "label": "Secondary",
+          "help": "Soft backgrounds and dividers"
+        },
+        "highlightColor": {
+          "label": "Accent (gold)",
+          "help": "Badges and decorative details"
+        },
+        "neutralColor": {
+          "label": "Neutral",
+          "help": "Background of secondary sections"
+        },
+        "successColor": {
+          "label": "Success",
+          "help": "Success messages"
+        },
+        "errorColor": {
+          "label": "Error",
+          "help": "Errors and discounts"
+        },
+        "warningColor": {
+          "label": "Warning",
+          "help": "Warnings"
+        },
+        "infoColor": {
+          "label": "Info",
+          "help": "Informational messages"
+        },
+        "surfaceColor": {
+          "label": "Page background",
+          "help": "Main site background and cards"
+        },
+        "surfaceMutedColor": {
+          "label": "Soft background",
+          "help": "Product photo frames and grey sections"
+        },
+        "borderColor": {
+          "label": "Lines & borders",
+          "help": "Dividers and card borders"
+        },
+        "textColor": {
+          "label": "Text",
+          "help": "Body text and headings"
+        },
+        "textMutedColor": {
+          "label": "Muted text",
+          "help": "Descriptions and secondary text"
+        }
+      },
+      "changedFrom": "Changed; was {hex}",
+      "hexOf": "{label} hex code",
+      "revertColor": "Revert this colour",
+      "livePreview": "Live preview",
+      "deviceDesktop": "Desktop view",
+      "deviceMobile": "Mobile view",
+      "previewHint": "Hover a colour to outline where the store uses it.",
+      "contrastTitle": "Readability",
+      "contrastHint": "Contrast checked against WCAG AA",
+      "contrastScore": "{passed} of {total} pass",
+      "sample": "Aa",
+      "ratio": "{value}:1 · min {min}",
+      "pass": "Pass",
+      "fail": "Low",
+      "checks": {
+        "body": "Text on background",
+        "muted": "Muted text on background",
+        "button": "Primary button label",
+        "frame": "Text on product frame",
+        "sale": "Discounted price",
+        "accent": "Gold details"
+      },
+      "preview": {
+        "announcement": "Rooshak's autumn collection has arrived",
+        "nav1": "Crystal",
+        "nav2": "Vases",
+        "nav3": "Gifts",
+        "eyebrow": "New collection",
+        "heroTitle": "Crystal that lights up your table",
+        "heroText": "Fruit bowls, candy dishes and vases for hosting and gifting.",
+        "shopNow": "Shop the collection",
+        "explore": "View all",
+        "chip1": "All",
+        "chip2": "Fruit bowls",
+        "chip3": "Candy dishes",
+        "chip4": "Vases",
+        "product1": "Footed crystal fruit bowl",
+        "price1": "2,450,000 Toman",
+        "product2": "Cut crystal vase",
+        "price2": "1,840,000 Toman",
+        "oldPrice2": "2,300,000",
+        "product3": "Crystal goblet",
+        "price3": "980,000 Toman",
+        "badgeNew": "New",
+        "badgeSale": "−20%",
+        "alertSuccess": "Added to your cart",
+        "alertError": "This item is out of stock",
+        "alertWarning": "Only 2 left",
+        "alertInfo": "Ships tomorrow",
+        "footer": "© Rooshak",
+        "footerLink1": "FAQ",
+        "footerLink2": "Contact"
+      }
+    },
     "dashboard": "Dashboard",
     "dashboardTitle": "Admin panel",
     "dashboardSubtitle": "Manage store content, entities, and settings",
