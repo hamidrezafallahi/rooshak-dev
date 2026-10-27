@@ -40,6 +40,18 @@ function xmlEscape(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
+// The API serializes .NET DateTimes without a timezone (e.g.
+// "2026-09-16T05:59:17.241546"), which W3C Datetime / Google reject.
+// Backend timestamps are UTC, so treat zone-less values as UTC.
+function toW3cDate(value?: string | null): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  const hasZone = /(Z|[+-]\d{2}:?\d{2})$/i.test(trimmed);
+  const date = new Date(hasZone || !trimmed.includes('T') ? trimmed : `${trimmed}Z`);
+  if (Number.isNaN(date.getTime()) || date.getUTCFullYear() < 2000) return undefined;
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 function toAbsoluteImage(url?: string | null) {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
@@ -78,7 +90,7 @@ function extractRecords(payload: unknown): SitemapRecord[] {
         .filter(Boolean);
       return {
         key,
-        lastmod: record.updatedAt || undefined,
+        lastmod: toW3cDate(record.updatedAt),
         images,
       };
     })
