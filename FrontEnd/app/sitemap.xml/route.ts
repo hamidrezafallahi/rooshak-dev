@@ -27,6 +27,7 @@ type SitemapEntry = {
   path: string;
   priority: number;
   changeFrequency: ChangeFreq;
+  lastmod?: string;
 };
 
 const FETCH_TIMEOUT_MS = 2500;
@@ -50,6 +51,16 @@ function toW3cDate(value?: string | null): string | undefined {
   const date = new Date(hasZone || !trimmed.includes('T') ? trimmed : `${trimmed}Z`);
   if (Number.isNaN(date.getTime()) || date.getUTCFullYear() < 2000) return undefined;
   return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+// A listing page changes when one of its items does, so it takes the newest
+// item date. toW3cDate output is uniform UTC ISO, so string order is time order.
+function newestLastmod(records: SitemapRecord[]): string | undefined {
+  return records.reduce<string | undefined>(
+    (latest, item) =>
+      item.lastmod && (!latest || item.lastmod > latest) ? item.lastmod : latest,
+    undefined,
+  );
 }
 
 function toAbsoluteImage(url?: string | null) {
@@ -178,20 +189,20 @@ export async function GET() {
 
   const staticPaths: SitemapEntry[] = [
     { path: '', priority: 1.0, changeFrequency: 'weekly' },
-    { path: 'products', priority: 0.9, changeFrequency: 'daily' },
-    { path: 'blog', priority: 0.9, changeFrequency: 'weekly' },
-    { path: 'brands', priority: 0.8, changeFrequency: 'weekly' },
-    { path: 'categories', priority: 0.8, changeFrequency: 'weekly' },
-    { path: 'tags', priority: 0.7, changeFrequency: 'weekly' },
+    { path: 'products', priority: 0.9, changeFrequency: 'daily', lastmod: newestLastmod(products) },
+    { path: 'blog', priority: 0.9, changeFrequency: 'weekly', lastmod: newestLastmod(blogs) },
+    { path: 'brands', priority: 0.8, changeFrequency: 'weekly', lastmod: newestLastmod(brands) },
+    { path: 'categories', priority: 0.8, changeFrequency: 'weekly', lastmod: newestLastmod(categories) },
+    { path: 'tags', priority: 0.7, changeFrequency: 'weekly', lastmod: newestLastmod(tags) },
     { path: 'exhibition', priority: 0.8, changeFrequency: 'weekly' },
-    { path: 'discounts', priority: 0.8, changeFrequency: 'daily' },
+    { path: 'discounts', priority: 0.8, changeFrequency: 'daily', lastmod: newestLastmod(discounts) },
     { path: 'faq', priority: 0.6, changeFrequency: 'weekly' },
     { path: 'cooperation', priority: 0.5, changeFrequency: 'monthly' },
   ];
 
   const chunks = [
     ...staticPaths.map((item) =>
-      buildUrlXml(item.path, item.priority, item.changeFrequency),
+      buildUrlXml(item.path, item.priority, item.changeFrequency, item.lastmod),
     ),
     ...products.map((item) =>
       buildUrlXml(
