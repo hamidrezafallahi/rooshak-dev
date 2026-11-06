@@ -57,7 +57,7 @@ namespace Application.Handler.CommandHandler
                 if (!UploadPaths.IsStoredPath(logoUrl))
                     return ServiceResult<IdDto>.Failed("آپلود لوگو ناموفق بود");
 
-                brand.Update(userId.Value, null, logoUrl, null, false);
+                brand.Update(userId.Value, null, logoUrl, null, null);
             }
 
             await _repo.SaveChangesAsync(cancellationToken);
