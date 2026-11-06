@@ -13,7 +13,8 @@ using Services.Services.Uploader.DTO;
 public class SlideCommandHandler(
         ISlideRepository _slideRepository,
         IHttpContextAccessor _accessor,
-        IUploaderService _uploaderService) :
+        IUploaderService _uploaderService,
+        IUnitOfWork _unitOfWork) :
     IRequestHandler<CreateSlideCommand, ServiceResult<IdDto>>,
     IRequestHandler<UpdateSlideCommand, ServiceResult<IdDto>>,
     IRequestHandler<ActiveSlideCommand, ServiceResult<IdDto>>,
@@ -31,6 +32,10 @@ public class SlideCommandHandler(
 
         if (string.IsNullOrWhiteSpace(request.FirstUrl))
             return ServiceResult<IdDto>.Failed("آدرس صفحه مربوط به بنر الزامی است");
+
+        // The id names the upload folder, so the row is saved before the file; the
+        // transaction takes it back if the file cannot be stored.
+        await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -79,6 +84,7 @@ public class SlideCommandHandler(
 
             slide.SetMobileMedia(userId.Value, mobileBanner, mobileVideo);
             await _slideRepository.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return ServiceResult<IdDto>.Ok(new IdDto { Id = slide.Id });
         }
@@ -98,13 +104,11 @@ public class SlideCommandHandler(
         if (slide == null)
             return ServiceResult<IdDto>.Failed("اسلاید موردنظر پیدا نشد.");
 
+        var filesBefore = new[] { slide.BannerUrl, slide.VideoUrl, slide.MobileBannerUrl, slide.MobileVideoUrl };
+
         string? bannerUrl = null;
         if (request.BannerUrl is not null && request.BannerUrl.Length > 0)
         {
-            await _uploaderService.DeleteStoredFile(
-                slide.BannerUrl,
-                UploadPaths.LandingSlides(slide.Id));
-
             var uploadDto = new UploadDTO
             {
                 File = request.BannerUrl,
@@ -118,14 +122,9 @@ public class SlideCommandHandler(
 
         string? videoPath = null;
         if (request.RemoveVideo && !string.IsNullOrWhiteSpace(slide.VideoUrl))
-        {
-            await _uploaderService.DeleteStoredFile(slide.VideoUrl, UploadPaths.LandingSlides(slide.Id));
             slide.ClearVideo(userId.Value);
-        }
         if (request.VideoUrl is not null && request.VideoUrl.Length > 0)
         {
-            if (!string.IsNullOrWhiteSpace(slide.VideoUrl))
-                await _uploaderService.DeleteStoredFile(slide.VideoUrl, UploadPaths.LandingSlides(slide.Id));
             videoPath = await _uploaderService.UploadVideo(new UploadDTO
             {
                 File = request.VideoUrl,
@@ -138,15 +137,9 @@ public class SlideCommandHandler(
         // ---- نسخه‌ی موبایل ----
         var folder = UploadPaths.LandingSlides(slide.Id);
         if (request.RemoveMobileBanner && !string.IsNullOrWhiteSpace(slide.MobileBannerUrl))
-        {
-            await _uploaderService.DeleteStoredFile(slide.MobileBannerUrl, folder);
             slide.ClearMobileBanner(userId.Value);
-        }
         if (request.RemoveMobileVideo && !string.IsNullOrWhiteSpace(slide.MobileVideoUrl))
-        {
-            await _uploaderService.DeleteStoredFile(slide.MobileVideoUrl, folder);
             slide.ClearMobileVideo(userId.Value);
-        }
 
         string? newMobileBanner = null;
         if (request.MobileBannerUrl is { Length: > 0 })
@@ -154,8 +147,6 @@ public class SlideCommandHandler(
             newMobileBanner = await UploadImageIfAny(request.MobileBannerUrl, slide.Id);
             if (newMobileBanner is null)
                 return ServiceResult<IdDto>.Failed("آپلود پوستر موبایل ناموفق بود");
-            if (!string.IsNullOrWhiteSpace(slide.MobileBannerUrl))
-                await _uploaderService.DeleteStoredFile(slide.MobileBannerUrl, folder);
         }
 
         string? newMobileVideo = null;
@@ -164,8 +155,6 @@ public class SlideCommandHandler(
             newMobileVideo = await UploadVideoIfAny(request.MobileVideoUrl, slide.Id);
             if (newMobileVideo is null)
                 return ServiceResult<IdDto>.Failed("آپلود ویدیوی موبایل ناموفق بود (فقط mp4/webm تا ۳۰ مگابایت)");
-            if (!string.IsNullOrWhiteSpace(slide.MobileVideoUrl))
-                await _uploaderService.DeleteStoredFile(slide.MobileVideoUrl, folder);
         }
 
         slide.SetMobileMedia(userId.Value, newMobileBanner, newMobileVideo);
@@ -180,6 +169,11 @@ public class SlideCommandHandler(
          videoPath
         );
         await _slideRepository.SaveChangesAsync(cancellationToken);
+
+        // Only now: a failed upload or save must leave the slide with everything it had.
+        var filesKept = new[] { slide.BannerUrl, slide.VideoUrl, slide.MobileBannerUrl, slide.MobileVideoUrl };
+        foreach (var file in filesBefore.Except(filesKept).Where(f => !string.IsNullOrWhiteSpace(f)))
+            await _uploaderService.DeleteStoredFile(file, folder);
 
         return ServiceResult<IdDto>.Ok(new IdDto { Id = slide.Id });
     }

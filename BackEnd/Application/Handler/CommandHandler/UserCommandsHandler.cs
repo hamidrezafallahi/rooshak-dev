@@ -33,10 +33,7 @@ namespace Application.Handler.CommandHandler
                 return ServiceResult<IdDto>.Unauthorized("حساب کاربری موردنظر پیدا نشد؛ لطفاً دوباره وارد شوید.");
             if (request.UserImageFile != null)
             {
-                await _uploaderService.DeleteStoredFile(
-                    user.Image,
-                    UploadPaths.Users(user.Id));
-
+                var oldImage = user.Image;
                 user.UpdateProfile(request.FullName, request.PhoneNumber, request.UserDescription, user.Id);
                 var uploadDto = new UploadDTO
                 {
@@ -44,8 +41,14 @@ namespace Application.Handler.CommandHandler
                     Path = UploadPaths.Users(user.Id)
                 };
                 var imageUrl = await _uploaderService.UploadAsWebp(uploadDto);
-                if (UploadPaths.IsStoredPath(imageUrl))
-                    user.SetImage(imageUrl!, user.Id);
+                if (!UploadPaths.IsStoredPath(imageUrl))
+                    return ServiceResult<IdDto>.Failed("آپلود تصویر پروفایل ناموفق بود");
+
+                user.SetImage(imageUrl!, user.Id);
+                await _userRepo.SaveChangesAsync(cancellationToken);
+
+                // Only now: a failed upload or save must leave the current picture in place.
+                await _uploaderService.DeleteStoredFile(oldImage, UploadPaths.Users(user.Id));
             }
             await _userRepo.SaveChangesAsync(cancellationToken);
 

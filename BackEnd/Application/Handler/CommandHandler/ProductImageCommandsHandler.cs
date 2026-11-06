@@ -26,47 +26,48 @@ public class AddProductImageCommandHandler(
         if (product == null)
             return ServiceResult<IdDto>.Failed("محصول پیدا نشد");
 
-        var productImages = _repository.Query(pi => pi.ProductId == request.ProductId).ToList();
-        if (productImages.Count > 0)
+        if (request.Images == null || !request.Images.Any())
+            return ServiceResult<IdDto>.Ok(new IdDto { Id = product.Id });
+
+        // New files first: if one cannot be stored, the product keeps the images it has.
+        var uploaded = new List<(string Url, bool IsMain)>();
+        for (int i = 0; i < request.Images.Count; i++)
         {
-            foreach (var img in productImages)
+            var file = request.Images[i];
+            var isMain = request.IsMainImages?.ElementAtOrDefault(i) ?? false;
+
+            var uploadDto = new UploadDTO
             {
-                await _uploaderService.DeleteStoredFile(
-                    img.ImageUrl,
-                    UploadPaths.Products(product.Id));
-                img.Delete(userId.Value);
-            }
+                File = file,
+                Path = UploadPaths.Products(product.Id)
+            };
+
+            var imageUrl = await _uploaderService.UploadAsWebp(uploadDto);
+            if (!UploadPaths.IsStoredPath(imageUrl))
+                return ServiceResult<IdDto>.Failed($"آپلود تصویر «{file.FileName}» ناموفق بود");
+
+            uploaded.Add((imageUrl!, isMain));
         }
 
-        if (request.Images != null && request.Images.Any())
+        var replaced = _repository.Query(pi => pi.ProductId == request.ProductId).ToList();
+        foreach (var img in replaced)
+            img.Delete(userId.Value);
+
+        foreach (var (url, isMain) in uploaded)
         {
-            for (int i = 0; i < request.Images.Count; i++)
-            {
-                var file = request.Images[i];
-                var isMain = request.IsMainImages?.ElementAtOrDefault(i) ?? false;
-
-                var uploadDto = new UploadDTO
-                {
-                    File = file,
-                    Path = UploadPaths.Products(product.Id)
-                };
-
-                var imageUrl = await _uploaderService.UploadAsWebp(uploadDto);
-                if (!UploadPaths.IsStoredPath(imageUrl))
-                    continue;
-
-                var productImage = ProductImage.Create(
+            product.AddImage(
+                ProductImage.Create(
                     productId: product.Id,
-                    imageUrl: imageUrl!,
+                    imageUrl: url,
                     isMain: isMain,
-                    currentUserId: userId.Value
-                );
-
-                product.AddImage(productImage, userId.Value);
-            }
-
-            await _repository.SaveChangesAsync(cancellationToken);
+                    currentUserId: userId.Value),
+                userId.Value);
         }
+
+        await _repository.SaveChangesAsync(cancellationToken);
+
+        foreach (var img in replaced)
+            await _uploaderService.DeleteStoredFile(img.ImageUrl, UploadPaths.Products(product.Id));
 
         return ServiceResult<IdDto>.Ok(new IdDto { Id = product.Id });
     }

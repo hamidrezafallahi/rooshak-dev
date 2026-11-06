@@ -14,7 +14,8 @@ public class BlogCommandHandler(
             IBlogRepository _blogRepository,
             IBlogContentQualityService _qualityService,
             IHttpContextAccessor _accessor,
-            IUploaderService _uploaderService) :
+            IUploaderService _uploaderService,
+            IUnitOfWork _unitOfWork) :
         IRequestHandler<CreateBlogCommand, ServiceResult<IdDto>>,
         IRequestHandler<UpdateBlogCommand, ServiceResult<IdDto>>,
         IRequestHandler<DeleteBlogCommand, ServiceResult<IdDto>>,
@@ -86,6 +87,10 @@ public class BlogCommandHandler(
              currentUserId: userId.Value
              );
 
+        // The id names the upload folder, so the row is saved before the file; the
+        // transaction takes it back if the file cannot be stored.
+        await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
         if (request.IsDraft || isAiPipeline)
             blog.SetActive(false, userId.Value);
 
@@ -101,11 +106,14 @@ public class BlogCommandHandler(
             };
 
             var thumbnailUrl = await _uploaderService.UploadAsWebp(uploadDto);
-            if (UploadPaths.IsStoredPath(thumbnailUrl))
-                blog.UpdateFile(currentUserId: userId.Value, thumbnailFile: thumbnailUrl);
+            if (!UploadPaths.IsStoredPath(thumbnailUrl))
+                return ServiceResult<IdDto>.Failed("آپلود تصویر بلاگ ناموفق بود");
+
+            blog.UpdateFile(currentUserId: userId.Value, thumbnailFile: thumbnailUrl);
         }
 
         await _blogRepository.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return ServiceResult<IdDto>.Ok(new IdDto { Id = blog.Id });
     }
 
@@ -122,10 +130,6 @@ public class BlogCommandHandler(
         string? thumbnailUrl = null;
         if (request.ThumbnailFile is not null)
         {
-            await _uploaderService.DeleteStoredFile(
-                blog.ThumbnailFile,
-                UploadPaths.Blogs(blog.Id));
-
             var uploadDto = new UploadDTO
             {
                 File = request.ThumbnailFile,
@@ -137,6 +141,7 @@ public class BlogCommandHandler(
                 return ServiceResult<IdDto>.Failed("آپلود تصویر بلاگ ناموفق بود");
         }
 
+        var oldThumbnail = blog.ThumbnailFile;
         blog.Update(
             currentUserId: userId.Value,
             titleFa: string.IsNullOrWhiteSpace(request.TitleFa) ? null : request.TitleFa,
@@ -159,6 +164,11 @@ public class BlogCommandHandler(
             );
 
         await _blogRepository.SaveChangesAsync(cancellationToken);
+
+        // Only now: a failed upload or save must leave the current image in place.
+        if (thumbnailUrl is not null)
+            await _uploaderService.DeleteStoredFile(oldThumbnail, UploadPaths.Blogs(blog.Id));
+
         return ServiceResult<IdDto>.Ok(new IdDto { Id = blog.Id });
     }
 
