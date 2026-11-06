@@ -12,12 +12,17 @@ namespace Application.Tests;
 
 public class UpdateUserProfileCommandHandlerTests
 {
-    private const string OldImage = "uploads/users/0/old.webp";
+    private const string OldImage = "uploads/users/1/old.webp";
+
+    private const int SuperAdmin = 1;
+    private const int Admin = 2;
+    private const int ContentEditor = 5;
+    private const int Customer = 6;
 
     [Fact]
     public async Task Edit_without_image_saves_the_new_fields()
     {
-        var repo = new FakeUserRepository(ExistingUser());
+        var repo = new FakeUserRepository(UserWith(id: 1, Customer));
         var uploader = new FakeUploader();
 
         var result = await CreateHandler(repo, uploader).Handle(Edit(repo.User), CancellationToken.None);
@@ -33,7 +38,7 @@ public class UpdateUserProfileCommandHandlerTests
     [Fact]
     public async Task Edit_with_image_saves_the_new_fields_and_replaces_the_image()
     {
-        var repo = new FakeUserRepository(ExistingUser());
+        var repo = new FakeUserRepository(UserWith(id: 1, Customer));
         var uploader = new FakeUploader();
 
         var result = await CreateHandler(repo, uploader).Handle(Edit(repo.User, Image()), CancellationToken.None);
@@ -43,13 +48,13 @@ public class UpdateUserProfileCommandHandlerTests
             new SavedProfile("New Name", "09121111111", "New description", FakeUploader.StoredPath),
             repo.LastSaved);
         Assert.Equal([OldImage], uploader.Deleted);
-        Assert.Equal(["uploads/users/0"], uploader.Uploaded);
+        Assert.Equal(["uploads/users/1"], uploader.Uploaded);
     }
 
     [Fact]
     public async Task Edit_with_a_failed_upload_saves_nothing()
     {
-        var repo = new FakeUserRepository(ExistingUser());
+        var repo = new FakeUserRepository(UserWith(id: 1, Customer));
         var uploader = new FakeUploader { UploadFails = true };
 
         var result = await CreateHandler(repo, uploader).Handle(Edit(repo.User, Image()), CancellationToken.None);
@@ -62,7 +67,7 @@ public class UpdateUserProfileCommandHandlerTests
     [Fact]
     public async Task Edit_keeps_the_fields_it_does_not_send()
     {
-        var repo = new FakeUserRepository(ExistingUser());
+        var repo = new FakeUserRepository(UserWith(id: 1, Customer));
 
         var result = await CreateHandler(repo, new FakeUploader()).Handle(
             new UpdateUserProfileCommand { UserId = repo.User.Id, FullName = "" },
@@ -72,6 +77,71 @@ public class UpdateUserProfileCommandHandlerTests
         Assert.Equal(
             new SavedProfile("Old Name", "09120000000", "Old description", OldImage),
             repo.LastSaved);
+    }
+
+    [Theory]
+    [InlineData(SuperAdmin)]
+    [InlineData(Admin)]
+    [InlineData(ContentEditor)]
+    public async Task Staff_can_edit_their_own_profile(int role)
+    {
+        var repo = new FakeUserRepository(UserWith(id: 1, role));
+
+        var result = await CreateHandler(repo, new FakeUploader()).Handle(Edit(repo.User), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("New Name", repo.LastSaved?.FullName);
+    }
+
+    [Theory]
+    [InlineData(SuperAdmin, Admin)]
+    [InlineData(SuperAdmin, Customer)]
+    [InlineData(Admin, ContentEditor)]
+    [InlineData(Admin, Customer)]
+    [InlineData(ContentEditor, Customer)]
+    public async Task A_higher_role_can_edit_someone_else(int editorRole, int targetRole)
+    {
+        var repo = new FakeUserRepository(UserWith(id: 1, targetRole), UserWith(id: 2, editorRole));
+
+        var result = await CreateHandler(repo, new FakeUploader(), signedInAs: 2)
+            .Handle(Edit(repo.User), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("New Name", repo.LastSaved?.FullName);
+    }
+
+    [Theory]
+    [InlineData(ContentEditor, SuperAdmin)]
+    [InlineData(ContentEditor, Admin)]
+    [InlineData(Admin, SuperAdmin)]
+    [InlineData(SuperAdmin, SuperAdmin)]
+    [InlineData(Admin, Admin)]
+    [InlineData(ContentEditor, ContentEditor)]
+    public async Task A_lower_or_equal_role_cannot_edit_someone_else(int editorRole, int targetRole)
+    {
+        var repo = new FakeUserRepository(UserWith(id: 1, targetRole), UserWith(id: 2, editorRole));
+        var uploader = new FakeUploader();
+
+        var result = await CreateHandler(repo, uploader, signedInAs: 2)
+            .Handle(Edit(repo.User, Image()), CancellationToken.None);
+
+        Assert.True(result.IsForbidden);
+        Assert.Equal("Old Name", repo.User.FullName);
+        Assert.Null(repo.LastSaved);
+        Assert.Empty(uploader.Uploaded);
+        Assert.Empty(uploader.Deleted);
+    }
+
+    [Fact]
+    public async Task A_token_of_a_removed_account_cannot_edit_anyone()
+    {
+        var repo = new FakeUserRepository(UserWith(id: 1, Customer));
+
+        var result = await CreateHandler(repo, new FakeUploader(), signedInAs: 2)
+            .Handle(Edit(repo.User), CancellationToken.None);
+
+        Assert.True(result.IsForbidden);
+        Assert.Null(repo.LastSaved);
     }
 
     private static UpdateUserProfileCommand Edit(User user, IFormFile? image = null) => new()
@@ -86,19 +156,25 @@ public class UpdateUserProfileCommandHandlerTests
     private static FormFile Image() =>
         new(new MemoryStream([1, 2, 3]), 0, 3, "UserImageFile", "avatar.jpg");
 
-    private static User ExistingUser()
+    private static User UserWith(int id, int role)
     {
-        var user = User.Create("Old Name", "user@example.com", "09120000000", "Old description");
-        user.SetImage(OldImage, user.Id);
+        var user = User.Create("Old Name", $"user{id}@example.com", "09120000000", "Old description");
+        typeof(BaseEntity).GetProperty(nameof(BaseEntity.Id))!.SetValue(user, id);
+        user.SetRole(new Role { Id = role }, id);
+        user.SetImage(OldImage, id);
         return user;
     }
 
-    private static UserCommandsHandler CreateHandler(FakeUserRepository repo, FakeUploader uploader)
+    /// <summary>Signed in as the profile's owner unless <paramref name="signedInAs"/> says otherwise.</summary>
+    private static UserCommandsHandler CreateHandler(
+        FakeUserRepository repo,
+        FakeUploader uploader,
+        int? signedInAs = null)
     {
         var http = new DefaultHttpContext
         {
             User = new ClaimsPrincipal(new ClaimsIdentity(
-                [new Claim(ClaimTypes.NameIdentifier, "3")],
+                [new Claim(ClaimTypes.NameIdentifier, (signedInAs ?? repo.User.Id).ToString())],
                 "test"))
         };
 
@@ -116,14 +192,15 @@ public class UpdateUserProfileCommandHandlerTests
         string? UserDescription,
         string Image);
 
-    private sealed class FakeUserRepository(User user) : IUserRepository
+    private sealed class FakeUserRepository(params User[] users) : IUserRepository
     {
-        public User User { get; } = user;
+        /// <summary>The profile being edited.</summary>
+        public User User { get; } = users[0];
 
-        /// <summary>The profile as it stood at the last SaveChangesAsync call.</summary>
+        /// <summary>That profile as it stood at the last SaveChangesAsync call.</summary>
         public SavedProfile? LastSaved { get; private set; }
 
-        public Task<User?> GetByIdAsync(int id) => Task.FromResult<User?>(id == User.Id ? User : null);
+        public Task<User?> GetByIdAsync(int id) => Task.FromResult(users.FirstOrDefault(u => u.Id == id));
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -145,7 +222,7 @@ public class UpdateUserProfileCommandHandlerTests
 
     private sealed class FakeUploader : IUploaderService
     {
-        public const string StoredPath = "uploads/users/0/new.webp";
+        public const string StoredPath = "uploads/users/1/new.webp";
 
         public List<string?> Deleted { get; } = [];
         public List<string> Uploaded { get; } = [];
