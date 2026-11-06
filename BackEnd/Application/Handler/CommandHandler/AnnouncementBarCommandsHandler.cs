@@ -13,7 +13,8 @@ namespace Application.Handler.CommandHandler
     public class AnnouncementBarCommandHandler(
         IAnnouncementBarRepository _repo,
         IHttpContextAccessor _accessor,
-        IUploaderService _uploader) :
+        IUploaderService _uploader,
+        IUnitOfWork _unitOfWork) :
         IRequestHandler<CreateAnnouncementBarCommand, ServiceResult<IdDto>>,
         IRequestHandler<UpdateAnnouncementBarCommand, ServiceResult<IdDto>>,
         IRequestHandler<ActiveAnnouncementBarCommand, ServiceResult<IdDto>>,
@@ -38,6 +39,9 @@ namespace Application.Handler.CommandHandler
                 return ServiceResult<IdDto>.Failed(ex.Message);
             }
 
+            // The id names the upload folder, so the row is saved before the file; the
+            // transaction takes it back if the file cannot be stored.
+            await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
             await _repo.AddAsync(bar);
             await _repo.SaveChangesAsync(cancellationToken);
 
@@ -51,6 +55,7 @@ namespace Application.Handler.CommandHandler
                 await _repo.SaveChangesAsync(cancellationToken);
             }
 
+            await transaction.CommitAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = bar.Id });
         }
 
@@ -77,12 +82,10 @@ namespace Application.Handler.CommandHandler
             }
 
             var folder = UploadPaths.AnnouncementBars(bar.Id);
+            var oldImage = bar.BackgroundImageUrl;
 
             if (request.RemoveBackgroundImage && !string.IsNullOrWhiteSpace(bar.BackgroundImageUrl))
-            {
-                await _uploader.DeleteStoredFile(bar.BackgroundImageUrl, folder);
                 bar.ClearBackgroundImage(userId.Value);
-            }
 
             if (request.BackgroundImageUrl is { Length: > 0 })
             {
@@ -90,13 +93,15 @@ namespace Application.Handler.CommandHandler
                 if (path is null)
                     return ServiceResult<IdDto>.Failed("آپلود تصویر پس‌زمینه ناموفق بود");
 
-                if (!string.IsNullOrWhiteSpace(bar.BackgroundImageUrl))
-                    await _uploader.DeleteStoredFile(bar.BackgroundImageUrl, folder);
-
                 bar.SetBackgroundImage(path, userId.Value);
             }
 
             await _repo.SaveChangesAsync(cancellationToken);
+
+            // Only now: a failed upload or save must leave the current image in place.
+            if (!string.IsNullOrWhiteSpace(oldImage) && oldImage != bar.BackgroundImageUrl)
+                await _uploader.DeleteStoredFile(oldImage, folder);
+
             return ServiceResult<IdDto>.Ok(new IdDto { Id = bar.Id });
         }
 

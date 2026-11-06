@@ -11,7 +11,8 @@ using Services.Services.Uploader.DTO;
 public class CategoryCommandHandler(
     ICategoryRepository _repo,
     IHttpContextAccessor _accessor,
-    IUploaderService _uploaderService) :
+    IUploaderService _uploaderService,
+    IUnitOfWork _unitOfWork) :
     IRequestHandler<CreateCategoryCommand, ServiceResult<IdDto>>,
     IRequestHandler<UpdateCategoryCommand, ServiceResult<IdDto>>,
     IRequestHandler<ActiveCategoryCommand, ServiceResult<IdDto>>,
@@ -40,6 +41,9 @@ public class CategoryCommandHandler(
             faqJson: request.FaqJson
         );
 
+        // The id names the upload folder, so the row is saved before the file; the
+        // transaction takes it back if the file cannot be stored.
+        await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
         await _repo.AddAsync(category);
         await _repo.SaveChangesAsync(cancellationToken);
         category.EnsureSlug(category.Id);
@@ -54,24 +58,25 @@ public class CategoryCommandHandler(
             };
 
             var thumbnailUrl = await _uploaderService.UploadAsWebp(uploadDto);
-            if (UploadPaths.IsStoredPath(thumbnailUrl))
-            {
-                category.Update(
-                    persianName: null,
-                    persianDesc: null,
-                    englishName: null,
-                    englishDesc: null,
-                    imageUrl: thumbnailUrl,
-                    showInLanding: null,
-                    parentCategoryId: null,
-                    currentUserId: userId.Value);
-            }
+            if (!UploadPaths.IsStoredPath(thumbnailUrl))
+                return ServiceResult<IdDto>.Failed("آپلود تصویر دسته‌بندی ناموفق بود");
+
+            category.Update(
+                persianName: null,
+                persianDesc: null,
+                englishName: null,
+                englishDesc: null,
+                imageUrl: thumbnailUrl,
+                showInLanding: null,
+                parentCategoryId: null,
+                currentUserId: userId.Value);
         }
 
         if (request.IsActive.HasValue)
             category.SetActive(request.IsActive.Value, userId.Value);
 
         await _repo.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return ServiceResult<IdDto>.Ok(new IdDto { Id = category.Id });
     }
 
@@ -88,10 +93,6 @@ public class CategoryCommandHandler(
         string? thumbnailUrl = null;
         if (request.CategoryCover is not null)
         {
-            await _uploaderService.DeleteStoredFile(
-                category.ImageUrl,
-                UploadPaths.Categories(category.Id));
-
             var uploadDto = new UploadDTO
             {
                 File = request.CategoryCover,
@@ -103,6 +104,7 @@ public class CategoryCommandHandler(
                 return ServiceResult<IdDto>.Failed("آپلود تصویر دسته‌بندی ناموفق بود");
         }
 
+        var oldCover = category.ImageUrl;
         category.Update(
             persianName: request.PersianName,
             persianDesc: request.CategoryPersianDesc,
@@ -125,6 +127,11 @@ public class CategoryCommandHandler(
             category.SetActive(request.IsActive.Value, userId.Value);
 
         await _repo.SaveChangesAsync(cancellationToken);
+
+        // Only now: a failed upload or save must leave the current cover in place.
+        if (thumbnailUrl is not null)
+            await _uploaderService.DeleteStoredFile(oldCover, UploadPaths.Categories(category.Id));
+
         return ServiceResult<IdDto>.Ok(new IdDto { Id = category.Id });
     }
 

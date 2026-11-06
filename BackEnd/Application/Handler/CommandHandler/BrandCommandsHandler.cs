@@ -13,7 +13,8 @@ namespace Application.Handler.CommandHandler
     public class BrandCommandHandler(
         IBrandRepository _repo,
         IHttpContextAccessor _accessor,
-        IUploaderService _uploaderService) :
+        IUploaderService _uploaderService,
+        IUnitOfWork _unitOfWork) :
         IRequestHandler<CreateBrandCommand, ServiceResult<IdDto>>,
         IRequestHandler<UpdateBrandCommand, ServiceResult<IdDto>>,
         IRequestHandler<DeleteBrandCommand, ServiceResult<IdDto>>,
@@ -37,6 +38,9 @@ namespace Application.Handler.CommandHandler
                 request.MetaDescriptionFa,
                 request.MetaDescriptionEn,
                 userId.Value);
+            // The id names the upload folder, so the row is saved before the file; the
+            // transaction takes it back if the file cannot be stored.
+            await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
             await _repo.AddAsync(brand);
             await _repo.SaveChangesAsync(cancellationToken);
             brand.EnsureSlug(brand.Id);
@@ -50,11 +54,14 @@ namespace Application.Handler.CommandHandler
                     Path = UploadPaths.Brands(brand.Id)
                 };
                 var logoUrl = await _uploaderService.UploadAsWebp(uploadDto);
-                if (UploadPaths.IsStoredPath(logoUrl))
-                    brand.Update(userId.Value, null, logoUrl, null, false);
+                if (!UploadPaths.IsStoredPath(logoUrl))
+                    return ServiceResult<IdDto>.Failed("آپلود لوگو ناموفق بود");
+
+                brand.Update(userId.Value, null, logoUrl, null, false);
             }
 
             await _repo.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = brand.Id });
         }
 
@@ -71,10 +78,6 @@ namespace Application.Handler.CommandHandler
             string? logoUrl = null;
             if (request.LogoFile is not null)
             {
-                await _uploaderService.DeleteStoredFile(
-                    brand.LogoUrl,
-                    UploadPaths.Brands(brand.Id));
-
                 var uploadDto = new UploadDTO
                 {
                     File = request.LogoFile,
@@ -85,6 +88,7 @@ namespace Application.Handler.CommandHandler
                     return ServiceResult<IdDto>.Failed("آپلود لوگو ناموفق بود");
             }
 
+            var oldLogo = brand.LogoUrl;
             brand.Update(
                 currentUserId: userId.Value,
                 name: request.Name ?? brand.Name,
@@ -99,6 +103,11 @@ namespace Application.Handler.CommandHandler
             );
             brand.EnsureSlug(brand.Id);
             await _repo.SaveChangesAsync(cancellationToken);
+
+            // Only now: a failed upload or save must leave the current logo in place.
+            if (logoUrl is not null)
+                await _uploaderService.DeleteStoredFile(oldLogo, UploadPaths.Brands(brand.Id));
+
             return ServiceResult<IdDto>.Ok(new IdDto { Id = brand.Id });
         }
 
