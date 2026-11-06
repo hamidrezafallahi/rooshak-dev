@@ -31,10 +31,17 @@ namespace Application.Handler.CommandHandler
             var user = await _userRepo.GetByIdAsync(request.UserId);
             if (user == null)
                 return ServiceResult<IdDto>.Unauthorized("حساب کاربری موردنظر پیدا نشد؛ لطفاً دوباره وارد شوید.");
+            if (user.Id != userId.Value)
+            {
+                // Read from the database: the role in a token can be out of date.
+                var editor = await _userRepo.GetByIdAsync(userId.Value);
+                if (editor == null || !editor.Outranks(user))
+                    return ServiceResult<IdDto>.Failed("فقط کاربری با نقش بالاتر می‌تواند پروفایل این کاربر را ویرایش کند.", ErrorCodes.Forbidden);
+            }
+            user.UpdateProfile(request.FullName, request.PhoneNumber, request.UserDescription, user.Id);
             if (request.UserImageFile != null)
             {
                 var oldImage = user.Image;
-                user.UpdateProfile(request.FullName, request.PhoneNumber, request.UserDescription, user.Id);
                 var uploadDto = new UploadDTO
                 {
                     File = request.UserImageFile,

@@ -392,11 +392,11 @@ public class UploadFailureTests
         FirstUrl = "/fa/products",
     };
 
-    private static HttpContextAccessor SignedIn() => new()
+    private static HttpContextAccessor SignedIn(int userId = 7) => new()
     {
         HttpContext = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "7")], "test")),
+            User = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId.ToString())], "test")),
         },
     };
 
@@ -422,7 +422,7 @@ public class UploadFailureTests
         new(images.Repository<IProductImageRepository>(), products.Repository<IProductRepository>(), SignedIn(), uploader);
 
     private static UserCommandsHandler Profiles(Table<User> users, FakeUploader uploader) =>
-        new(users.Repository<IUserRepository>(), null!, uploader, null!, SignedIn());
+        new(users.Repository<IUserRepository>(), null!, uploader, null!, SignedIn(users.Rows[0].Id));
 
     /// <summary>
     /// A table with the transaction semantics that matter here: rows added since the transaction

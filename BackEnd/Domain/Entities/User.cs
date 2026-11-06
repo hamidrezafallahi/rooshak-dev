@@ -142,6 +142,10 @@ namespace OnlineShop.Domain.Entities
             Role = role;
             MarkUpdated(currentUserId);
         }
+
+        /// <summary>Role ids run from the top down: 1 is SuperAdmin, 6 is Customer (see RoleConfiguration).</summary>
+        public bool Outranks(User other) => RoleId < other.RoleId;
+
         public void SetImage(string image, int currentUserId)
         {
             if (image == null)

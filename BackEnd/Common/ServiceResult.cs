@@ -19,6 +19,10 @@ namespace Common
         [JsonIgnore]
         public bool IsUnauthorized => !IsSuccess && ErrorCode == ErrorCodes.Unauthorized;
 
+        /// <summary>The caller is signed in but may not do this: controllers answer these with HTTP 403.</summary>
+        [JsonIgnore]
+        public bool IsForbidden => !IsSuccess && ErrorCode == ErrorCodes.Forbidden;
+
         public static ServiceResponse Ok()
         {
             return new ServiceResponse
