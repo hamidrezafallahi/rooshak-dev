@@ -1,4 +1,5 @@
-﻿namespace OnlineShop.Domain.Entities
+﻿using OnlineShop.Domain.Common;
+namespace OnlineShop.Domain.Entities
 {
     public class Blog : BaseEntity
     {
@@ -57,7 +58,7 @@
             )
         {
             if (string.IsNullOrWhiteSpace(titleFa) && string.IsNullOrWhiteSpace(titleEn))
-                throw new ArgumentException("At least one title must be provided (Fa or En).");
+                throw new DomainException("حداقل یکی از عنوان‌های فارسی یا انگلیسی مقاله باید وارد شود.");
 
             var blog = new Blog
             {

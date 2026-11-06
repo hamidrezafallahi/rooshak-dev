@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
@@ -64,7 +65,7 @@ namespace OnlineShop.Infrastructure.Services
             _logger = logger;
             _webHost = webHost;
             _connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
+                ?? throw new DependencyFailureException("رشتهٔ اتصال پایگاه داده در تنظیمات سرور تعریف نشده است.");
 
             var configuredDir = configuration["Backup:Directory"];
             _backupDirectory = string.IsNullOrWhiteSpace(configuredDir)
@@ -112,13 +113,11 @@ namespace OnlineShop.Infrastructure.Services
             try
             {
                 if (!process.Start())
-                    throw new InvalidOperationException("Failed to start pg_dump process.");
+                    throw ToolMissing("pg_dump", null);
             }
-            catch (Exception ex) when (ex is not InvalidOperationException)
+            catch (Exception ex) when (ex is not DomainException)
             {
-                throw new InvalidOperationException(
-                    "pg_dump was not found. Install PostgreSQL client tools or set Backup:PgDumpPath.",
-                    ex);
+                throw ToolMissing("pg_dump", ex);
             }
 
             var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -134,10 +133,7 @@ namespace OnlineShop.Infrastructure.Services
                     File.Delete(filePath);
 
                 _logger.LogError("pg_dump failed with exit code {ExitCode}: {Error}", process.ExitCode, stderr);
-                throw new InvalidOperationException(
-                    string.IsNullOrWhiteSpace(stderr)
-                        ? $"pg_dump failed with exit code {process.ExitCode}."
-                        : stderr.Trim());
+                throw ToolFailed("pg_dump", process.ExitCode, stderr);
             }
 
             return ToDto(new FileInfo(filePath));
@@ -380,23 +376,23 @@ namespace OnlineShop.Infrastructure.Services
             }
             catch (InvalidDataException)
             {
-                throw new InvalidOperationException("فایل انتخاب‌شده یک بک‌آپ معتبر (zip) نیست.");
+                throw new DomainException("فایل انتخاب‌شده یک بک‌آپ معتبر (zip) نیست.");
             }
 
             using (archive)
             {
                 var manifestEntry = archive.GetEntry("manifest.json")
-                    ?? throw new InvalidOperationException("این فایل بک‌آپ کامل نیست (manifest.json یافت نشد).");
+                    ?? throw new DomainException("این فایل بک‌آپ کامل نیست (manifest.json یافت نشد).");
 
                 BackupManifest? manifest;
                 await using (var manifestStream = manifestEntry.Open())
                     manifest = await JsonSerializer.DeserializeAsync<BackupManifest>(manifestStream, JsonOptions, ct);
 
                 if (manifest is null || manifest.Format != 1)
-                    throw new InvalidOperationException("نسخه‌ی فرمت این بک‌آپ پشتیبانی نمی‌شود.");
+                    throw new DomainException("نسخه‌ی فرمت این بک‌آپ پشتیبانی نمی‌شود.");
 
                 var dumpEntry = archive.GetEntry("database.dump")
-                    ?? throw new InvalidOperationException("فایل دیتابیس داخل بک‌آپ یافت نشد.");
+                    ?? throw new DomainException("فایل دیتابیس داخل بک‌آپ یافت نشد.");
 
                 using (var sha = SHA256.Create())
                 {
@@ -407,7 +403,7 @@ namespace OnlineShop.Infrastructure.Services
 
                     var actual = Convert.ToHexString(sha.Hash!);
                     if (!string.Equals(actual, manifest.DumpSha256, StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidOperationException("بک‌آپ آسیب دیده است (checksum دیتابیس مطابقت ندارد).");
+                        throw new DomainException("بک‌آپ آسیب دیده است (checksum دیتابیس مطابقت ندارد).");
                 }
 
                 var rootFull = Path.GetFullPath(uploadsTargetDir)
@@ -423,7 +419,7 @@ namespace OnlineShop.Infrastructure.Services
 
                     var destination = Path.GetFullPath(Path.Combine(uploadsTargetDir, entry.FullName[prefix.Length..]));
                     if (!destination.StartsWith(rootFull, StringComparison.Ordinal))
-                        throw new InvalidOperationException("بک‌آپ شامل مسیر نامعتبر است و پذیرفته نشد.");
+                        throw new DomainException("بک‌آپ شامل مسیر نامعتبر است و پذیرفته نشد.");
 
                     Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                     entry.ExtractToFile(destination, overwrite: true);
@@ -643,13 +639,11 @@ namespace OnlineShop.Infrastructure.Services
             try
             {
                 if (!process.Start())
-                    throw new InvalidOperationException($"Failed to start {tool}.");
+                    throw ToolMissing(tool, null);
             }
-            catch (Exception ex) when (ex is not InvalidOperationException)
+            catch (Exception ex) when (ex is not DomainException)
             {
-                throw new InvalidOperationException(
-                    $"{tool} was not found. Install PostgreSQL client tools or configure its path under Backup:*Path.",
-                    ex);
+                throw ToolMissing(tool, ex);
             }
 
             var stderrTask = process.StandardError.ReadToEndAsync(ct);
@@ -661,11 +655,41 @@ namespace OnlineShop.Infrastructure.Services
             if (process.ExitCode != 0)
             {
                 _logger.LogError("{Tool} failed with exit code {ExitCode}: {Error}", tool, process.ExitCode, stderr);
-                throw new InvalidOperationException(
-                    string.IsNullOrWhiteSpace(stderr)
-                        ? $"{tool} failed with exit code {process.ExitCode}."
-                        : stderr.Trim());
+                throw ToolFailed(tool, process.ExitCode, stderr);
             }
+        }
+
+        private static DependencyFailureException ToolMissing(string tool, Exception? cause)
+        {
+            const string Hint = "ابزارهای کلاینت PostgreSQL را روی سرور نصب کنید یا مسیر آن را در تنظیمات Backup وارد کنید.";
+            var message = $"ابزار {tool} روی سرور پیدا نشد یا اجرا نشد. {Hint}";
+            return cause is null
+                ? new DependencyFailureException(message)
+                : new DependencyFailureException(message, cause);
+        }
+
+        /// <summary>The tool's stderr is English and may name the host, so it only goes to the detail.</summary>
+        private static DependencyFailureException ToolFailed(string tool, int exitCode, string stderr)
+        {
+            var output = stderr.Trim();
+            var reason =
+                output.Contains("version mismatch", StringComparison.OrdinalIgnoreCase)
+                    ? $"نسخهٔ ابزار {tool} با نسخهٔ سرور پایگاه داده هم‌خوان نیست."
+                : output.Contains("password authentication failed", StringComparison.OrdinalIgnoreCase)
+                    ? $"رمز عبور پایگاه داده برای ابزار {tool} پذیرفته نشد."
+                : output.Contains("No space left", StringComparison.OrdinalIgnoreCase)
+                    ? "فضای دیسک سرور پر شده است."
+                : output.Contains("permission denied", StringComparison.OrdinalIgnoreCase)
+                    ? $"ابزار {tool} اجازهٔ دسترسی لازم را ندارد."
+                : output.Contains("connection to server", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("could not connect", StringComparison.OrdinalIgnoreCase)
+                    ? $"ابزار {tool} به پایگاه داده وصل نشد."
+                : $"اجرای ابزار {tool} با خطا متوقف شد.";
+
+            return new DependencyFailureException(reason)
+            {
+                TechnicalDetail = $"{tool} exit code {exitCode}: {output}",
+            };
         }
 
         private static BackupFileDto ToDto(FileInfo info) => new()
@@ -720,8 +744,8 @@ namespace OnlineShop.Infrastructure.Services
                         return value;
                 }
 
-                throw new InvalidOperationException(
-                    $"Connection string is missing required key: {string.Join('/', keys)}");
+                throw new DependencyFailureException(
+                    $"رشتهٔ اتصال پایگاه داده کامل نیست؛ مقدار {string.Join('/', keys)} در تنظیمات سرور وارد نشده است.");
             }
 
             var portText = parts.TryGetValue("Port", out var portValue) ? portValue : "5432";

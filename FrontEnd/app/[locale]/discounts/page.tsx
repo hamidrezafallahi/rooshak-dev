@@ -7,6 +7,7 @@ import PageHeader from '@components/molecules/storefront/PageHeader';
 import { getAll } from '@lib/getAll';
 import { buildPageMetadata } from '@lib/seo';
 import { IBlog } from '@models/Blog';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -46,7 +47,9 @@ export default async function Page({ params, searchParams }: Props) {
     <article className="store-page !pt-6">
       <PageHeader title={t('title')} description={t('description')} />
 
-      {items.length === 0 ? (
+      {!response.isSuccess ? (
+        <ApiErrorNotice message={response.error} />
+      ) : items.length === 0 ? (
         <EmptyState
           title={t('empty')}
           description={t('comingSoon')}

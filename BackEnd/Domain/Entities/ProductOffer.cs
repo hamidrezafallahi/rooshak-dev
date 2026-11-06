@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using OnlineShop.Domain.Common;
+using Domain.Entities;
 using OnlineShop.Domain.Entities;
 
 public class ProductOffers : BaseEntity
@@ -73,7 +74,7 @@ public class ProductOffers : BaseEntity
     public void DecreaseInventory(int quantity, int userId)
     {
         if (!CanSell(quantity))
-            throw new InvalidOperationException("Insufficient inventory");
+            throw new DomainException("موجودی این کالا کافی نیست.");
 
         Inventory -= quantity;
         MarkUpdated(userId);

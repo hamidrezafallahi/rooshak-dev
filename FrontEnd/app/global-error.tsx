@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { messageFromDigest } from '@lib/apiError';
 
 type Props = {
   error: Error & { digest?: string };
@@ -9,6 +10,9 @@ type Props = {
 
 /** Root-level boundary — must define its own html/body. */
 export default function GlobalError({ error, reset }: Props) {
+  // Server errors reach production builds without their message; ours carry it in the digest.
+  const explanation = messageFromDigest(error.digest);
+
   useEffect(() => {
     const payload = {
       level: 'error',
@@ -46,9 +50,10 @@ export default function GlobalError({ error, reset }: Props) {
         <div style={{ maxWidth: 420, textAlign: 'center' }}>
           <h1 style={{ fontSize: 22, marginBottom: 12 }}>خطای بحرانی</h1>
           <p style={{ opacity: 0.85, fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-            {process.env.NODE_ENV === 'development'
-              ? error.message
-              : 'برنامه با مشکل غیرمنتظره روبه‌رو شد.'}
+            {explanation ??
+              (process.env.NODE_ENV === 'development'
+                ? error.message
+                : 'برنامه با مشکل غیرمنتظره روبه‌رو شد.')}
           </p>
           <button
             type="button"

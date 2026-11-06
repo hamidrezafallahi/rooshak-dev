@@ -4,15 +4,18 @@ import { getTranslations } from 'next-intl/server';
 
 import CategoryCard from '@components/molecules/categoryCart';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { ICategory } from '@models/category';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function BrandCategories({ id }: { id: number }) {
   const result = await safeFetchJson<SimpleResponse<ICategory[]>>(
     `${serverApiBaseUrl}/Brands/getProductsCategoriesByBrandId/${id}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
   const categories: ICategory[] =
     result.ok && result.data?.isSuccess !== false ? result.data?.data || [] : [];
   const t = await getTranslations();

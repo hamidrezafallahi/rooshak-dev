@@ -25,7 +25,7 @@ import {
 export default function ProductCommentForm({ id }: { id: number }) {
 const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const t = useTranslations();
-  const pathname = usePathname();
+  const pathname = usePathname()!;
   const locale = useLocale();
   const [value, setValue] = useState(0);
   const [mutateCommand, { isLoading }] = useGetConditionallyMutation();
@@ -41,10 +41,10 @@ const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
       },
       method: "POST",
     });
-    if (res) {
-      console.log(res);
+    // Only a saved rating stays selected; a failure was shown by baseQueryByToken.
+    if (!('error' in res) && res.data?.isSuccess !== false) {
+      setValue(e);
     }
-    setValue(e);
   };
   const handleSubmitComment = async () => {
     const comment = textAreaRef.current?.value.trim();

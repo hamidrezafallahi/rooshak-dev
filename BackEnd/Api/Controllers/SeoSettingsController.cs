@@ -21,7 +21,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<ListDto<SeoSettingDto>>> GetAll([FromQuery] GetSeoSettingsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -31,7 +31,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<SeoResolvedDto>> Resolve([FromQuery] ResolveSeoSettingQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -41,7 +41,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<SeoSettingDto>> GetById([FromRoute] int id)
     {
         var result = await _mediator.Send(new GetSeoSettingByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -52,7 +52,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<IdDto>> Create([FromBody] CreateSeoSettingCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -63,7 +63,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] UpdateSeoSettingCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -74,7 +74,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<IdDto>> Active([FromBody] ActiveSeoSettingCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -85,7 +85,7 @@ public class SeoSettingsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteSeoSettingCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);

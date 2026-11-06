@@ -91,7 +91,7 @@ public class ProductOfferDiscountQueryHandler(IProductOfferDiscountRepository _r
                     ProductName = pod.ProductOffer.Product.Name
 
                 }).FirstOrDefault();
-            if (dto == null) return ServiceResult<ProductOfferDiscountDto>.Failed("Product offer discount not found");
+            if (dto == null) return ServiceResult<ProductOfferDiscountDto>.Failed("تخفیف این پیشنهاد محصول پیدا نشد.");
 
             return ServiceResult<ProductOfferDiscountDto>.Ok(dto);
         }

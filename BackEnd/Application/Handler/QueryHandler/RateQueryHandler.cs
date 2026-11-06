@@ -73,7 +73,7 @@ using OnlineShop.Domain.Interfaces;
     {
         var now = DateTime.UtcNow;
         var rate = await _repo.Query(r=> r.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
-        if (rate == null) return ServiceResult<GetRateByIdDto?>.Failed("rate not found");
+        if (rate == null) return ServiceResult<GetRateByIdDto?>.Failed("امتیاز موردنظر پیدا نشد.");
 
         var dto = new GetRateByIdDto
         {

@@ -20,6 +20,7 @@ import {
   refreshTokens,
   writeSessionCookies,
 } from '@lib/session-refresh';
+import { describeStatus } from '@lib/apiError';
 
 async function refreshFromCookies(): Promise<TokenRefresh> {
   const cookieStore = await cookies();
@@ -40,14 +41,14 @@ export async function POST() {
 
   if (result.kind === 'error') {
     return NextResponse.json(
-      { isSuccess: false, message: 'Refresh unavailable' },
+      { isSuccess: false, error: describeStatus(503) },
       { status: 502 }
     );
   }
 
   if (result.kind === 'invalid') {
     const res = NextResponse.json(
-      { isSuccess: false, message: 'Refresh failed' },
+      { isSuccess: false, error: 'نشست کاربری شما منقضی شده است؛ لطفاً دوباره وارد شوید.' },
       { status: 401 }
     );
     clearSessionCookies(res.cookies);

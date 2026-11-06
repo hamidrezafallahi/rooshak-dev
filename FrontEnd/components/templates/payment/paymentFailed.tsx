@@ -37,7 +37,7 @@ export default function PaymentFailed({}: IPaymentFailedProps) {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
 
   const errorMessage =
     searchParams.get("errorMessage") || t("payment.paymentFailed");

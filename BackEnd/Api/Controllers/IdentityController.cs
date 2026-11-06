@@ -59,7 +59,7 @@ public async Task<IActionResult> RefreshToken(
     public async Task<ActionResult<bool>> ChangePassword([FromBody] ChangeUserPasswordByAdminCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -68,7 +68,7 @@ public async Task<IActionResult> RefreshToken(
     public async Task<ActionResult<bool>> ChangePassword([FromBody] ChangeUserPasswordCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -78,7 +78,7 @@ public async Task<IActionResult> RefreshToken(
     public async Task<ActionResult<bool>> ChangeRole([FromBody] SetUserRoleCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -92,7 +92,7 @@ public async Task<IActionResult> RefreshToken(
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -105,7 +105,7 @@ public async Task<IActionResult> RefreshToken(
     {
         var command = new DeleteUserCommand { Id = id };
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

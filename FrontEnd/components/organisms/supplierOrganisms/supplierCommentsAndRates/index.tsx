@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import MediaImage from '@components/atoms/MediaImage';
 import { StarIcon } from '@components/atoms/iconComponents';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import {
   EnumTargetType,
@@ -13,6 +13,7 @@ import {
 } from '@models/comment';
 
 import CommentAndRate from './CommentAndRate';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function SupplierCommentsAndRates(props: {
   params: { slug: string; locale: string };
@@ -25,6 +26,8 @@ export async function SupplierCommentsAndRates(props: {
     `${serverApiBaseUrl}/Comments/${EnumTargetType.Supplier}/${slug}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
 
   if (!result.ok || result.data?.isSuccess === false) {
     return <div>{t('common.supplierNotFound')}</div>;

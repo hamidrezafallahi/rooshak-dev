@@ -69,7 +69,7 @@ public class GetLandingSlideQueryHandler(ISlideRepository _repo,IEntityConfigRep
     {
         var entity = await _repo.GetByIdAsync(request.Id);
         if (entity == null)
-            return ServiceResult<LandingSliderDto?>.Failed("Slide not found");
+            return ServiceResult<LandingSliderDto?>.Failed("اسلاید موردنظر پیدا نشد.");
         var Dto = new LandingSliderDto
         {
             Id = entity.Id,

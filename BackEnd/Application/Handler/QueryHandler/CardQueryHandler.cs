@@ -72,7 +72,7 @@ namespace Application.Handler.QueryHandler
             var cart = await _cartRepo.GetByIdWithItemsAsync(request.Id);
 
             if (cart == null)
-                return ServiceResult<CartDto?>.Failed("Cart not found");
+                return ServiceResult<CartDto?>.Failed("سبد خرید پیدا نشد.");
 
             var cartDto = new CartDto
             {
@@ -96,10 +96,10 @@ namespace Application.Handler.QueryHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<detailCartDto?>.Failed("Unauthorized");
+                return ServiceResult<detailCartDto?>.Unauthorized();
             var cart = await _cartRepo.GetDetailCartAsync(request.Id, userId.Value);
             if (cart == null)
-                return ServiceResult<detailCartDto?>.Failed("Cart not found");
+                return ServiceResult<detailCartDto?>.Failed("سبد خرید پیدا نشد.");
             var detailCart = new detailCartDto
             {
                 Id = cart.Id,
@@ -130,11 +130,11 @@ namespace Application.Handler.QueryHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<CartDto>.Failed("Unauthorized");
+                return ServiceResult<CartDto>.Unauthorized();
             var cart = await _cartRepo.GetByUserIdWithItemsAsync(userId.Value);
 
             if (cart == null || !cart.Items.Any(i => !i.IsDeleted))
-                return ServiceResult<CartDto>.Failed("No active carts found");
+                return ServiceResult<CartDto>.Failed("سبد خرید فعالی پیدا نشد.");
 
             var cartDto = new CartDto
             {
@@ -252,7 +252,7 @@ namespace Application.Handler.QueryHandler
         {
             var item = await _repo.GetByIdAsync(request.Id);
             if (item == null)
-                return ServiceResult<CartItemDto?>.Failed("Cart item not found");
+                return ServiceResult<CartItemDto?>.Failed("این کالا در سبد خرید پیدا نشد.");
 
             var itemDto = new CartItemDto
             {

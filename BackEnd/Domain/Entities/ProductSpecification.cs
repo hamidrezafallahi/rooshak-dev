@@ -1,4 +1,5 @@
-﻿using OnlineShop.Domain.Entities;
+﻿using OnlineShop.Domain.Common;
+using OnlineShop.Domain.Entities;
 namespace Domain.Entities
 {
     public class ProductSpecification : BaseEntity
@@ -17,9 +18,9 @@ namespace Domain.Entities
             string value)
         {
             if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key cannot be empty.");
+                throw new DomainException("عنوان مشخصه نمی‌تواند خالی باشد.");
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("value cannot be empty.");
+                throw new DomainException("مقدار مشخصه نمی‌تواند خالی باشد.");
 
             var spec = new ProductSpecification
             {

@@ -22,7 +22,7 @@ public class BlogsController : BaseController
     public async Task<ActionResult<ListDto<BlogDto>>> GetBlogs([FromQuery] GetBlogsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -34,7 +34,7 @@ public class BlogsController : BaseController
         {
             IncludeInactive = includeInactive
         });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -43,7 +43,7 @@ public class BlogsController : BaseController
     public async Task<ActionResult<BlogDto>> GetBlogBySlug(string slug)
     {
         var result = await _mediator.Send(new GetBlogBySlugQuery { Slug = slug });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -51,7 +51,7 @@ public class BlogsController : BaseController
     public async Task<ActionResult<BlogDto>> GetBlogById(int id)
     {
         var result = await _mediator.Send(new GetBlogByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -59,7 +59,7 @@ public class BlogsController : BaseController
     public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4selectOption([FromQuery] GetBlogs4selectOptionQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -70,7 +70,7 @@ public class BlogsController : BaseController
         [FromBody] BlogContentQualityRequestDto payload)
     {
         var result = await _mediator.Send(new ValidateBlogContentCommand { Payload = payload });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -83,7 +83,7 @@ public class BlogsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -100,7 +100,7 @@ public class BlogsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -114,7 +114,7 @@ public class BlogsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -133,7 +133,7 @@ public class BlogsController : BaseController
         };
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

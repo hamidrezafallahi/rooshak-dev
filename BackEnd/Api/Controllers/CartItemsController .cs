@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult<List<CartItemDto>>> GetAll([FromQuery] GetAllCartItemsQuery query)
         {
             var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
         }
@@ -31,7 +31,7 @@ using Microsoft.AspNetCore.Mvc;
         {
 
             var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
 
@@ -42,7 +42,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult<CartItemDto>> GetById(int id)
         {
             var result = await _mediator.Send(new GetCartItemByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
  
@@ -55,7 +55,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult<CartItemDto>> AddOrUpdateItem([FromBody] AddOrUpdateCartItemCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -69,7 +69,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult> DecreaseItem([FromBody] DecreaseCartItemCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -81,7 +81,7 @@ using Microsoft.AspNetCore.Mvc;
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -93,7 +93,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult> DecreaseItem(int id)
         {
             var result = await _mediator.Send(new DeleteCartItemCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -107,7 +107,7 @@ using Microsoft.AspNetCore.Mvc;
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -116,7 +116,7 @@ using Microsoft.AspNetCore.Mvc;
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteCartItemCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

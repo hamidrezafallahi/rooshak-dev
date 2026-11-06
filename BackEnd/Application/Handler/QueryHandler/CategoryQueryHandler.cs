@@ -90,7 +90,7 @@ using OnlineShop.Domain.Entities;
         {
             var key = (request.IdOrSlug ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(key))
-                return ServiceResult<CategoryDto>.Failed("Category not found");
+                return ServiceResult<CategoryDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
 
             var allCategories = await _repo.Query()
                  .Where(c => !c.IsDeleted)
@@ -121,7 +121,7 @@ using OnlineShop.Domain.Entities;
                 category = allCategories.FirstOrDefault(c => c.Slug == key);
 
             if (category == null)
-                return ServiceResult<CategoryDto>.Failed("Category not found");
+                return ServiceResult<CategoryDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
             category.SubCategories = CategoryTreeBuilder.BuildTree(allCategories, category.Id);
             return ServiceResult<CategoryDto>.Ok(category);
         }

@@ -131,7 +131,7 @@ public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _p
         }
 
         if (tag == null)
-            return ServiceResult<TagDto?>.Failed("Tag not found");
+            return ServiceResult<TagDto?>.Failed("برچسب موردنظر پیدا نشد.");
 
         var dto = new TagDto
         {
@@ -193,7 +193,7 @@ public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _p
         var now = DateTime.UtcNow;
         var key = (request.IdOrSlug ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(key))
-            return ServiceResult<TagPriceListDto>.Failed("Tag not found");
+            return ServiceResult<TagPriceListDto>.Failed("برچسب موردنظر پیدا نشد.");
 
         Tag? tag = int.TryParse(key, out var tagId)
             ? await _repo.Query(t => t.Id == tagId && !t.IsDeleted)
@@ -202,7 +202,7 @@ public class TagQueryHandler(ITagRepository _repo, IProductOfferTagRepository _p
                          .FirstOrDefaultAsync(cancellationToken);
 
         if (tag == null || !tag.IsActive)
-            return ServiceResult<TagPriceListDto>.Failed("Tag not found");
+            return ServiceResult<TagPriceListDto>.Failed("برچسب موردنظر پیدا نشد.");
 
         // The tag lives on ProductOffers, so only offers carrying it may price the family.
         var products = await _productRepository

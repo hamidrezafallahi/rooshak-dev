@@ -5,6 +5,7 @@ using Application.Dtos;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OnlineShop.Domain.Interfaces;
 
 namespace Infrastructure.Services;
@@ -15,7 +16,8 @@ public class SeoOpsService(
     ICategoryRepository categoryRepository,
     IBrandRepository brandRepository,
     IHttpClientFactory httpClientFactory,
-    IConfiguration configuration) : ISeoOpsService
+    IConfiguration configuration,
+    ILogger<SeoOpsService> logger) : ISeoOpsService
 {
     private static readonly Regex InternalLinkRegex = new(
         @"href\s*=\s*[""'][^""']*(/products/|/categories/|/blog/)[^""']*[""']",
@@ -59,12 +61,15 @@ public class SeoOpsService(
                 check.StatusCode = (int)response.StatusCode;
                 check.Ok = response.IsSuccessStatusCode;
                 if (!check.Ok)
-                    check.Error = $"HTTP {(int)response.StatusCode}";
+                    check.Error = DescribeHealthStatus((int)response.StatusCode);
             }
             catch (Exception ex)
             {
                 check.Ok = false;
-                check.Error = ex.Message;
+                check.Error = ex is TaskCanceledException or TimeoutException
+                    ? "این آدرس در زمان مجاز پاسخ نداد."
+                    : "به این آدرس وصل نشد.";
+                logger.LogWarning(ex, "SEO health check failed for {Url}", url);
             }
             finally
             {
@@ -380,6 +385,15 @@ public class SeoOpsService(
         HtmlTagRegex.Replace(value ?? string.Empty, " ")
             .Replace("&nbsp;", " ", StringComparison.OrdinalIgnoreCase)
             .Trim();
+
+    private static string DescribeHealthStatus(int status) => status switch
+    {
+        401 or 403 => "این آدرس اجازهٔ دسترسی نمی‌دهد.",
+        404 => "این آدرس پیدا نشد.",
+        429 => "این آدرس به‌دلیل تعداد زیاد درخواست پاسخ نداد.",
+        >= 500 => "سرور این آدرس با خطا پاسخ داد.",
+        _ => "این آدرس پاسخ موفقی برنگرداند.",
+    };
 
     private static string TrimTrailingSlash(string value) =>
         string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim().TrimEnd('/');

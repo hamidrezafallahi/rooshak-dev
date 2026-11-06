@@ -29,7 +29,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const t = useTranslations();
   const locale = useLocale();
-  const pathname = usePathname();
+  const pathname = usePathname()!;
 
   const items = menu?.data ?? [];
 

@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { useGetConditionallyMutation } from '@services/base';
 import { IBaseQueryResponse } from '@services/base/type';
 import { resetShoppingCart } from '@slice/shoppingCartSlice';
+import { describeThrown } from '@lib/apiError';
 
 interface PaymentVerifyData {
   isSuccess: boolean;
@@ -22,7 +23,7 @@ export default function PaymentCheck() {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
   const dispatch = useDispatch();
   const [verifyPayment] = useGetConditionallyMutation();
   const started = useRef(false);
@@ -78,10 +79,10 @@ export default function PaymentCheck() {
             errorMessage
           )}`
         );
-      } catch (err: any) {
+      } catch (err) {
         router.replace(
           `/${locale}/payment?status=failed&errorCode=verification_error&errorMessage=${encodeURIComponent(
-            err?.data?.error ?? err?.message ?? t('payment.payment_error')
+            describeThrown(err)
           )}`
         );
       }

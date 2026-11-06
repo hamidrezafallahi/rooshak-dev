@@ -1,4 +1,5 @@
-﻿using OnlineShop.Domain.Entities;
+﻿using OnlineShop.Domain.Common;
+using OnlineShop.Domain.Entities;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -31,10 +32,10 @@ namespace OnlineShop.Domain.Entities
             )
         {
             if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("Title cannot be empty.", nameof(title));
+                throw new DomainException("عنوان روش ارسال نمی‌تواند خالی باشد.");
 
             if (price < 0)
-                throw new ArgumentException("Price cannot be negative.", nameof(price));
+                throw new DomainException("هزینهٔ ارسال نمی‌تواند منفی باشد.");
 
             var method = new ShippingMethod
             {
@@ -64,7 +65,7 @@ namespace OnlineShop.Domain.Entities
             if (price.HasValue)
             {
                 if (price < 0)
-                    throw new ArgumentException("Price cannot be negative.");
+                    throw new DomainException("هزینهٔ ارسال نمی‌تواند منفی باشد.");
                 Price = price.Value;
             }
 

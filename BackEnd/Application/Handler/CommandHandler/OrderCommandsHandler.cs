@@ -38,7 +38,7 @@ using OnlineShop.Domain.Interfaces;
 
     public async Task<ServiceResult<OrderIdDto>> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
     {
-        var userId = _accessor.HttpContext.GetUserId(); if (userId == null) return ServiceResult<OrderIdDto>.Failed("Unauthorized");
+        var userId = _accessor.HttpContext.GetUserId(); if (userId == null) return ServiceResult<OrderIdDto>.Unauthorized();
         DiscountCode? discountCode = null;
         var DiscountAmount = 0m;
         var totalAmount = 0m;
@@ -61,7 +61,7 @@ using OnlineShop.Domain.Interfaces;
         } 
         if (discountCode != null) { decimal codeDiscount = discountCode.IsPercent ? totalAmount * discountCode.Amount / 100m : discountCode.Amount; DiscountAmount += codeDiscount; } 
         var orderId = await _repo.CreateOrderFromCartAsync( userId.Value, request.ShippingAddressId, request.ShippingMethodId, request.PaymentMethodId, request.ShippingCost ?? 0, DiscountAmount, discountCode?.Id );
-        if (orderId == 0) return ServiceResult<OrderIdDto>.Failed("خطا در ثبت سفارش");
+        if (orderId == 0) return ServiceResult<OrderIdDto>.Failed("سفارش ثبت نشد؛ کالایی برای ثبت سفارش در سبد خرید شما پیدا نشد.");
         _jobService.Schedule<IOrderJobService>( job => job.DeleteOrderAfter15Min(orderId, userId.Value), TimeSpan.FromMinutes(15));
         return ServiceResult<OrderIdDto>.Ok(new OrderIdDto { OrderId = orderId });
     }
@@ -70,10 +70,10 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetByIdAsync(request.Id);
             if (order == null)
-                return ServiceResult<IdDto>.Failed("Order not found");
+                return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             order.Delete(userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });
@@ -82,10 +82,10 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var order = await _itemRepo.GetByIdAsync(request.Id);
         if (order == null)
-            return ServiceResult<IdDto>.Failed("Order not found");
+            return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
         order.Delete(userId.Value);
         await _itemRepo.SaveChangesAsync(cancellationToken);
         return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });
@@ -94,10 +94,10 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var order = await _repo.GetByIdAsync(request.Id);
         if (order == null)
-            return ServiceResult<IdDto>.Failed("order پیدا نشد");
+            return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
 
         order.SetActive(request.IsActive, userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
@@ -108,10 +108,10 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var orderItem = await _itemRepo.GetByIdAsync(request.Id);
         if (orderItem == null)
-            return ServiceResult<IdDto>.Failed("orderItem پیدا نشد");
+            return ServiceResult<IdDto>.Failed("این کالا در سفارش پیدا نشد.");
 
         orderItem.SetActive(!orderItem.IsActive, userId.Value);
         await _itemRepo.SaveChangesAsync(cancellationToken);
@@ -122,9 +122,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var result = await _repo.AddItemToOrderAsync(request.OrderId, request.ProductOfferId, request.Quantity, userId.Value);
-            if (result == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (result == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = result.Id });
         }
@@ -132,9 +132,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetOrderWithItemsAsync(request.OrderId);
-            if (order == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (order == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             order.RemoveItem(request.ProductId, userId.Value);
 
@@ -145,10 +145,10 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetOrderWithItemsAsync(request.OrderId);
             if (order == null)
-                return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+                return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             order.Confirm(userId.Value);
 
@@ -159,9 +159,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetByIdAsync(request.OrderId);
-            if (order == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (order == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             order.Pay(userId.Value);
             var cart = await _cartRepo.GetUserCartAsync(userId.Value);
@@ -174,9 +174,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetByIdAsync(request.OrderId);
-            if (order == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (order == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             order.Cancel(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });
@@ -185,9 +185,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetByIdAsync(request.OrderId);
-            if (order == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (order == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             order.Ship(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });
@@ -197,9 +197,9 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var order = await _repo.GetByIdAsync(request.OrderId);
-            if (order == null) return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            if (order == null) return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             order.Deliver(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });
@@ -208,11 +208,11 @@ using OnlineShop.Domain.Interfaces;
         {
             var order = await _repo.GetByIdAsync(request.OrderId);
             if (order == null)
-                return ServiceResult<IdDto>.Failed("Order not found");
+                return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             var discount = await _dcRepo.GetByIdAsync(request.DiscountCodeId);
             if (discount == null || !discount.IsValid)
-                return ServiceResult<IdDto>.Failed("Discount code is not valid");
+                return ServiceResult<IdDto>.Failed("کد تخفیف معتبر نیست؛ ممکن است منقضی شده یا ظرفیت آن تمام شده باشد.");
 
             // صدا زدن متد درست و ارسال currentUserId
             order.ApplyDiscountCode(discount, request.CurrentUserId);
@@ -227,7 +227,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var order = await _repo.GetByIdAsync(request.OrderId);
             if (order == null)
-                return ServiceResult<IdDto>.Failed("Order not found");
+                return ServiceResult<IdDto>.Failed("سفارش موردنظر پیدا نشد.");
             order.RemoveDiscountCode(request.CurrentUserId);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = order.Id });

@@ -16,12 +16,12 @@ public class ProductTagCommandHandler(IProductOfferTagRepository _repository, IH
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var productOfferTag = ProductOfferTag.Create(request.ProductOfferId, request.TagId, userId.Value);
         var exist = _repository.Query(pot => pot.TagId == request.TagId && pot.ProductOfferId == request.ProductOfferId).FirstOrDefault();
         if (exist is not null)
         {
-            return ServiceResult<IdDto>.Failed("it has same tag");
+            return ServiceResult<IdDto>.Failed("این برچسب قبلاً به این پیشنهاد محصول اضافه شده است.");
         }
         await _repository.AddAsync(productOfferTag);
         await _repository.SaveChangesAsync(cancellationToken);
@@ -32,12 +32,12 @@ public class ProductTagCommandHandler(IProductOfferTagRepository _repository, IH
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var productTag = await _repository.GetByIdAsync(request.Id);
-        if (productTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (productTag == null) return ServiceResult<IdDto>.Failed("برچسب پیشنهاد محصول پیدا نشد.");
         if (productTag.ProductOfferId == request.ProductOfferId && productTag.TagId == request.TagId)
         {
-            return ServiceResult<IdDto>.Failed("it has same tag");
+            return ServiceResult<IdDto>.Failed("این برچسب قبلاً به این پیشنهاد محصول اضافه شده است.");
         }
 
         productTag.Update(request.ProductOfferId, request.TagId, userId.Value);
@@ -50,9 +50,9 @@ public class ProductTagCommandHandler(IProductOfferTagRepository _repository, IH
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var productTag = await _repository.GetByIdAsync(request.Id);
-        if (productTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (productTag == null) return ServiceResult<IdDto>.Failed("برچسب پیشنهاد محصول پیدا نشد.");
 
         productTag.SetActive(request.IsActive, userId.Value);
 
@@ -64,9 +64,9 @@ public class ProductTagCommandHandler(IProductOfferTagRepository _repository, IH
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var productTag = await _repository.GetByIdAsync(request.Id);
-        if (productTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (productTag == null) return ServiceResult<IdDto>.Failed("برچسب پیشنهاد محصول پیدا نشد.");
 
         productTag.Delete(userId.Value);
 

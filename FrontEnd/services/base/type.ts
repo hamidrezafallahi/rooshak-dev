@@ -17,5 +17,10 @@ export interface IService<T, K = unknown> {
   method?: "GET" | "POST" | "DELETE" | "PUT"
   skip?: boolean;
   id?: string | number;
+  /**
+   * Reads answer isSuccess false both for "nothing found" and for real refusals, so only
+   * a caller that cannot go on without this data asks to have the reason shown.
+   */
+  reportFailure?: boolean;
 }
 

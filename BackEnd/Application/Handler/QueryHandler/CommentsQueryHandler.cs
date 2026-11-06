@@ -174,7 +174,7 @@ public class CommentQueryHandler(ICommentRepository _repo,
                    .FirstOrDefault();
 
         if (comment == null)
-            return ServiceResult<CommentDto?>.Failed("Blog not found");
+            return ServiceResult<CommentDto?>.Failed("مقالهٔ موردنظر پیدا نشد.");
         var commentDto = new CommentDto
         {
             Id = comment.Id,

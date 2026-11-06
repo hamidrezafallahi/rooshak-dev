@@ -48,12 +48,16 @@ const DeleteCategory = ({ id, endpoint }: { id: number; endpoint: string }) => {
   const [deleted, setDeleted] = useState(false);
   const [deleteApi, { isLoading }] = useCUDDataMutation();
   const deleteHandler = async () => {
-    const res = await deleteApi({
-      url: `/${endpoint + "/" + id}`,
-      method: "DELETE",
-    }).unwrap();
-    if (res) {
-      setDeleted(res.isSuccess);
+    try {
+      const res = await deleteApi({
+        url: `/${endpoint + "/" + id}`,
+        method: "DELETE",
+      }).unwrap();
+      if (res) {
+        setDeleted(res.isSuccess);
+      }
+    } catch {
+      // baseQueryByToken already showed the reason.
     }
   };
   return (
@@ -109,6 +113,7 @@ const ActiveCategory = ({
         showErrorToast(res.error);
       }
     } catch {
+      // baseQueryByToken already showed the reason.
       setIsActive(previous);
     }
   };

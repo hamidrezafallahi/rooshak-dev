@@ -1,4 +1,5 @@
-﻿namespace OnlineShop.Domain.Entities
+﻿using OnlineShop.Domain.Common;
+namespace OnlineShop.Domain.Entities
 {
     /// <summary>
     /// درخواست ثبت شده توسط بازدیدکننده سایت.
@@ -38,13 +39,13 @@
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(firstName))
-                throw new ArgumentException("FirstName cannot be empty.", nameof(firstName));
+                throw new DomainException("نام نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(lastName))
-                throw new ArgumentException("LastName cannot be empty.", nameof(lastName));
+                throw new DomainException("نام خانوادگی نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(phoneNumber))
-                throw new ArgumentException("PhoneNumber cannot be empty.", nameof(phoneNumber));
+                throw new DomainException("شماره موبایل نمی‌تواند خالی باشد.");
 
             var request = new ContactRequest
             {

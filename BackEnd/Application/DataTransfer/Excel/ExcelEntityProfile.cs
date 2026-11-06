@@ -62,7 +62,7 @@ namespace Application.DataTransfer.Excel
         public abstract Task<IReadOnlyDictionary<string, List<ExcelRow>>> ExportAsync(ExcelExportRequest request, CancellationToken cancellationToken);
 
         public virtual Task ImportAsync(ExcelImportContext context) =>
-            throw new NotSupportedException($"Import is not supported for '{EntityKey}'.");
+            throw new NotSupportedException($"ورود از اکسل برای «{EntityKey}» پشتیبانی نمی‌شود.");
 
         // ─── Helpers for subclasses ───────────────────────────────────────
 

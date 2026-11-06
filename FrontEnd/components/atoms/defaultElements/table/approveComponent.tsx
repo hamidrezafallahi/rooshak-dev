@@ -14,6 +14,8 @@ import {
 import { approveComment } from '@lib/comment';
 
 import { Button } from '../customButton';
+import { describeStatus } from '@lib/apiError';
+import { showErrorToast } from '@utils/core';
 
 interface IProps {
   id: number;
@@ -23,13 +25,15 @@ interface IProps {
 export default function ApproveComponent({ id, isApprove }: IProps) {
  
   const [isPending, startTransition] = useTransition();
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const handleApprove = (formData: FormData) => {
     startTransition(async () => {
-     const refresh =  await approveComment(params.field as string,formData);
-     if(refresh){
-      router.refresh()
+     const result = await approveComment(params.field as string, formData);
+     if (result.ok) {
+      router.refresh();
+     } else {
+      showErrorToast(result.error ?? describeStatus(500), '', 6000);
      }
     });
   };

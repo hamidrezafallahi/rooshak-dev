@@ -122,7 +122,7 @@ public class ProductModel3DTests : IDisposable
         Assert.Null(model.UsdzUrl);
         Assert.Null(model.UsdzSizeBytes);
 
-        Assert.Throws<ArgumentException>(() => ProductModel3D.Create(5, " ", 1, 1));
+        Assert.Throws<OnlineShop.Domain.Common.DomainException>(() => ProductModel3D.Create(5, " ", 1, 1));
     }
 
     private sealed class FakeEnv(string webRoot) : IWebHostEnvironment

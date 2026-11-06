@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Commands;
 using Application.Common;
 using Application.Common.Interfaces;
@@ -23,7 +24,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             AnnouncementBar bar;
             try
@@ -33,7 +34,7 @@ namespace Application.Handler.CommandHandler
                     request.BackgroundColor, request.TextColor, request.HeightPx,
                     request.StartsAt, request.EndsAt, request.DisplayOrder, userId.Value);
             }
-            catch (ArgumentException ex)
+            catch (DomainException ex)
             {
                 return ServiceResult<IdDto>.Failed(ex.Message);
             }
@@ -58,7 +59,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var bar = await _repo.GetByIdAsync(request.Id);
             if (bar == null)
@@ -71,7 +72,7 @@ namespace Application.Handler.CommandHandler
                     request.BackgroundColor, request.TextColor, request.HeightPx,
                     request.StartsAt, request.EndsAt, request.DisplayOrder, userId.Value);
             }
-            catch (ArgumentException ex)
+            catch (DomainException ex)
             {
                 return ServiceResult<IdDto>.Failed(ex.Message);
             }
@@ -104,7 +105,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var bar = await _repo.GetByIdAsync(request.Id);
             if (bar == null)
@@ -119,7 +120,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var bar = await _repo.GetByIdAsync(request.Id);
             if (bar == null)

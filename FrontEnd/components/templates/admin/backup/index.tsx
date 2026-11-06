@@ -13,6 +13,13 @@ import {
   showErrorToast,
   showSuccessToast,
 } from '@utils/core';
+import {
+  ApiRequestError,
+  describeStatus,
+  describeThrown,
+  errorTextOf,
+  readApiResult,
+} from '@lib/apiError';
 
 type BackupFile = {
   fileName: string;
@@ -61,13 +68,13 @@ async function uploadRestore(
     () => sendRestore(form, onProgress, onSent),
     (sent) => sent.status,
   );
-  if (xhr.status === 401 || xhr.status === 403) {
-    throw new Error('UNAUTHORIZED');
-  }
   try {
-    return JSON.parse(xhr.responseText) as ApiEnvelope<RestoreResult>;
+    const body = JSON.parse(xhr.responseText) as ApiEnvelope<RestoreResult>;
+    return xhr.status >= 400 && body?.isSuccess !== true
+      ? { ...body, isSuccess: false, error: errorTextOf(body) ?? describeStatus(xhr.status) }
+      : body;
   } catch {
-    throw new Error(`HTTP ${xhr.status}`);
+    return { isSuccess: false, error: describeStatus(xhr.status) };
   }
 }
 
@@ -86,7 +93,7 @@ function sendRestore(
       }
     };
     xhr.upload.onload = onSent;
-    xhr.onerror = () => reject(new Error('NETWORK'));
+    xhr.onerror = () => reject(new ApiRequestError(describeStatus('FETCH_ERROR')));
     xhr.onload = () => resolve(xhr);
     xhr.send(form);
   });
@@ -153,19 +160,7 @@ async function apiRequest<T>(
     },
   });
 
-  if (response.status === 401 || response.status === 403) {
-    throw new Error('UNAUTHORIZED');
-  }
-
-  if (response.status === 204) {
-    return { isSuccess: true, data: null };
-  }
-
-  const payload = (await response.json()) as ApiEnvelope<T>;
-  if (!response.ok && !payload?.error) {
-    throw new Error(`HTTP ${response.status}`);
-  }
-  return payload;
+  return readApiResult<T>(response);
 }
 
 export default function AdminBackupPanel() {
@@ -194,12 +189,15 @@ export default function AdminBackupPanel() {
         const result = await apiRequest<BackupSettings>('Backup/settings');
         if (result.isSuccess && result.data) {
           setSettings(result.data);
+        } else if (!result.isSuccess) {
+          showErrorToast(result.error || t('admin.backupLoadError'));
         }
-      } catch {
+      } catch (error) {
         // Settings are optional; the backup list still works.
+        showErrorToast(describeThrown(error));
       }
     });
-  }, []);
+  }, [t]);
 
   const loadSeedStatus = useCallback(() => {
     startTransition(async () => {
@@ -207,12 +205,15 @@ export default function AdminBackupPanel() {
         const result = await apiRequest<SeedStatus>('Seed');
         if (result.isSuccess && result.data) {
           setSeedStatus(result.data);
+        } else if (!result.isSuccess) {
+          showErrorToast(result.error || t('admin.backupLoadError'));
         }
-      } catch {
+      } catch (error) {
         // Seed panel is optional; backup still works.
+        showErrorToast(describeThrown(error));
       }
     });
-  }, []);
+  }, [t]);
 
   const loadBackups = useCallback(() => {
     startTransition(async () => {
@@ -225,9 +226,9 @@ export default function AdminBackupPanel() {
           return;
         }
         setItems(result.data?.items ?? []);
-      } catch {
+      } catch (error) {
         setLoadError(true);
-        showErrorToast(t('admin.backupLoadError'));
+        showErrorToast(describeThrown(error));
       }
     });
   }, [t]);
@@ -256,8 +257,8 @@ export default function AdminBackupPanel() {
       }
       showSuccessToast(t('admin.seedApplySuccess'));
       loadSeedStatus();
-    } catch {
-      showErrorToast(t('admin.seedApplyError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setSeeding(false);
     }
@@ -273,8 +274,8 @@ export default function AdminBackupPanel() {
       }
       showSuccessToast(t('admin.backupCreateSuccess'));
       loadBackups();
-    } catch {
-      showErrorToast(t('admin.backupCreateError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setCreating(false);
     }
@@ -292,8 +293,8 @@ export default function AdminBackupPanel() {
       }
       showSuccessToast(t('admin.backupFullCreateSuccess'));
       loadBackups();
-    } catch {
-      showErrorToast(t('admin.backupCreateError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setCreatingFull(false);
     }
@@ -317,8 +318,8 @@ export default function AdminBackupPanel() {
       }
       setSettings(result.data);
       showSuccessToast(t('admin.backupAutoSaved'));
-    } catch {
-      showErrorToast(t('admin.backupAutoSaveError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setSavingSettings(false);
     }
@@ -354,11 +355,7 @@ export default function AdminBackupPanel() {
       loadBackups();
       loadSettings();
     } catch (error) {
-      showErrorToast(
-        error instanceof Error && error.message === 'UNAUTHORIZED'
-          ? t('admin.backupRestoreSuperAdminOnly')
-          : t('admin.backupRestoreError'),
-      );
+      showErrorToast(describeThrown(error));
     } finally {
       setRestoreStage('idle');
     }
@@ -382,7 +379,8 @@ export default function AdminBackupPanel() {
       );
 
       if (!response.ok) {
-        showErrorToast(t('admin.backupDownloadError'));
+        const { error } = await readApiResult(response);
+        showErrorToast(error || t('admin.backupDownloadError'));
         return;
       }
 
@@ -397,8 +395,8 @@ export default function AdminBackupPanel() {
       URL.revokeObjectURL(url);
       showSuccessToast(t('admin.backupDownloadSuccess'));
       loadSettings();
-    } catch {
-      showErrorToast(t('admin.backupDownloadError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setBusyFile(null);
     }
@@ -420,8 +418,8 @@ export default function AdminBackupPanel() {
       }
       showSuccessToast(t('admin.backupDeleteSuccess'));
       setItems((prev) => prev.filter((item) => item.fileName !== fileName));
-    } catch {
-      showErrorToast(t('admin.backupDeleteError'));
+    } catch (error) {
+      showErrorToast(describeThrown(error));
     } finally {
       setBusyFile(null);
     }

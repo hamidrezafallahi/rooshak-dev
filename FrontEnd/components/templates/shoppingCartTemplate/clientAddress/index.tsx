@@ -56,7 +56,9 @@ export default function ClientAddress() {
         setShowAddForm(false);
         refetch();
       }
-    } catch {}
+    } catch {
+      // baseQueryByToken already showed the reason.
+    }
   };
   const handleShowAddForm = () => {
     setShowAddForm(true);
@@ -75,7 +77,9 @@ export default function ClientAddress() {
         setShowAddForm(false);
         refetch();
       }
-    } catch {}
+    } catch {
+      // baseQueryByToken already showed the reason.
+    }
   };
 
 

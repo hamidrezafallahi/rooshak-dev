@@ -16,6 +16,7 @@ import RedirectToPayment from '@components/templates/payment/redirectToPayment';
 import { useGetConditionallyMutation } from '@services/base';
 import { IBaseQueryResponse } from '@services/base/type';
 import { showErrorToast } from '@utils/core';
+import { describeThrown } from '@lib/apiError';
 
 export interface IOrderSummarySnapshot {
   addressName: string;
@@ -57,10 +58,8 @@ export default function FinalizeOrder({
       }
 
       showErrorToast(res.error ?? t('payment.payment_error'));
-    } catch (err: any) {
-      showErrorToast(
-        err?.data?.error ?? err?.message ?? t('payment.payment_error')
-      );
+    } catch (err) {
+      showErrorToast(describeThrown(err));
     }
   };
 

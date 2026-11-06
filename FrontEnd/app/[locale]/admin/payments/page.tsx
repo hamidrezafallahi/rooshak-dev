@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import {
-  fetchWithAuth,
-  forbiddenMessage,
-} from '@lib/client-auth';
+  ApiRequestError,
+  describeThrown,
+  readApiResult,
+} from '@lib/apiError';
+import { fetchWithAuth } from '@lib/client-auth';
 
 type Payment = {
   id: number;
@@ -76,18 +78,15 @@ export default function AdminPaymentsPage() {
           cache: 'no-store',
           signal: controller.signal,
         });
-        // A framework 401/403 has an empty body, so check before parsing.
-        if (response.status === 403) throw new Error(forbiddenMessage());
-        if (response.status === 401) throw new Error('HTTP 401');
-        const payload = (await response.json()) as PaymentsResponse;
-        if (!response.ok || payload.isSuccess === false) {
-          throw new Error(payload.error || `HTTP ${response.status}`);
+        const payload = await readApiResult<PaymentsResponse['data']>(response);
+        if (!payload.isSuccess) {
+          throw new ApiRequestError(payload.error ?? '');
         }
         setPayments(payload.data?.records ?? []);
         setTotalCount(payload.data?.totalCount ?? payload.data?.records?.length ?? 0);
       } catch (loadError) {
         if (!controller.signal.aborted) {
-          setError(loadError instanceof Error ? loadError.message : 'خطا در دریافت پرداخت‌ها');
+          setError(describeThrown(loadError));
         }
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);

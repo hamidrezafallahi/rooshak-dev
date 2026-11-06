@@ -22,16 +22,20 @@ function PromoCode() {
   const dispatch = useDispatch();
   const handleSubmitPromoCode = async () => {
     if (promoCode && promoCode.trim().length > 0) {
-      const res = await getPromoCode({
-        url: `/DiscountCodes/getCode/${promoCode?.trim()}`,
-        method: "GET",
-        id:"none"
-      }).unwrap();
-      if (res.isSuccess == false) {
+      try {
+        const res = await getPromoCode({
+          url: `/DiscountCodes/getCode/${promoCode?.trim()}`,
+          method: "GET",
+          id:"none"
+        }).unwrap();
+        if (res.isSuccess == false) {
           showErrorToast(res.error);
         } else if (res.isSuccess) {
           dispatch(setPromotionCode({ promo: res.data}));
-        showSuccessToast(t("shoppingCart.promoCodeSubmit"));
+          showSuccessToast(t("shoppingCart.promoCodeSubmit"));
+        }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     }
   };

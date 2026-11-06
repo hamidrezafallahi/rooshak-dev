@@ -60,7 +60,7 @@ public abstract class BaseEntity
     protected void MarkDeleted(int userId)
     {
         if (IsDeleted)
-            throw new DomainException($"Entity {GetType().Name} with Id {Id} is already deleted.");
+            throw new DomainException("این رکورد قبلاً حذف شده است.");
 
         IsDeleted = true;
         DeletedAt = DateTime.UtcNow;

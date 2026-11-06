@@ -4,9 +4,10 @@ import { getTranslations } from 'next-intl/server';
 
 import { SimpleProductCard } from '@components/molecules/productCard';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { ILandingProduct } from '@models/product';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function CategoryProducts({ id }: { id: number }) {
   const t = await getTranslations('productsPage');
@@ -15,6 +16,8 @@ export async function CategoryProducts({ id }: { id: number }) {
     `${serverApiBaseUrl}/Products/getProductByCategoryId/${id}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
 
   if (!result.ok || !result.data) return null;
 

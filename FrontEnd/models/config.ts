@@ -24,4 +24,5 @@ interface  menuItem {
     }
 export interface menuResponse {
   data: menuItem[];
+  error?: string;
 }

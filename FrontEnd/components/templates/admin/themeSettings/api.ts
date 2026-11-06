@@ -1,8 +1,6 @@
 import { browserApiBaseUrl } from '@/lib/api';
-import {
-  fetchWithAuth,
-  forbiddenMessage,
-} from '@/lib/client-auth';
+import { describeThrown, readApiResult } from '@/lib/apiError';
+import { fetchWithAuth } from '@/lib/client-auth';
 import { revalidateEntity } from '@lib/revalidateEntity';
 
 export const THEME_ENDPOINT = 'themeSettings';
@@ -15,14 +13,9 @@ async function send(path: string, init: RequestInit): Promise<Result> {
       ...init,
       cache: 'no-store',
     });
-    if (res.status === 403) return { isSuccess: false, error: forbiddenMessage() };
-    const json = (await res.json().catch(() => null)) as Result | null;
-    if (!res.ok || !json?.isSuccess) {
-      return { isSuccess: false, error: json?.error || `HTTP ${res.status}` };
-    }
-    return { isSuccess: true };
+    return await readApiResult(res);
   } catch (err) {
-    return { isSuccess: false, error: err instanceof Error ? err.message : null };
+    return { isSuccess: false, error: describeThrown(err) };
   }
 }
 

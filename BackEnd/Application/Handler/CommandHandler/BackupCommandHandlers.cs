@@ -14,36 +14,22 @@ namespace Application.Handler.CommandHandler
             CreateBackupCommand request,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                var file = await backupService.CreateAsync(cancellationToken);
-                return ServiceResult<BackupFileDto>.Ok(file);
-            }
-            catch (Exception ex)
-            {
-                return ServiceResult<BackupFileDto>.Failed(ex.Message);
-            }
+            var file = await backupService.CreateAsync(cancellationToken);
+            return ServiceResult<BackupFileDto>.Ok(file);
         }
 
         public async Task<ServiceResult<BackupFileDto>> Handle(
             DeleteBackupCommand request,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                var deleted = await backupService.DeleteAsync(request.FileName, cancellationToken);
-                if (!deleted)
-                    return ServiceResult<BackupFileDto>.Failed("Backup file not found");
+            var deleted = await backupService.DeleteAsync(request.FileName, cancellationToken);
+            if (!deleted)
+                return ServiceResult<BackupFileDto>.Failed("فایل پشتیبان موردنظر پیدا نشد.");
 
-                return ServiceResult<BackupFileDto>.Ok(new BackupFileDto
-                {
-                    FileName = request.FileName,
-                });
-            }
-            catch (Exception ex)
+            return ServiceResult<BackupFileDto>.Ok(new BackupFileDto
             {
-                return ServiceResult<BackupFileDto>.Failed(ex.Message);
-            }
+                FileName = request.FileName,
+            });
         }
     }
 }

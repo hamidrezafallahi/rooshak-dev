@@ -7,6 +7,7 @@ import {
 } from '@models/category';
 
 import { serverApiBaseUrl } from './api';
+import { describeStatus, readApiResult } from './apiError';
 
 const emptyCategoryQueries: CategoryRequestQueries['queries'] = {};
 
@@ -24,14 +25,13 @@ export async function getCategories(
     const res = await fetch(url, {
       next: { revalidate: 60, tags: ['categories'] },
     });
-    if (!res.ok) {
-      console.error('getCategories HTTP error', { url, status: res.status });
-      return undefined;
+    const result = await readApiResult<PagedResponse<ICategory>['data']>(res);
+    if (!result.isSuccess) {
+      console.error('getCategories failed', { url, status: res.status, error: result.error });
     }
-    const data: PagedResponse<ICategory> = await res.json();
-    return data;
-
+    return result;
   } catch (error) {
-    console.log(error)
+    console.error('getCategories: no answer', { url }, error);
+    return { isSuccess: false, data: null, error: describeStatus(503) };
   }
 }

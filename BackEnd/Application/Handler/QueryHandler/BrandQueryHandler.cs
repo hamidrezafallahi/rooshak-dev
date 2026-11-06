@@ -116,7 +116,7 @@ namespace Application.Handler.QueryHandler
         {
             var key = (request.IdOrSlug ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(key))
-                return ServiceResult<BrandDto?>.Failed("Brand not found");
+                return ServiceResult<BrandDto?>.Failed("برند موردنظر پیدا نشد.");
 
             IQueryable<Brand> query = _repo.Query(b => !b.IsDeleted);
             if (int.TryParse(key, out var id))
@@ -126,7 +126,7 @@ namespace Application.Handler.QueryHandler
 
             var brand = await query.FirstOrDefaultAsync(cancellationToken);
             if (brand == null)
-                return ServiceResult<BrandDto?>.Failed("Brand not found");
+                return ServiceResult<BrandDto?>.Failed("برند موردنظر پیدا نشد.");
             var brandDto = new BrandDto
             {
                 Id = brand.Id,

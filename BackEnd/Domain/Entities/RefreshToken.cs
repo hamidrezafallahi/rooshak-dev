@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 
 namespace OnlineShop.Domain.Entities
 {
@@ -48,7 +49,7 @@ namespace OnlineShop.Domain.Entities
         public void Revoke(string? replacedByToken, int currentUserId)
         {
             if (IsRevoked)
-                throw new InvalidOperationException("Token already revoked.");
+                throw new DomainException("این نشست قبلاً باطل شده است.");
 
             IsRevoked = true;
             ReplacedByToken = replacedByToken;

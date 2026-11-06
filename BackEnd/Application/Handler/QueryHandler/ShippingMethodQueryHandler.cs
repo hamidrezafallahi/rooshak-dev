@@ -80,7 +80,7 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<ShippingMethodDto>.Failed("Unauthorized");
+            return ServiceResult<ShippingMethodDto>.Unauthorized();
         var entity = await _repo.GetByIdAsync(request.Id);
         if (entity == null)
             return ServiceResult<ShippingMethodDto>.Failed("متد ارسال پیدا نشد");

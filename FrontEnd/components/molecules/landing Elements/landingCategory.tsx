@@ -6,15 +6,23 @@ import { ICategory } from '@models/category';
 
 import CategoryCard from '../categoryCart';
 import SectionHeading from '../storefront/SectionHeading';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 interface IProps {
   categories: ICategory[];
+  error?: string | null;
 }
 
-export default async function LandingCategory({ categories }: IProps) {
+export default async function LandingCategory({ categories, error }: IProps) {
   const locale = await getLocale();
   const t = await getTranslations('landing');
-  if (!categories?.length) return null;
+  if (!categories?.length) {
+    return error ? (
+      <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 w-full max-w-[1440px]">
+        <ApiErrorNotice message={error} />
+      </section>
+    ) : null;
+  }
 
   return (
     <section

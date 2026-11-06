@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using OnlineShop.Domain.Entities;
 using Xunit;
 
@@ -16,7 +17,7 @@ public class ThemeAndAnnouncementDomainTests
 
         Assert.Equal("Crystal", theme.Name);
         Assert.Equal("#abcdef", theme.PrimaryColor);
-        Assert.Throws<ArgumentException>(() => ThemeSetting.Create(" ", Palette(), 1));
+        Assert.Throws<DomainException>(() => ThemeSetting.Create(" ", Palette(), 1));
     }
 
     [Theory]
@@ -25,7 +26,7 @@ public class ThemeAndAnnouncementDomainTests
     [InlineData("#12345g")]
     public void Theme_rejects_invalid_hex(string value)
     {
-        Assert.Throws<ArgumentException>(() => ThemeSetting.Create("x", Palette(value), 1));
+        Assert.Throws<DomainException>(() => ThemeSetting.Create("x", Palette(value), 1));
     }
 
     [Fact]
@@ -70,7 +71,7 @@ public class ThemeAndAnnouncementDomainTests
     [InlineData(500)]
     public void Announcement_height_is_range_checked(int height)
     {
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<DomainException>(() =>
             AnnouncementBar.Create("سلام", null, null, null, null, height, null, null, null, 1));
     }
 
@@ -78,11 +79,11 @@ public class ThemeAndAnnouncementDomainTests
     public void Announcement_rejects_end_before_start_and_bad_colors()
     {
         var now = DateTime.UtcNow;
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<DomainException>(() =>
             AnnouncementBar.Create("سلام", null, null, null, null, null, now, now.AddHours(-1), null, 1));
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<DomainException>(() =>
             AnnouncementBar.Create("سلام", null, null, "blue", null, null, null, null, null, 1));
-        Assert.Throws<ArgumentException>(() =>
+        Assert.Throws<DomainException>(() =>
             AnnouncementBar.Create(" ", null, null, null, null, null, null, null, null, 1));
     }
 }

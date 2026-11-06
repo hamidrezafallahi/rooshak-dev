@@ -15,7 +15,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var entityConfig = EntityConfig.Create(
                  userId.Value,
@@ -37,11 +37,11 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var config = await _repo.GetByIdAsync(request.Id);
             if (config == null)
-                return ServiceResult<IdDto>.Failed("Config پیدا نشد");
+                return ServiceResult<IdDto>.Failed("پیکربندی موردنظر پیدا نشد.");
             //var title = string.IsNullOrWhiteSpace(request.Title) ? null : request.Title;
             //var content = string.IsNullOrWhiteSpace(request.Content) ? null : request.Content;
             //var slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug;
@@ -65,11 +65,11 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var config = await _repo.GetByIdAsync(request.Id);
             if (config == null)
-                return ServiceResult<IdDto>.Failed("Config پیدا نشد");
+                return ServiceResult<IdDto>.Failed("پیکربندی موردنظر پیدا نشد.");
 
             config.Delete(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -80,11 +80,11 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var config = await _repo.GetByIdAsync(request.Id);
             if (config == null)
-                return ServiceResult<IdDto>.Failed("Config پیدا نشد");
+                return ServiceResult<IdDto>.Failed("پیکربندی موردنظر پیدا نشد.");
 
             config.SetActive(request.IsActive, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);

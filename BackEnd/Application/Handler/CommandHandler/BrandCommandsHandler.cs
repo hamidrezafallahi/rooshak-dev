@@ -23,7 +23,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var brand = Brand.Create(
                 name: request.Name,
@@ -62,7 +62,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var brand = await _repo.GetByIdAsync(request.Id);
             if (brand == null)
@@ -106,7 +106,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var brand = await _repo.GetByIdAsync(request.Id);
             if (brand == null)
@@ -125,7 +125,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var brand = await _repo.GetByIdAsync(request.Id);
             if (brand == null)

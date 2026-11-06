@@ -16,6 +16,7 @@ export default function OrderDetails({
     url: `/orders/${selectedOrderId}`,
     method: "GET",
     skip: !selectedOrderId,
+    reportFailure: true,
   });
 
   if (!selectedOrderId)

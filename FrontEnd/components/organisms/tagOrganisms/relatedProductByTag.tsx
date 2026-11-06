@@ -5,14 +5,17 @@ import { getTranslations } from 'next-intl/server';
 import { SimpleProductCard } from '@components/molecules/productCard';
 import { ISimpleProduct } from '@components/molecules/productCard/type';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function RelatedProductByTag({ tagId }: { tagId: number }) {
   const result = await safeFetchJson<SimpleResponse<ISimpleProduct[]>>(
     `${serverApiBaseUrl}/ProductOfferTags/tag/${tagId}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
   const products: ISimpleProduct[] =
     result.ok && result.data?.isSuccess !== false ? result.data?.data || [] : [];
   const t = await getTranslations();

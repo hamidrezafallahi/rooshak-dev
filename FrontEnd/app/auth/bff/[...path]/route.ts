@@ -12,6 +12,7 @@ import {
   refreshTokens,
   writeSessionCookies,
 } from '@lib/session-refresh';
+import { describeStatus } from '@lib/apiError';
 
 export const dynamic = 'force-dynamic';
 /** Allow large banner/product image uploads through the BFF. */
@@ -132,13 +133,25 @@ function copyDownloadHeaders(upstream: Response, target: Headers) {
 async function handle(req: NextRequest, context: RouteContext) {
   const { path } = await context.params;
   if (!path?.length) {
-    return NextResponse.json({ isSuccess: false, error: 'Missing path' }, { status: 400 });
+    return NextResponse.json(
+      {
+        isSuccess: false,
+        error: 'آدرس سرویس در درخواست مشخص نشده است.',
+        errorCode: 'BAD_REQUEST',
+      },
+      { status: 400 },
+    );
   }
   try {
     return await proxyToBackend(req, path);
-  } catch {
+  } catch (error) {
+    console.error('BFF: no answer from the backend', req.nextUrl.pathname, error);
     return NextResponse.json(
-      { isSuccess: false, error: 'BFF proxy failed' },
+      {
+        isSuccess: false,
+        error: describeStatus(503),
+        errorCode: 'SERVICE_UNAVAILABLE',
+      },
       { status: 502 }
     );
   }

@@ -1,9 +1,13 @@
 import { browserApiBaseUrl } from '@/lib/api';
 import {
-  fetchWithAuth,
-  forbiddenMessage,
-} from '@/lib/client-auth';
-import { SimpleResponse } from '@models/base';
+  ApiResult,
+  describeThrown,
+  readApiResult,
+} from '@/lib/apiError';
+import { fetchWithAuth } from '@/lib/client-auth';
+
+export type { FieldError } from '@/lib/apiError';
+export type SaveEntityResponse = ApiResult<any>;
 
 /**
  * Persist an admin entity.
@@ -25,7 +29,7 @@ export async function saveEntity({
   endPoint: string;
   body: FormData | Record<string, unknown>;
   method: 'POST' | 'PUT';
-}): Promise<SimpleResponse<any>> {
+}): Promise<SaveEntityResponse> {
   try {
     const path = endPoint.replace(/^\/+/, '');
     const isFormData =
@@ -41,39 +45,8 @@ export async function saveEntity({
       cache: 'no-store',
     });
 
-    if (response.status === 403) {
-      return { data: null, isSuccess: false, error: forbiddenMessage() };
-    }
-
-    let data: SimpleResponse<any>;
-    try {
-      data = await response.json();
-    } catch {
-      return {
-        data: null,
-        isSuccess: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-      };
-    }
-
-    if (!response.ok && data?.isSuccess !== true) {
-      return {
-        data: data?.data ?? null,
-        isSuccess: false,
-        error:
-          data?.error ||
-          `HTTP ${response.status}: ${response.statusText}`,
-      };
-    }
-
-    return data;
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Failed to save entity';
-    return {
-      data: null,
-      isSuccess: false,
-      error: message,
-    };
+    return await readApiResult(response);
+  } catch (error) {
+    return { data: null, isSuccess: false, error: describeThrown(error) };
   }
 }

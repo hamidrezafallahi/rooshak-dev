@@ -17,6 +17,7 @@ import {
   ContactRequestFormProps,
   ContactRequestFormValues,
 } from './type';
+import { describeThrown } from '@lib/apiError';
 
 const EMPTY_VALUES: ContactRequestFormValues = {
   firstName: '',
@@ -91,8 +92,8 @@ export default function ContactRequestForm({
       } else {
         showErrorToast(res?.error || t('errors.submitFailed'), '', 5000);
       }
-    } catch {
-      showErrorToast(t('errors.connectionError'), '', 5000);
+    } catch (error) {
+      showErrorToast(describeThrown(error), '', 5000);
     }
   };
 

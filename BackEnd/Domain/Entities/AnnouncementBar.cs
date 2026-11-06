@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 namespace OnlineShop.Domain.Entities
 {
     /// <summary>
@@ -101,22 +102,21 @@ namespace OnlineShop.Domain.Entities
             bool replaceSchedule)
         {
             if (string.IsNullOrWhiteSpace(messageFa))
-                throw new ArgumentException("متن فارسی نوار اعلان الزامی است", nameof(messageFa));
+                throw new DomainException("متن فارسی نوار اعلان الزامی است");
 
             if (heightPx is { } h && (h < MinHeightPx || h > MaxHeightPx))
-                throw new ArgumentException(
-                    $"ارتفاع نوار باید بین {MinHeightPx} تا {MaxHeightPx} پیکسل باشد", nameof(heightPx));
+                throw new DomainException($"ارتفاع نوار باید بین {MinHeightPx} تا {MaxHeightPx} پیکسل باشد");
 
             if (!string.IsNullOrWhiteSpace(backgroundColor) && !ThemeSetting.IsValidHex(backgroundColor))
-                throw new ArgumentException("رنگ پس‌زمینه باید به شکل #RRGGBB باشد", nameof(backgroundColor));
+                throw new DomainException("رنگ پس‌زمینه باید به شکل #RRGGBB باشد");
 
             if (!string.IsNullOrWhiteSpace(textColor) && !ThemeSetting.IsValidHex(textColor))
-                throw new ArgumentException("رنگ متن باید به شکل #RRGGBB باشد", nameof(textColor));
+                throw new DomainException("رنگ متن باید به شکل #RRGGBB باشد");
 
             var start = replaceSchedule ? ToUtc(startsAt) : StartsAt;
             var end = replaceSchedule ? ToUtc(endsAt) : EndsAt;
             if (start is not null && end is not null && end < start)
-                throw new ArgumentException("پایان نمایش نمی‌تواند قبل از شروع باشد", nameof(endsAt));
+                throw new DomainException("پایان نمایش نمی‌تواند قبل از شروع باشد");
 
             MessageFa = messageFa.Trim();
             MessageEn = (messageEn ?? string.Empty).Trim();

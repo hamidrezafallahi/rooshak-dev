@@ -21,7 +21,7 @@ public class SpecialOffersController : BaseController
     public async Task<ActionResult<ListDto<SpecialOffersDto>>> GetSpecialOffers([FromQuery] GetSpecialOffersQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
 
         return Ok(result);
@@ -30,7 +30,7 @@ public class SpecialOffersController : BaseController
     public async Task<ActionResult<ListDto<SpecialOffersDto>>> GetLandingSpecialOffers([FromQuery] GetLandingSpecialOffersQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
 
         return Ok(result);
@@ -40,7 +40,7 @@ public class SpecialOffersController : BaseController
     public async Task<ActionResult<SpecialOffersDto>> GetSpecialOfferById(int id)
     {
         var result = await _mediator.Send(new GetSpecialOfferByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -52,7 +52,7 @@ public class SpecialOffersController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -67,7 +67,7 @@ public class SpecialOffersController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -81,7 +81,7 @@ public class SpecialOffersController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -93,7 +93,7 @@ public class SpecialOffersController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteSpecialOfferCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

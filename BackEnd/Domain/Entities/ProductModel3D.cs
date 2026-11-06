@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 namespace OnlineShop.Domain.Entities
 {
     /// <summary>
@@ -23,7 +24,7 @@ namespace OnlineShop.Domain.Entities
         public static ProductModel3D Create(int productId, string modelUrl, long modelSizeBytes, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(modelUrl))
-                throw new ArgumentException("ModelUrl cannot be empty.", nameof(modelUrl));
+                throw new DomainException("نشانی فایل مدل نمی‌تواند خالی باشد.");
 
             var model = new ProductModel3D
             {
@@ -38,7 +39,7 @@ namespace OnlineShop.Domain.Entities
         public void SetModel(string modelUrl, long sizeBytes, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(modelUrl))
-                throw new ArgumentException("ModelUrl cannot be empty.", nameof(modelUrl));
+                throw new DomainException("نشانی فایل مدل نمی‌تواند خالی باشد.");
 
             ModelUrl = modelUrl;
             ModelSizeBytes = sizeBytes;

@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using System.Text.RegularExpressions;
 
 namespace OnlineShop.Domain.Entities
@@ -43,7 +44,7 @@ namespace OnlineShop.Domain.Entities
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("نام تم الزامی است", nameof(name));
+                throw new DomainException("نام تم الزامی است");
 
             var theme = new ThemeSetting { Name = name.Trim() };
             theme.ApplyPalette(palette);
@@ -84,12 +85,12 @@ namespace OnlineShop.Domain.Entities
             if (string.IsNullOrWhiteSpace(incoming))
             {
                 if (string.IsNullOrEmpty(current))
-                    throw new ArgumentException($"رنگ {field} الزامی است", field);
+                    throw new DomainException($"رنگ {field} الزامی است");
                 return current;
             }
 
             if (!IsValidHex(incoming))
-                throw new ArgumentException($"رنگ {field} باید به شکل #RRGGBB باشد", field);
+                throw new DomainException($"رنگ {field} باید به شکل #RRGGBB باشد");
 
             return incoming.Trim().ToLowerInvariant();
         }

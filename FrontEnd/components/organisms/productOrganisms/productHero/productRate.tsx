@@ -2,10 +2,11 @@ import { getTranslations } from 'next-intl/server';
 
 import { Rate } from '@components/atoms/defaultElements/customRate';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { EnumTargetType } from '@models/comment';
 import { IRate } from '@models/rate';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 type Props = {
   id: number;
@@ -23,6 +24,8 @@ export default async function ProductRate({ id, average, count }: Props) {
       `${serverApiBaseUrl}/Rates/average?targetType=${EnumTargetType.Product}&targetId=${id}`,
       { next: { revalidate: 36 } },
     );
+    const failure = loadFailure(result);
+    if (failure) return <ApiErrorNotice message={failure} />;
     resolvedAverage =
       result.ok && result.data?.isSuccess !== false
         ? result.data?.data?.average ?? 0

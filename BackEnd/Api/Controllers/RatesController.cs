@@ -20,7 +20,7 @@ public class RatesController : BaseController
     public async Task<ActionResult<ListDto<RateDto>>> GetAll([FromQuery] GetAllRateQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -28,7 +28,7 @@ public class RatesController : BaseController
     public async Task<ActionResult<RateDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetRateByIdQuery {Id=id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -36,7 +36,7 @@ public class RatesController : BaseController
     public async Task<ActionResult<ListDto<AverageRateDto>>> GetAverage([FromQuery] GetAverageRateQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -48,7 +48,7 @@ public class RatesController : BaseController
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -57,7 +57,7 @@ public class RatesController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] AddOrUpdateRateCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -70,7 +70,7 @@ public class RatesController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -80,7 +80,7 @@ public class RatesController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteRateCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

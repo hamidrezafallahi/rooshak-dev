@@ -18,7 +18,7 @@ using OnlineShop.Domain.Interfaces;
         public async Task<ServiceResult<IdDto>> Handle(UpdateCartCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var cart = await _repo.GetByIdAsync(request.Id);
             if (cart == null) return ServiceResult<IdDto>.Failed("سبد خرید یافت نشد");
@@ -52,7 +52,7 @@ using OnlineShop.Domain.Interfaces;
         {
             
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<CartReadModel>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<CartReadModel>.Unauthorized();
 
             var cart = await _repo.GetUserCartAsync(userId.Value);
             if (cart == null)
@@ -97,11 +97,11 @@ using OnlineShop.Domain.Interfaces;
     {
        
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
         var cart = await _repo.GetUserCartAsync(userId.Value);
         if (cart == null) return ServiceResult<IdDto>.Failed("سبد یافت نشد");
         var existingItem = cart.Items.FirstOrDefault(i => !i.IsDeleted && i.ProductId == request.ProductId && i.ProductOfferId == request.ProductOfferId) ?? null;
-        if (existingItem == null) return ServiceResult<IdDto>.Failed("آیتم یافت نشد");
+        if (existingItem == null) return ServiceResult<IdDto>.Failed("این کالا در سبد خرید شما پیدا نشد.");
 
         existingItem.Update(request.ProductId,
       request.ProductOfferId,
@@ -127,14 +127,14 @@ using OnlineShop.Domain.Interfaces;
     public async Task<ServiceResult<CartReadModel>> Handle(DecreaseCartItemCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<CartReadModel>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<CartReadModel>.Unauthorized();
             var cart = await _repo.GetUserCartAsync(userId.Value);
             if (cart == null) return ServiceResult<CartReadModel>.Failed("سبد یافت نشد");
 
 
 
             var existingItem = cart.Items.FirstOrDefault(i => !i.IsDeleted && i.ProductId == request.ProductId && i.ProductOfferId == request.ProductOfferId) ?? null;
-            if (existingItem == null) return ServiceResult<CartReadModel>.Failed("آیتم یافت نشد");
+            if (existingItem == null) return ServiceResult<CartReadModel>.Failed("این کالا در سبد خرید شما پیدا نشد.");
 
             if (existingItem.Quantity > 1)
                 existingItem.UpdateQuantity(existingItem.Quantity - 1, userId.Value);
@@ -160,7 +160,7 @@ using OnlineShop.Domain.Interfaces;
         {
  
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var cartItem = await _itemRepo.GetByIdAsync(request.Id);
             if (cartItem == null) return ServiceResult<IdDto>.Failed("آیتم سبد پیدا نشد.");
@@ -184,7 +184,7 @@ using OnlineShop.Domain.Interfaces;
     {
 
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var cartItem = await _itemRepo.GetByIdAsync(request.Id);
         if (cartItem == null) return ServiceResult<IdDto>.Failed("آیتم سبد پیدا نشد.");
@@ -209,7 +209,7 @@ using OnlineShop.Domain.Interfaces;
         {
 
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<CartReadModel>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<CartReadModel>.Unauthorized();
 
             var userCart = await _repo.GetUserCartAsync(userId.Value) ?? Cart.Create(userId.Value, new List<CartItem>(), userId.Value);
             if (userCart.Id == 0) await _repo.AddAsync(userCart);

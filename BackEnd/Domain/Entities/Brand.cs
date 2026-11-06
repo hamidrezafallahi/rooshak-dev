@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -19,7 +20,7 @@ namespace OnlineShop.Domain.Entities
         public static Brand Create(string name, string description, int currentUserId, string? slug = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty.", nameof(name));
+                throw new DomainException("نام برند نمی‌تواند خالی باشد.");
 
             var brand = new Brand
             {

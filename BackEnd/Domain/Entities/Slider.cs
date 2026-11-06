@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 namespace OnlineShop.Domain.Entities
 {
     public class Slide : BaseEntity
@@ -29,7 +30,7 @@ namespace OnlineShop.Domain.Entities
         )
         {
             if (string.IsNullOrWhiteSpace(firstUrl))
-                throw new ArgumentException("آدرس صفحه مربوط به بنر دیده نشد");
+                throw new DomainException("آدرس صفحه مربوط به بنر دیده نشد");
             var slide = new Slide
             {
                 FirstUrl = firstUrl ?? string.Empty,

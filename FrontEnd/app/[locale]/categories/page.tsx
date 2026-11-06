@@ -9,6 +9,7 @@ import PageHeader from '@components/molecules/storefront/PageHeader';
 import { getAll } from '@lib/getAll';
 import { buildPageMetadata } from '@lib/seo';
 import { ICategory } from '@models/category';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export const revalidate = 60;
 
@@ -57,7 +58,9 @@ export default async function Page({ params, searchParams }: Props) {
     <article className="store-page !pt-6">
       <PageHeader title={t('title')} description={t('description')} />
 
-      {categories.length === 0 ? (
+      {!response.isSuccess ? (
+        <ApiErrorNotice message={response.error} />
+      ) : categories.length === 0 ? (
         <EmptyState title={t('empty')} description={t('emptyHint')} />
       ) : (
         <>

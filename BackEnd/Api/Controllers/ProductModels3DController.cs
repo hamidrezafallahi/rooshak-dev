@@ -31,7 +31,7 @@ public class ProductModels3DController : BaseController
     {
         command.ProductId = productId;
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -40,7 +40,7 @@ public class ProductModels3DController : BaseController
     {
         command.ProductId = productId;
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -48,7 +48,7 @@ public class ProductModels3DController : BaseController
     public async Task<IActionResult> Delete(int productId)
     {
         var result = await _mediator.Send(new DeleteProductModel3DCommand { ProductId = productId });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -58,7 +58,7 @@ public class ProductModels3DController : BaseController
     {
         command.ProductId = productId;
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -66,7 +66,7 @@ public class ProductModels3DController : BaseController
     public async Task<IActionResult> DeleteScanSource(int id)
     {
         var result = await _mediator.Send(new DeleteProductScanSourceCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 }

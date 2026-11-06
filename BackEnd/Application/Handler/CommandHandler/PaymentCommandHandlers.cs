@@ -29,7 +29,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var payment = Payment.Create(request.OrderId, request.Amount, request.PaymentMethodId, userId.Value);
             await _repo.AddAsync(payment);
@@ -42,10 +42,10 @@ namespace Application.Handler.CommandHandler
         public async Task<ServiceResult<IdDto>> Handle(MarkPaymentAsPaidCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var payment = await _repo.GetByIdAsync(request.PaymentId);
-            if (payment == null) return ServiceResult<IdDto>.Failed("Payment not found");
+            if (payment == null) return ServiceResult<IdDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             payment.MarkAsPaid(request.TransactionId, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -57,10 +57,10 @@ namespace Application.Handler.CommandHandler
         public async Task<ServiceResult<IdDto>> Handle(MarkPaymentAsFailedCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var payment = await _repo.GetByIdAsync(request.PaymentId);
-            if (payment == null) return ServiceResult<IdDto>.Failed("Payment not found");
+            if (payment == null) return ServiceResult<IdDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             payment.MarkAsFailed(request.TransactionId, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -72,10 +72,10 @@ namespace Application.Handler.CommandHandler
         public async Task<ServiceResult<IdDto>> Handle(CancelPaymentCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var payment = await _repo.GetByIdAsync(request.PaymentId);
-            if (payment == null) return ServiceResult<IdDto>.Failed("Payment not found");
+            if (payment == null) return ServiceResult<IdDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             payment.Cancel(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -86,10 +86,10 @@ namespace Application.Handler.CommandHandler
         public async Task<ServiceResult<IdDto>> Handle(ActivePaymentCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var payment = await _repo.GetByIdAsync(request.Id);
-            if (payment == null) return ServiceResult<IdDto>.Failed("Payment not found");
+            if (payment == null) return ServiceResult<IdDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             payment.SetActive(request.IsActive, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -101,10 +101,10 @@ namespace Application.Handler.CommandHandler
         public async Task<ServiceResult<IdDto>> Handle(DeletePaymentCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var payment = await _repo.GetByIdAsync(request.PaymentId);
-            if (payment == null) return ServiceResult<IdDto>.Failed("Payment not found");
+            if (payment == null) return ServiceResult<IdDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             payment.Delete(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -126,14 +126,14 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<PaymentStartDto>.Failed("Unauthorized");
+                return ServiceResult<PaymentStartDto>.Unauthorized();
 
             var order = await _orderRepo.GetByIdAsync(request.OrderId);
             if (order == null || order.UserId != userId)
-                return ServiceResult<PaymentStartDto>.Failed("Order not found");
+                return ServiceResult<PaymentStartDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             if (order.Status != OrderStatus.Pending)
-                return ServiceResult<PaymentStartDto>.Failed("Order not payable");
+                return ServiceResult<PaymentStartDto>.Failed("این سفارش در وضعیت قابل پرداخت نیست.");
 
             var payment = Payment.Create(order.Id, order.FinalPrice, order.PaymentMethodId, userId.Value);
             await _paymentRepo.AddAsync(payment);
@@ -155,7 +155,7 @@ namespace Application.Handler.CommandHandler
                 payment.MarkAsFailed(gatewayResult.Authority ?? string.Empty, userId.Value);
                 await _paymentRepo.SaveChangesAsync(cancellationToken);
                 return ServiceResult<PaymentStartDto>.Failed(
-                    gatewayResult.ErrorMessage ?? "Gateway request failed");
+                    gatewayResult.ErrorMessage ?? "درخواست پرداخت به درگاه انجام نشد.");
             }
 
             payment.SetTransactionId(gatewayResult.Authority, userId.Value);
@@ -183,10 +183,10 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<PaymentVerifyResponseDto>.Failed("Unauthorized");
+                return ServiceResult<PaymentVerifyResponseDto>.Unauthorized();
 
             if (string.IsNullOrWhiteSpace(request.Authority))
-                return ServiceResult<PaymentVerifyResponseDto>.Failed("Authority is required");
+                return ServiceResult<PaymentVerifyResponseDto>.Failed("شناسهٔ پرداخت از درگاه دریافت نشد.");
 
             var payment = await _paymentRepo.GetByTransactionIdAsync(request.Authority);
 
@@ -203,11 +203,11 @@ namespace Application.Handler.CommandHandler
             }
 
             if (payment == null)
-                return ServiceResult<PaymentVerifyResponseDto>.Failed("Payment not found");
+                return ServiceResult<PaymentVerifyResponseDto>.Failed("پرداخت موردنظر پیدا نشد.");
 
             var order = await _orderRepo.GetOrderWithItemsAsync(payment.OrderId);
             if (order == null || order.UserId != userId)
-                return ServiceResult<PaymentVerifyResponseDto>.Failed("Order not found");
+                return ServiceResult<PaymentVerifyResponseDto>.Failed("سفارش موردنظر پیدا نشد.");
 
             // Idempotent: already paid
             if (payment.Status == PaymentStatus.Success && order.Status == OrderStatus.Paid)
@@ -222,7 +222,7 @@ namespace Application.Handler.CommandHandler
             }
 
             if (order.Status != OrderStatus.Pending)
-                return ServiceResult<PaymentVerifyResponseDto>.Failed("Order not payable");
+                return ServiceResult<PaymentVerifyResponseDto>.Failed("این سفارش در وضعیت قابل پرداخت نیست.");
 
             var isOkStatus = string.Equals(request.Status, "OK", StringComparison.OrdinalIgnoreCase);
             if (!isOkStatus)
@@ -236,7 +236,7 @@ namespace Application.Handler.CommandHandler
                     OrderId = order.Id,
                     TransactionId = request.Authority,
                     Amount = payment.Amount,
-                    ErrorMessage = "Payment cancelled or failed"
+                    ErrorMessage = "پرداخت لغو شد یا در درگاه ناموفق بود."
                 });
             }
 
@@ -252,7 +252,7 @@ namespace Application.Handler.CommandHandler
                     OrderId = order.Id,
                     TransactionId = request.Authority,
                     Amount = payment.Amount,
-                    ErrorMessage = verifyResult.ErrorMessage ?? "Payment verification failed"
+                    ErrorMessage = verifyResult.ErrorMessage ?? "تأیید پرداخت از درگاه انجام نشد."
                 });
             }
 

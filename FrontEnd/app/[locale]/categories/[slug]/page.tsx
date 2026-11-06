@@ -11,6 +11,7 @@ import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
 import type { ICategory } from '@models/category';
+import { ApiRequestError, describeStatus } from '@lib/apiError';
 
 export const dynamicParams = true;
 
@@ -24,13 +25,15 @@ export async function generateStaticParams() {
 
 async function fetchCategory(
   slug: string,
-): Promise<{ status: number; category: ICategory | null }> {
+): Promise<{ status: number; category: ICategory | null; error?: string }> {
   const result = await safeFetchJson<SimpleResponse<ICategory>>(
     `${serverApiBaseUrl}/Categories/${slug}`,
     { next: { revalidate: 36 } },
   );
 
-  if (!result.ok) return { status: result.status || 500, category: null };
+  if (!result.ok) {
+    return { status: result.status || 500, category: null, error: result.error };
+  }
   if (result.data.isSuccess === false || !result.data.data) {
     return { status: 404, category: null };
   }
@@ -73,23 +76,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
-  const { status, category } = await fetchCategory(slug);
+  const { status, category, error } = await fetchCategory(slug);
 
   // A real 404 status, not a 200 "not found" page (soft 404).
   if (status === 404) {
     notFound();
   }
 
+  // API down / 5xx: error status instead of an indexable 200 page.
   if (!category) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('loadError')}</h1>
-          <p className="store-empty-desc">{tStore('loadErrorHint')}</p>
-        </div>
-      </div>
-    );
+    throw new ApiRequestError(error ?? describeStatus(status));
   }
 
   if (category.slug && category.slug !== slug && /^\d+$/.test(slug)) {

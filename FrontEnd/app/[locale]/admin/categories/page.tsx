@@ -33,16 +33,6 @@ export default async function Page({
 
   const res = await getFormConfigByEntityName('categories');
 
-  if (!res) {
-    return (
-      <div className="admin-page">
-        <div className="admin-panel admin-empty">
-          <p className="admin-empty-title">Form configuration not found</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <AdminCategoryTemplate
       categories={list?.data.records ?? []}

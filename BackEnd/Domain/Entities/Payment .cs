@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 using Domain.Enums;
 using Domain.Enums.Domain.Enums;
 
@@ -22,7 +23,7 @@ namespace OnlineShop.Domain.Entities
         public static Payment Create(int orderId, decimal amount, int paymentMethodId, int currentUserId)
         {
             if (amount <= 0)
-                throw new ArgumentException("Payment amount must be greater than zero.");
+                throw new DomainException("مبلغ پرداخت باید بیشتر از صفر باشد.");
 
             var payment = new Payment
             {

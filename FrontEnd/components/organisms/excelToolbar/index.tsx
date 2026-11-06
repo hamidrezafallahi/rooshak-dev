@@ -17,6 +17,7 @@ import {
   importExcel,
 } from '@lib/excel';
 import { showErrorToast, showSuccessToast } from '@utils/core';
+import { describeThrown } from '@lib/apiError';
 
 type ExcelToolbarProps = {
   /** Admin endpoint name, e.g. "products". */
@@ -60,7 +61,7 @@ export default function ExcelToolbar({ entity, selectedIds, search, filters }: E
     try {
       await action();
     } catch (error) {
-      showErrorToast(error instanceof Error && error.message ? error.message : t('downloadError'));
+      showErrorToast(describeThrown(error));
     } finally {
       setBusy(null);
     }

@@ -31,7 +31,7 @@ interface TCommentAndRate {
 }
 export default function CommentAndRate({ ...props }: TCommentAndRate) {
   const { TargetId, TargetType } = props;
-  const pathname = usePathname();
+  const pathname = usePathname()!;
   const locale = useLocale();
   const [value, setValue] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -49,10 +49,10 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
       },
       method: "POST",
     });
-    if (res) {
-      console.log(res);
+    // Only a saved rating stays selected; a failure was shown by baseQueryByToken.
+    if (!('error' in res) && res.data?.isSuccess !== false) {
+      setValue(e);
     }
-    setValue(e);
   };
 
   const handleSubmitComment = async () => {

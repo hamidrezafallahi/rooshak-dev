@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 namespace OnlineShop.Domain.Entities
 {
     public class Category : BaseEntity
@@ -44,7 +45,7 @@ namespace OnlineShop.Domain.Entities
             string? faqJson = null)
         {
             if (string.IsNullOrWhiteSpace(persianName))
-                throw new ArgumentException("Category persianName cannot be empty.", nameof(persianName));
+                throw new DomainException("نام فارسی دسته‌بندی نمی‌تواند خالی باشد.");
 
             var category = new Category
             {

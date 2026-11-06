@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using OnlineShop.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Enums;
 using OnlineShop.Domain.Interfaces;
@@ -278,7 +279,7 @@ namespace OnlineShop.Infrastructure.Repositories
             var code = await _context.DiscountCode
                 .FirstOrDefaultAsync(c => c.Id == discountCodeId && c.IsValid && !c.IsDeleted);
 
-            if (code == null) throw new Exception("Discount code not found or invalid.");
+            if (code == null) throw new DomainException("کد تخفیف پیدا نشد یا معتبر نیست.");
 
             order.ApplyDiscountCode(code, currentUserId);
             await _context.SaveChangesAsync();

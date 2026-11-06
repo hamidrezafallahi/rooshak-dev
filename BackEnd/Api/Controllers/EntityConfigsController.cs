@@ -22,7 +22,7 @@ public class EntityConfigsController : BaseController
     public async Task<ActionResult<ListDto<EntityConfigDto>>> GetEntityConfigs([FromQuery] GetEntityConfigsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -33,7 +33,7 @@ public class EntityConfigsController : BaseController
     public async Task<ActionResult<List<MenuDto>>> GetMenu()
     {
         var result = await _mediator.Send(new GetMenuQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -43,7 +43,7 @@ public class EntityConfigsController : BaseController
     public async Task<ActionResult<EntityConfigDto>> GetEntityConfigById(int id)
     {
         var result = await _mediator.Send(new GetEntityConfigByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -52,7 +52,7 @@ public class EntityConfigsController : BaseController
     public async Task<ActionResult<EntityConfigDto>> GetEntityConfigByurl(string entity)
     {
         var result = await _mediator.Send(new GetFormQuery { EntityName = entity });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -62,7 +62,7 @@ public class EntityConfigsController : BaseController
     public async Task<ActionResult<EntityConfigDto>> GetEntityConfigByName(string url)
     {
         var result = await _mediator.Send(new GetEntityConfigByNameQuery { EntityName = url });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
     // ===== Create =====
@@ -74,7 +74,7 @@ public class EntityConfigsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -90,7 +90,7 @@ public class EntityConfigsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -103,7 +103,7 @@ public class EntityConfigsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -116,7 +116,7 @@ public class EntityConfigsController : BaseController
     {
         var command = new DeleteEntityConfigCommand { Id = id };
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

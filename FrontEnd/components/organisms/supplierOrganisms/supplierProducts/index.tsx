@@ -3,11 +3,12 @@ import React from 'react';
 import { getTranslations } from 'next-intl/server';
 
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { IDetailedProductOffer } from '@models/product';
 
 import SupplierProductsCarousel from './supplierProductsCarousel';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function SupplierProducts(props: { id: number }) {
   const { id } = props;
@@ -21,6 +22,8 @@ export async function SupplierProducts(props: { id: number }) {
   >(`${serverApiBaseUrl}/productOffers/by-seller/${id}`, {
     next: { revalidate: 36 },
   });
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
 
   if (!result.ok || !result.data) {
     return <div>{t('common.noProductsFound')}</div>;

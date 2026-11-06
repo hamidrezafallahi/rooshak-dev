@@ -23,7 +23,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
 
             var spacialOffer = SpecialOffer.Create(
@@ -44,7 +44,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var spacialOffer = await _repo.GetByIdAsync(request.Id);
             if (spacialOffer == null)
@@ -66,7 +66,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var specialOffer = await _repo.GetByIdAsync(request.Id);
             if (specialOffer == null)
@@ -81,7 +81,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var specialOffer = await _repo.GetByIdAsync(request.Id);
             if (specialOffer == null)

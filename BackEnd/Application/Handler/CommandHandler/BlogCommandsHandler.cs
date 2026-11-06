@@ -24,7 +24,7 @@ public class BlogCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var isAiPipeline = string.Equals(request.Source, "ai-pipeline", StringComparison.OrdinalIgnoreCase)
             || request.IsDraft;
@@ -61,7 +61,7 @@ public class BlogCommandHandler(
                 var exists = await _blogRepository.Query(b => !b.IsDeleted && b.Slug == slug)
                     .AnyAsync(cancellationToken);
                 if (exists)
-                    return ServiceResult<IdDto>.Failed($"Slug '{slug}' already exists.");
+                    return ServiceResult<IdDto>.Failed($"مقاله‌ای با نامک «{slug}» از قبل وجود دارد؛ نامک دیگری انتخاب کنید.");
             }
         }
 
@@ -89,15 +89,8 @@ public class BlogCommandHandler(
         if (request.IsDraft || isAiPipeline)
             blog.SetActive(false, userId.Value);
 
-        try
-        {
-            await _blogRepository.AddAsync(blog);
-            await _blogRepository.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            return ServiceResult<IdDto>.Failed($"خطا: {ex.Message}");
-        }
+        await _blogRepository.AddAsync(blog);
+        await _blogRepository.SaveChangesAsync(cancellationToken);
 
         if (request.ThumbnailFile is not null)
         {
@@ -120,7 +113,7 @@ public class BlogCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var blog = await _blogRepository.GetByIdAsync(request.Id);
         if (blog == null)
@@ -173,7 +166,7 @@ public class BlogCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var blog = await _blogRepository.GetByIdAsync(request.Id);
         if (blog == null)
@@ -192,7 +185,7 @@ public class BlogCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var blog = await _blogRepository.GetByIdAsync(request.Id);
         if (blog == null)

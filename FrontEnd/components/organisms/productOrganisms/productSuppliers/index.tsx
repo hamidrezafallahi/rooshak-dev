@@ -5,13 +5,14 @@ import {
 
 import EntityGrid from '@components/molecules/storefront/EntityGrid';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 
 import {
   ISupplier,
   SupplierCardGrid,
 } from './supplierCard';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function ProductSupplierExtended({
   productId,
@@ -22,6 +23,8 @@ export async function ProductSupplierExtended({
     `${serverApiBaseUrl}/productOffers/by-product/${productId}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
   const suppliers =
     result.ok && result.data?.isSuccess !== false
       ? result.data?.data || []

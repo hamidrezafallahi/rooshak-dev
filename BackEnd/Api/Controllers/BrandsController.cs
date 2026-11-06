@@ -20,7 +20,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<ListDto<BrandDto>>> GetAll([FromQuery] GetAllBrandsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -28,7 +28,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4selectOption([FromQuery] GetBrands4selectOptionQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -37,7 +37,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<BrandDto>> GetByIdOrSlug(string idOrSlug)
     {
         var result = await _mediator.Send(new GetBrandByIdQuery { IdOrSlug = idOrSlug });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         if (!result.IsSuccess || result.Data is null) return NotFound(result);
 
         return Ok(result);
@@ -46,7 +46,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<IEnumerable<IdDto>>> GetAllBrandsIds()
     {
         var result = await _mediator.Send(new GetAllBrandsIdQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -54,14 +54,14 @@ public class BrandsController : BaseController
     public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllBrandsSlugs()
     {
         var result = await _mediator.Send(new GetAllBrandsSlugsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
     [HttpGet("getproductbybrandid/{brandId}")]
     public async Task<ActionResult<IEnumerable<ProductCardDto>>> GetproductsByBrand(int brandId)
     {
         var result = await _mediator.Send(new GetProductsByBrandIdQuery(brandId));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -69,7 +69,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetproductsCategoriesByBrand(int brandId)
     {
         var result = await _mediator.Send(new GetProductsCategoriesByBrandIdQuery(brandId));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -77,7 +77,7 @@ public class BrandsController : BaseController
     public async Task<ActionResult<IEnumerable<UserDto>>> GetProductsSuppliersByBrandIdQuery(int brandId)
     {
         var result = await _mediator.Send(new GetProductsSuppliersByBrandIdQuery(brandId));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -91,7 +91,7 @@ public class BrandsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -108,7 +108,7 @@ public class BrandsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -123,7 +123,7 @@ public class BrandsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -140,7 +140,7 @@ public class BrandsController : BaseController
         };
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);

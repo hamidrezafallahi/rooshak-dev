@@ -6,12 +6,19 @@ import { getAll } from '@lib/getAll';
 import { SpecialOffer } from '@models/specialOffer';
 
 import SpecialOfferCarouselClient from './SpecialOfferCarouselClient';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export default async function LandingSpecialOffer() {
   const t = await getTranslations('landing');
   const specialOffers = await getAll<SpecialOffer>('SpecialOffers/landing');
   const records = specialOffers?.data?.records ?? [];
-  if (!records.length) return null;
+  if (!records.length) {
+    return specialOffers.isSuccess ? null : (
+      <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 w-full max-w-[1440px]">
+        <ApiErrorNotice message={specialOffers.error} />
+      </section>
+    );
+  }
 
   return (
     <section className="bg-black text-white">

@@ -1,7 +1,10 @@
-﻿using Api.Security;
+﻿using Api.Errors;
+using Api.Security;
 using Application.DataTransfer.Excel;
+using Common;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -18,7 +21,16 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers()
+        builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ApiErrorResultFilter>();
+            })
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                // Failures keep the API's own error shape instead of ASP.NET's ProblemDetails.
+                options.SuppressMapClientErrors = true;
+                options.InvalidModelStateResponseFactory = ValidationMessages.ToResult;
+            })
             .AddJsonOptions(options =>
             {
                 // Admin forms historically send numeric inputs as JSON strings.
@@ -82,6 +94,18 @@ public class Program
         var internalPermitLimit = builder.Configuration.GetValue("RateLimiting:InternalPermitLimit", 1000);
         builder.Services.AddRateLimiter(options =>
         {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = (context, _) =>
+            {
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                {
+                    var seconds = (int)Math.Ceiling(retryAfter.TotalSeconds);
+                    context.HttpContext.Response.Headers.RetryAfter = seconds.ToString();
+                    context.HttpContext.Items[ApiErrorItems.Message] =
+                        $"تعداد درخواست‌های شما از حد مجاز گذشته است؛ {seconds} ثانیهٔ دیگر دوباره تلاش کنید.";
+                }
+                return ValueTask.CompletedTask;
+            };
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
                 // After UseForwardedHeaders this is the visitor's IP, also for the calls
@@ -119,6 +143,19 @@ public class Program
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                };
+                opt.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HttpContext.Items[ApiErrorItems.Message] = context.AuthenticateFailure switch
+                        {
+                            null => ErrorMessages.LoginRequired,
+                            SecurityTokenExpiredException => ErrorMessages.SessionExpired,
+                            _ => ErrorMessages.SessionInvalid,
+                        };
+                        return Task.CompletedTask;
+                    },
                 };
             })
             .AddScheme<AuthenticationSchemeOptions, CatalogApiKeyAuthenticationHandler>(
@@ -175,6 +212,7 @@ public class Program
         }
 
         app.InitializeDatabase();
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
         // ASP.NET refuses to serve unknown extensions: register the 3D formats (GLB/glTF/USDZ).
         var staticContentTypes = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
         staticContentTypes.Mappings[".glb"] = "model/gltf-binary";

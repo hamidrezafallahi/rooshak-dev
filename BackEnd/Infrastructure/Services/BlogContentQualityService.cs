@@ -74,7 +74,7 @@ public class BlogContentQualityService(IBlogRepository blogRepository) : IBlogCo
                 .AnyAsync(cancellationToken);
 
             if (slugExists)
-                result.Errors.Add($"Slug '{slug}' already exists.");
+                result.Errors.Add($"مقاله‌ای با نامک «{slug}» از قبل وجود دارد؛ نامک دیگری انتخاب کنید.");
         }
 
         var internalLinkCount = InternalLinkRegex.Matches(contentFa + introFa + conclusionFa).Count;

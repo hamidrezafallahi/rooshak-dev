@@ -54,7 +54,7 @@ public class RoleQueryHandler(IRoleRepository _roleRepo,IEntityConfigRepository 
                                       .FirstOrDefaultAsync(cancellationToken);
 
             if (role == null)
-                return ServiceResult<UserRoleDto?>.Failed("Role not found");
+                return ServiceResult<UserRoleDto?>.Failed("نقش کاربری موردنظر پیدا نشد.");
 
             return ServiceResult<UserRoleDto?>.Ok(role);
         }

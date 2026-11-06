@@ -48,7 +48,7 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IEnumerable<OrderReadModel>>.Failed("Unauthorized");
+            return ServiceResult<IEnumerable<OrderReadModel>>.Unauthorized();
         var orders = await _repository.GetOrdersByUserIdAsync(userId.Value);
         return ServiceResult<IEnumerable<OrderReadModel>>.Ok(orders);
     }
@@ -56,11 +56,11 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<OrderReadModel>.Failed("Unauthorized");
+            return ServiceResult<OrderReadModel>.Unauthorized();
 
         var order = await _repository.GetOrderWithItemsReadModelAsync(request.OrderId);
         if (order == null)
-            return ServiceResult<OrderReadModel?>.Failed("Order not found");
+            return ServiceResult<OrderReadModel?>.Failed("سفارش موردنظر پیدا نشد.");
         var dto = new OrderReadModel
         {
             Id = order.Id,
@@ -206,7 +206,7 @@ using OnlineShop.Domain.Interfaces;
             var orderItems = await _repository.GetItemsByOrderIdAsync(request.OrderId);
 
             if (orderItems == null || !orderItems.Any())
-                return ServiceResult<IEnumerable<OrderItemReadModel?>>.Failed("Order not found");
+                return ServiceResult<IEnumerable<OrderItemReadModel?>>.Failed("سفارش موردنظر پیدا نشد.");
 
             return ServiceResult<IEnumerable<OrderItemReadModel?>>.Ok(orderItems);
         }
@@ -215,7 +215,7 @@ using OnlineShop.Domain.Interfaces;
         var orderItem = _repository.Query(oi => oi.Id == request.Id).FirstOrDefault();
 
         if (orderItem == null)
-            return ServiceResult<OrderItemReadModel?>.Failed("Order not found");
+            return ServiceResult<OrderItemReadModel?>.Failed("سفارش موردنظر پیدا نشد.");
         var orderItemDto = new OrderItemReadModel
         {
             Id = orderItem.Id,
@@ -231,7 +231,7 @@ using OnlineShop.Domain.Interfaces;
     public async Task<ServiceResult<TotalPriceDto>> Handle(CalculateTotalPriceQuery request, CancellationToken cancellationToken)
     {
         var total = await _repository.CalculateTotalPriceAsync(request.OrderId);
-        if (total == null) return ServiceResult<TotalPriceDto>.Failed("total price not found");
+        if (total == null) return ServiceResult<TotalPriceDto>.Failed("مبلغ کل این سفارش پیدا نشد.");
         return ServiceResult<TotalPriceDto>.Ok(new TotalPriceDto { TotalPrice = total });
     }
 }

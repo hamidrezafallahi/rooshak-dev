@@ -65,7 +65,7 @@ public class UserTagQueryHandler(IUserTagRepository _repo,
                 .FirstOrDefaultAsync(pot => pot.Id == request.Id, cancellationToken);
 
             if (UserTag == null)
-                return ServiceResult<UserTagDto>.Failed("UserTag not found");
+                return ServiceResult<UserTagDto>.Failed("برچسب کاربر موردنظر پیدا نشد.");
 
             
 

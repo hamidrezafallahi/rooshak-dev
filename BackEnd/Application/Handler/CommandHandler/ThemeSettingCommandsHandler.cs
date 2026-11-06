@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Commands;
 using Application.Common;
 using Common;
@@ -19,7 +20,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             try
             {
@@ -32,7 +33,7 @@ namespace Application.Handler.CommandHandler
                 await _repo.SaveChangesAsync(cancellationToken);
                 return ServiceResult<IdDto>.Ok(new IdDto { Id = theme.Id });
             }
-            catch (ArgumentException ex)
+            catch (DomainException ex)
             {
                 return ServiceResult<IdDto>.Failed(ex.Message);
             }
@@ -42,7 +43,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var theme = await _repo.GetByIdAsync(request.Id);
             if (theme == null)
@@ -52,7 +53,7 @@ namespace Application.Handler.CommandHandler
             {
                 theme.Update(request.Name, ToPalette(request), userId.Value);
             }
-            catch (ArgumentException ex)
+            catch (DomainException ex)
             {
                 return ServiceResult<IdDto>.Failed(ex.Message);
             }
@@ -65,7 +66,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var theme = await _repo.GetByIdAsync(request.Id);
             if (theme == null)
@@ -97,7 +98,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var theme = await _repo.GetByIdAsync(request.Id);
             if (theme == null)

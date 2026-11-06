@@ -23,7 +23,7 @@ public class CommentsController : BaseController
     public async Task<ActionResult<IEnumerable<CommentDto>>> GetAll([FromQuery] GetAllCommentsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -32,7 +32,7 @@ public class CommentsController : BaseController
     public async Task<ActionResult<List<CommentDto>>> GetComments(string targetType, int targetId)
     {
         if (!Enum.TryParse<EnumTargetType>(targetType, true, out var targetEnum))
-            return BadRequest("Invalid TargetType");
+            return BadRequest("نوع مورد انتخاب‌شده برای نظر معتبر نیست.");
 
         var query = new GetCommentsByTargetQuery
         {
@@ -41,7 +41,7 @@ public class CommentsController : BaseController
         };
 
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -51,7 +51,7 @@ public class CommentsController : BaseController
     public async Task<ActionResult<CommentDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetCommentByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -64,7 +64,7 @@ public class CommentsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -79,7 +79,7 @@ public class CommentsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -96,7 +96,7 @@ public class CommentsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -113,7 +113,7 @@ public class CommentsController : BaseController
 
         var result = await _mediator.Send(command);
 
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -127,7 +127,7 @@ public class CommentsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -136,7 +136,7 @@ public class CommentsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteCommentCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

@@ -20,12 +20,16 @@ function IncreaseButton({ ...props }: ShoppingCartButtonProps) {
   const dispatch = useDispatch();
   const increaseHandler = async () => {
     if (isAuthenticated) {
-      const syncCartResponse = await itemMutate({
-        url: '/CartItems',
-        body: { ProductId: id, ProductOfferId: productOfferId,Quantity:1},
-      }).unwrap();
-      if (syncCartResponse.isSuccess) {
-        dispatch(synchronousCart(syncCartResponse.data));
+      try {
+        const syncCartResponse = await itemMutate({
+          url: '/CartItems',
+          body: { ProductId: id, ProductOfferId: productOfferId,Quantity:1},
+        }).unwrap();
+        if (syncCartResponse.isSuccess) {
+          dispatch(synchronousCart(syncCartResponse.data));
+        }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     } else {
       dispatch(increaseToCart({ id ,productOfferId}));

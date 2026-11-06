@@ -1,7 +1,12 @@
 import { browserApiBaseUrl } from '@lib/api';
 import {
+  ApiRequestError,
+  describeStatus,
+  errorTextOf,
+  readApiResult,
+} from '@lib/apiError';
+import {
   fetchWithAuth,
-  forbiddenMessage,
   withAuthRetry,
 } from '@lib/client-auth';
 
@@ -83,17 +88,9 @@ function exportQuery(params: ExcelExportParams) {
 
 async function download(url: string, fallbackName: string) {
   const res = await fetchWithAuth(url, { cache: 'no-store' });
-  if (res.status === 403) {
-    throw new Error(forbiddenMessage());
-  }
   if (!res.ok) {
-    let message: string | undefined;
-    try {
-      message = ((await res.json()) as ApiResult<unknown>)?.error ?? undefined;
-    } catch {
-      /* not JSON */
-    }
-    throw new Error(message || `HTTP ${res.status}`);
+    const { error } = await readApiResult(res);
+    throw new ApiRequestError(error ?? describeStatus(res.status));
   }
 
   const disposition = res.headers.get('content-disposition') ?? '';
@@ -148,9 +145,7 @@ export function importExcel(
   return withAuthRetry(
     () => sendImport(url, body, onProgress),
     (sent) => sent.status,
-  ).then((sent) =>
-    sent.status === 403 ? { isSuccess: false, error: forbiddenMessage() } : sent.result,
-  );
+  ).then((sent) => sent.result);
 }
 
 function sendImport(
@@ -171,13 +166,20 @@ function sendImport(
 
     xhr.onload = () => {
       try {
-        resolve({ status: xhr.status, result: JSON.parse(xhr.responseText) as ApiResult<ExcelImportResult> });
+        const body = JSON.parse(xhr.responseText) as ApiResult<ExcelImportResult>;
+        const failed = xhr.status >= 400 && body?.isSuccess !== true;
+        resolve({
+          status: xhr.status,
+          result: failed
+            ? { ...body, isSuccess: false, error: errorTextOf(body) ?? describeStatus(xhr.status) }
+            : body,
+        });
       } catch {
-        resolve({ status: xhr.status, result: { isSuccess: false, error: `HTTP ${xhr.status}` } });
+        resolve({ status: xhr.status, result: { isSuccess: false, error: describeStatus(xhr.status) } });
       }
     };
-    xhr.onerror = () => resolve({ status: 0, result: { isSuccess: false, error: 'Upload failed' } });
-    xhr.ontimeout = () => resolve({ status: 0, result: { isSuccess: false, error: 'Timeout' } });
+    xhr.onerror = () => resolve({ status: 0, result: { isSuccess: false, error: describeStatus('FETCH_ERROR') } });
+    xhr.ontimeout = () => resolve({ status: 0, result: { isSuccess: false, error: describeStatus('TIMEOUT_ERROR') } });
 
     onProgress?.({ stage: 'uploading', percent: 0 });
     xhr.send(body);

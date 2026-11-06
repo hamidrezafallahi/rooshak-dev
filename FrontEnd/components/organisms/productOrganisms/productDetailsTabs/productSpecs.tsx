@@ -1,9 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { ISpecificationResponse } from '@models/product';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export default async function ProductSpecs({ id }: { id: number }) {
   const t = await getTranslations();
@@ -11,6 +12,8 @@ export default async function ProductSpecs({ id }: { id: number }) {
     `${serverApiBaseUrl}/Products/getSpecifications/${id}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
   const specs =
     result.ok && result.data?.isSuccess !== false ? result.data?.data : null;
 

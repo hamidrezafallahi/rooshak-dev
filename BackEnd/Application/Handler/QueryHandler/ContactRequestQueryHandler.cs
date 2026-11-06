@@ -88,7 +88,7 @@ namespace Application.Handler.QueryHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<ContactRequestDto>.Failed("Unauthorized");
+                return ServiceResult<ContactRequestDto>.Unauthorized();
 
             var entity = await _repo.GetByIdAsync(request.Id);
             if (entity == null)

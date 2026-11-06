@@ -21,16 +21,20 @@ function DecreaseButton({ ...props }: ShoppingCartButtonProps) {
   const dispatch = useDispatch();
   const decreaseHandler = async () => {
     if (isAuthenticated) {
-      const syncCartResponse = await itemMutate({
-        url: '/CartItems/decrease',
-        body: { ProductId: id, ProductOfferId: productOfferId },
-      }).unwrap();
-      if (syncCartResponse.isSuccess) {
-        if (syncCartResponse.data?.items?.length > 0) {
-          dispatch(synchronousCart(syncCartResponse.data));
-        } else {
-          dispatch(removeFromCart({ id, productOfferId }));
+      try {
+        const syncCartResponse = await itemMutate({
+          url: '/CartItems/decrease',
+          body: { ProductId: id, ProductOfferId: productOfferId },
+        }).unwrap();
+        if (syncCartResponse.isSuccess) {
+          if (syncCartResponse.data?.items?.length > 0) {
+            dispatch(synchronousCart(syncCartResponse.data));
+          } else {
+            dispatch(removeFromCart({ id, productOfferId }));
+          }
         }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     } else {
       console.log("no token decrease");

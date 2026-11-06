@@ -62,12 +62,16 @@ export default function SpecialOfferCarouselClient({ spacialOffers }: Props) {
     const productOfferId = offer.product.productOfferId;
 
     if (isAuthenticated) {
-      const syncCartResponse = await itemMutate({
-        url: '/CartItems',
-        body: { ProductId: id, ProductOfferId: productOfferId, Quantity: 1 },
-      }).unwrap();
-      if (syncCartResponse.isSuccess) {
-        dispatch(synchronousCart(syncCartResponse.data));
+      try {
+        const syncCartResponse = await itemMutate({
+          url: '/CartItems',
+          body: { ProductId: id, ProductOfferId: productOfferId, Quantity: 1 },
+        }).unwrap();
+        if (syncCartResponse.isSuccess) {
+          dispatch(synchronousCart(syncCartResponse.data));
+        }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     } else {
       dispatch(

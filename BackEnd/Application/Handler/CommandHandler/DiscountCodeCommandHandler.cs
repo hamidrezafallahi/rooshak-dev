@@ -15,7 +15,7 @@ public class DiscountCodeCommandHandler(IDiscountCodeRepository _repo, IHttpCont
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId is null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var discount = DiscountCode.Create(
             code: request.Code.ToLower(),
             amount: request.Amount,
@@ -36,7 +36,7 @@ public class DiscountCodeCommandHandler(IDiscountCodeRepository _repo, IHttpCont
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId is null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var discount = await _repo.GetByIdAsync(request.Id);
         if (discount == null)
             return ServiceResult<IdDto>.Failed("کد تخفیف پیدا نشد");
@@ -60,11 +60,11 @@ public class DiscountCodeCommandHandler(IDiscountCodeRepository _repo, IHttpCont
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var discountCode = await _repo.GetByIdAsync(request.Id);
         if (discountCode == null)
-            return ServiceResult<IdDto>.Failed("discount Code not found");
+            return ServiceResult<IdDto>.Failed("کد تخفیف پیدا نشد.");
         discountCode.SetActive(request.IsActive, userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
 
@@ -76,7 +76,7 @@ public class DiscountCodeCommandHandler(IDiscountCodeRepository _repo, IHttpCont
 
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var discount = await _repo.GetByIdAsync(request.Id);
         if (discount == null)
             return ServiceResult<IdDto>.Failed("این کد تخفیف موجود نیست");

@@ -26,7 +26,7 @@ type AdminShellProps = {
 
 export default function AdminShell({ menu, children }: AdminShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname()!;
   const locale = useLocale();
   const t = useTranslations();
 

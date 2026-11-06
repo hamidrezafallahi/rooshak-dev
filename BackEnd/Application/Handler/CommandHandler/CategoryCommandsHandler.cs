@@ -21,7 +21,7 @@ public class CategoryCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var category = Category.Create(
              request.PersianName,
@@ -79,11 +79,11 @@ public class CategoryCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var category = await _repo.GetByIdAsync(request.Id);
         if (category == null)
-            return ServiceResult<IdDto>.Failed("این کتگوری موجود نیست.");
+            return ServiceResult<IdDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
 
         string? thumbnailUrl = null;
         if (request.CategoryCover is not null)
@@ -132,11 +132,11 @@ public class CategoryCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var category = await _repo.GetByIdAsync(request.Id);
         if (category == null)
-            return ServiceResult<IdDto>.Failed("این کتگوری موجود نیست.");
+            return ServiceResult<IdDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
 
         category.SetActive(request.IsActive, userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
@@ -147,11 +147,11 @@ public class CategoryCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var category = await _repo.GetByIdAsync(request.Id);
         if (category == null)
-            return ServiceResult<IdDto>.Failed("این کتگوری موجود نیست");
+            return ServiceResult<IdDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
 
         await _uploaderService.DeleteStoredFile(
             category.ImageUrl,

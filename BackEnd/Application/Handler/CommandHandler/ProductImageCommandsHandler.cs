@@ -20,7 +20,7 @@ public class AddProductImageCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var product = _productRepo.Query(p => p.Id == request.ProductId).FirstOrDefault();
         if (product == null)
@@ -75,7 +75,7 @@ public class AddProductImageCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var image = await _repository.GetByIdAsync(request.Id);
         if (image == null)
@@ -90,7 +90,7 @@ public class AddProductImageCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var image = await _repository.GetByIdAsync(request.Id);
         if (image == null)

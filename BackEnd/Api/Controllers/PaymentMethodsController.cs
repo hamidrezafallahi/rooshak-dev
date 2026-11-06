@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<PaymentMethodDto>>> GetAll([FromQuery] GetAllPaymentMethodsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -32,7 +32,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4selectOption([FromQuery] GetPaymentMethods4selectOptionQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -45,7 +45,7 @@ namespace WebApi.Controllers
             {
                 Id = id
             });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -57,7 +57,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Create([FromBody] CreatePaymentMethodCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
  
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -103,7 +103,7 @@ namespace WebApi.Controllers
             };
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

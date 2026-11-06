@@ -8,6 +8,7 @@ import { getAll } from '@lib/getAll';
 import { IBlog } from '@models/Blog';
 
 import SectionHeading from '../storefront/SectionHeading';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 function formatBlogDate(value: Date | string | null | undefined, locale: string) {
   if (!value) return null;
@@ -32,6 +33,14 @@ export default async function BlogSection() {
     byConfig: false,
     onlyActives: true,
   });
+
+  if (!response.isSuccess) {
+    return (
+      <section className="store-section luca-container">
+        <ApiErrorNotice message={response.error} />
+      </section>
+    );
+  }
 
   const posts = response?.data?.records ?? [];
 

@@ -18,13 +18,13 @@ public class RateCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         if (request.TargetId == null)
-            return ServiceResult<IdDto>.Failed("Target id is empty");
+            return ServiceResult<IdDto>.Failed("مورد امتیازدهی مشخص نشده است.");
         if (request.Value == null)
-            return ServiceResult<IdDto>.Failed("Value id is empty");
+            return ServiceResult<IdDto>.Failed("مقدار امتیاز ارسال نشده است.");
         if (request.TargetType == null)
-            return ServiceResult<IdDto>.Failed("Type id is empty");
+            return ServiceResult<IdDto>.Failed("نوع مورد امتیازدهی مشخص نشده است.");
 
         var existingRate = _repo.Query(r => r.IsActive && r.TargetId == request.TargetId && r.TargetType == request.TargetType && r.UserId == userId.Value).FirstOrDefault();
 
@@ -56,11 +56,11 @@ public class RateCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var rate = await _repo.GetByIdAsync(request.Id);
         if (rate == null)
-            return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            return ServiceResult<IdDto>.Failed("امتیاز موردنظر پیدا نشد.");
 
         rate.SetActive(request.IsActive, userId.Value);
 
@@ -72,11 +72,11 @@ public class RateCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var rate = await _repo.GetByIdAsync(request.Id);
         if (rate == null)
-            return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            return ServiceResult<IdDto>.Failed("امتیاز موردنظر پیدا نشد.");
 
         rate.Delete(userId.Value);
 

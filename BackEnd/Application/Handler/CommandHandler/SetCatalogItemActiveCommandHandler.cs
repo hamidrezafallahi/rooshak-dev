@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Commands;
 using Application.Common;
 using Application.Common.Interfaces;
@@ -23,18 +24,18 @@ namespace Application.Handler.CommandHandler
         {
             var userId = accessor.HttpContext?.GetUserId();
             if (userId == null)
-                return ServiceResult<CatalogItemActiveDto>.Failed("Unauthorized");
+                return ServiceResult<CatalogItemActiveDto>.Unauthorized();
 
             if (request.Id <= 0)
-                return ServiceResult<CatalogItemActiveDto>.Failed("Product id is required.");
+                return ServiceResult<CatalogItemActiveDto>.Failed("شناسهٔ محصول ارسال نشده است.");
 
             var product = await productRepository.GetByIdAsync(request.Id);
             if (product == null)
-                return ServiceResult<CatalogItemActiveDto>.Failed("Product not found");
+                return ServiceResult<CatalogItemActiveDto>.Failed("محصول موردنظر پیدا نشد.");
 
             var offers = await offerRepository.GetAllAsync(o => o.ProductId == product.Id);
             if (request.IsActive && offers.Count == 0)
-                return ServiceResult<CatalogItemActiveDto>.Failed("Product has no offer to publish");
+                return ServiceResult<CatalogItemActiveDto>.Failed("این محصول هیچ پیشنهاد فروشی ندارد و نمی‌توان آن را منتشر کرد.");
 
             var images = await imageRepository.GetAllAsync(i => i.ProductId == product.Id);
 
@@ -58,16 +59,16 @@ namespace Application.Handler.CommandHandler
                     ImageCount = images.Count
                 });
             }
-            catch (OperationCanceledException)
+            catch (DomainException ex)
             {
-                await transaction.RollbackAsync(CancellationToken.None);
-                throw;
+                await transaction.RollbackAsync(cancellationToken);
+                return ServiceResult<CatalogItemActiveDto>.Failed(ex.Message, ex.Code);
             }
             catch
             {
-                await transaction.RollbackAsync(cancellationToken);
-                return ServiceResult<CatalogItemActiveDto>.Failed(
-                    "Catalog item active state could not be updated as a complete Product+Offer unit.");
+                // Nothing was kept; the error middleware reports what happened.
+                await transaction.RollbackAsync(CancellationToken.None);
+                throw;
             }
         }
     }

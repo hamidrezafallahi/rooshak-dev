@@ -5,13 +5,21 @@ import Link from 'next/link';
 
 import FaqAccordion from '@components/molecules/storefront/FaqAccordion';
 import { getFaqs } from '@lib/faq';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 /** How many questions the landing page previews before linking to /faq. */
 const LANDING_FAQ_LIMIT = 6;
 
 /** Landing-page FAQ preview. Renders nothing until at least one FAQ exists. */
 export default async function LandingFaq({ locale }: { locale: string }) {
-  const faqs = await getFaqs(LANDING_FAQ_LIMIT);
+  const { faqs, error } = await getFaqs(LANDING_FAQ_LIMIT);
+  if (error) {
+    return (
+      <section className="store-section luca-container">
+        <ApiErrorNotice message={error} />
+      </section>
+    );
+  }
   if (!faqs.length) return null;
 
   const t = await getTranslations({ locale, namespace: 'faqPage' });

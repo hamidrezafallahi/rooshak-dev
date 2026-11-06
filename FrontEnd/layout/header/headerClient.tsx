@@ -40,7 +40,7 @@ type HeaderProps = {
 
 export default function HeaderClient({ overlay = false, announcement = null }: HeaderProps) {
   const locale = useLocale();
-  const pathname = usePathname();
+  const pathname = usePathname()!;
   const t = useTranslations('header');
   const tBrand = useTranslations('brand');
   const [scrolled, setScrolled] = useState(false);

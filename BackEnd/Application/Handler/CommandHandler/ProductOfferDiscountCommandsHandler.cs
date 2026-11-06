@@ -28,19 +28,19 @@ public class ProductOfferDiscountCommandHandler(
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var productOffer = await _productOfferRepo.GetByIdAsync(request.ProductOfferId);
             if (productOffer == null || productOffer.IsDeleted)
-                return ServiceResult<IdDto>.Failed("Product offer not found");
+                return ServiceResult<IdDto>.Failed("پیشنهاد محصول موردنظر پیدا نشد.");
 
             if (productOffer.SupplierId != userId.Value)
-                return ServiceResult<IdDto>.Failed("Unauthorized - You don't own this offer");
+                return ServiceResult<IdDto>.Failed("این پیشنهاد متعلق به شما نیست و اجازهٔ تغییر آن را ندارید.");
 
  
             var discount = await _discountRepo.GetByIdAsync(request.DiscountId);
             if (discount == null || discount.IsDeleted)
-                return ServiceResult<IdDto>.Failed("Discount not found");
+                return ServiceResult<IdDto>.Failed("تخفیف موردنظر پیدا نشد.");
 
             var exists = (await _repository
                 .Query(pd => pd.ProductOfferId == request.ProductOfferId &&
@@ -50,7 +50,7 @@ public class ProductOfferDiscountCommandHandler(
                 .Any();
 
             if (exists)
-                return ServiceResult<IdDto>.Failed("This discount is already added to this offer");
+                return ServiceResult<IdDto>.Failed("این تخفیف قبلاً به این پیشنهاد اضافه شده است.");
 
             // ایجاد
             var productOfferDiscount = ProductOfferDiscount.Create(
@@ -68,7 +68,7 @@ public class ProductOfferDiscountCommandHandler(
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var productOfferDiscount = await _repository.GetByIdAsync(request.Id);
             if (productOfferDiscount == null)
                 return ServiceResult<IdDto>.Failed("رابطه محصول-تخفیف پیدا نشد");
@@ -92,7 +92,7 @@ public class ProductOfferDiscountCommandHandler(
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var productOfferDiscount = await _repository.GetByIdAsync(request.Id);
             if (productOfferDiscount == null)
                 return ServiceResult<IdDto>.Failed("رابطه محصول-تخفیف پیدا نشد");
@@ -108,7 +108,7 @@ public class ProductOfferDiscountCommandHandler(
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var productOfferDiscount = await _repository.GetByIdAsync(request.Id);
             if (productOfferDiscount == null)
                 return ServiceResult<IdDto>.Failed("رابطه محصول-تخفیف پیدا نشد");

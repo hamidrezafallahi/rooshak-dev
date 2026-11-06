@@ -108,7 +108,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var entity = await _repo.GetByIdAsync(request.Id);
             if (entity == null)
-                return ServiceResult<PaymentMethodDto>.Failed("Payment method not found");
+                return ServiceResult<PaymentMethodDto>.Failed("روش پرداخت موردنظر پیدا نشد.");
 
             var dto = new PaymentMethodDto
             {

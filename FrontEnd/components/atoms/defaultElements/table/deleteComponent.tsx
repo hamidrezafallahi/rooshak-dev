@@ -10,7 +10,7 @@ import { TrashbinIcon } from '../../iconComponents';
 
 function DeleteComponent({ ...props }: { id: string }) {
   const { id } = props;
-  const params = useParams();
+  const params = useParams()!;
   const [deleteRecord, { isLoading }] = useGetConditionallyMutation();
   const handleDeleteRecord = async () => {
     const deleteRes = await deleteRecord({

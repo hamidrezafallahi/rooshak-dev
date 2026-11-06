@@ -31,6 +31,7 @@ import {
   IProps,
   ISignup,
 } from './type';
+import { describeThrown, readApiResult } from '@lib/apiError';
 
 export function SignUpForm({ className, setIsLogin, ...props }: IProps) {
   const [signup, setSignup] = useState<ISignup>({
@@ -136,7 +137,7 @@ const handleRegister = async () => {
       body: formData,  // browser خودش Content-Type: multipart/form-data set می‌کنه
     });
 
-    const res = await response.json();
+    const res = await readApiResult(response);
     
     if (res.isSuccess) {
       showSuccessToast(t("register.success"));
@@ -146,7 +147,7 @@ const handleRegister = async () => {
     }
   } catch (error) {
     console.error(error);
-    showErrorToast(t("register.connectionError"));
+    showErrorToast(describeThrown(error));
   }
 };
 

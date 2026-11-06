@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 
 
 using static System.Net.Mime.MediaTypeNames;
@@ -36,13 +37,13 @@ namespace OnlineShop.Domain.Entities
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                throw new ArgumentException("FullName cannot be empty.", nameof(fullName));
+                throw new DomainException("نام و نام خانوادگی نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty.", nameof(email));
+                throw new DomainException("ایمیل نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(phoneNumber))
-                throw new ArgumentException("PhoneNumber cannot be empty.", nameof(phoneNumber));
+                throw new DomainException("شماره موبایل نمی‌تواند خالی باشد.");
 
             var user = new User
             {
@@ -69,13 +70,13 @@ namespace OnlineShop.Domain.Entities
           )
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                throw new ArgumentException("FullName cannot be empty.", nameof(fullName));
+                throw new DomainException("نام و نام خانوادگی نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty.", nameof(email));
+                throw new DomainException("ایمیل نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(phoneNumber))
-                throw new ArgumentException("PhoneNumber cannot be empty.", nameof(phoneNumber));
+                throw new DomainException("شماره موبایل نمی‌تواند خالی باشد.");
 
           
             var user = new User
@@ -130,7 +131,7 @@ namespace OnlineShop.Domain.Entities
         public void ChangePassword(string newPassword, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(newPassword))
-                throw new ArgumentException("PasswordHash cannot be empty.", nameof(newPassword));
+                throw new DomainException("رمز عبور نمی‌تواند خالی باشد.");
             Password = newPassword;
             MarkUpdated(currentUserId);
         }
