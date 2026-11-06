@@ -31,10 +31,10 @@ namespace Application.Handler.CommandHandler
             var user = await _userRepo.GetByIdAsync(request.UserId);
             if (user == null)
                 return ServiceResult<IdDto>.Unauthorized("حساب کاربری موردنظر پیدا نشد؛ لطفاً دوباره وارد شوید.");
+            user.UpdateProfile(request.FullName, request.PhoneNumber, request.UserDescription, user.Id);
             if (request.UserImageFile != null)
             {
                 var oldImage = user.Image;
-                user.UpdateProfile(request.FullName, request.PhoneNumber, request.UserDescription, user.Id);
                 var uploadDto = new UploadDTO
                 {
                     File = request.UserImageFile,
