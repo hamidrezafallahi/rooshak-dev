@@ -111,7 +111,7 @@ export default function AdminPaymentsPage() {
 
       return matchesQuery && matchesStatus;
     });
-  }, [query, statusFilter]);
+  }, [payments, query, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPayments.length / pageSize));
   const safePage = Math.min(currentPage, totalPages);
