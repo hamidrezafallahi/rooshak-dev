@@ -5,6 +5,7 @@ namespace OnlineShop.Domain.Interfaces
     {
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByPhoneNumberAsync(string phoneNumber);
+        Task<bool> ExistsBySlugAsync(string slug);
         Task<UserModel?> GetUserWithDetailsAsync(int userId);
  
     }

@@ -22,6 +22,12 @@ namespace OnlineShop.Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
         }
 
+        // Same rule as the unique index: a deleted account gives its slug back.
+        public async Task<bool> ExistsBySlugAsync(string slug)
+        {
+            return await _dbSet.AnyAsync(u => u.Slug == slug && !u.IsDeleted);
+        }
+
         public async Task<UserModel?> GetUserWithDetailsAsync(int userId)
         {
             return await Query(u => u.Id == userId)

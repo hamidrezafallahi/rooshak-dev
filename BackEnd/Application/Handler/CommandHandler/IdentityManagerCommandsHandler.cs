@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OnlineShop.Domain.Common;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Interfaces;
 using Services.Services.Uploader.DTO;
@@ -48,6 +49,11 @@ IRequestHandler<DeleteUserCommand, ServiceResult<IdDto>>
                 phoneNumber: request.PhoneNumber,
                 userDescription: request.UserDescription
                 );
+        await MakeSlugUniqueAsync(user);
+        // The password goes in with the first save, so the account is never stored without one,
+        // whatever happens to the profile image. No one is signed in yet: 0, as for anonymous contact requests.
+        var hashedPassword = _passwordHasher.HashPassword(user, request.Password.Trim());
+        user.ChangePassword(hashedPassword, currentUserId: 0);
         await _repo.AddAsync(user);
         await _repo.SaveChangesAsync(cancellationToken);
 
@@ -58,17 +64,44 @@ IRequestHandler<DeleteUserCommand, ServiceResult<IdDto>>
                 File = request.UserImageFile,
                 Path = UploadPaths.Users(user.Id)
             };
-            var imageUrl = await _uploaderService.UploadAsWebp(uploadDto);
+            string? imageUrl;
+            try
+            {
+                imageUrl = await _uploaderService.UploadAsWebp(uploadDto);
+            }
+            catch
+            {
+                // All or nothing: remove the account (a hard delete) so the visitor can register again with
+                // the same email, and let the error reach the client as before.
+                await _repo.DeleteAsync(user.Id);
+                throw;
+            }
             if (UploadPaths.IsStoredPath(imageUrl))
                 user.SetImage(imageUrl!, user.Id);
         }
-        var hashedPassword = _passwordHasher.HashPassword(user, request.Password.Trim());
-        user.ChangePassword(hashedPassword, user.Id);
         await _repo.SaveChangesAsync(cancellationToken);
 
         return ServiceResult<IdDto>.Ok(new IdDto { Id = user.Id });
 
     }
+    /// <summary>
+    /// The slug comes from the name, which two customers can share, while /suppliers/{slug} has to
+    /// stay unique. The first one keeps the clean address; the next ones get a number.
+    /// </summary>
+    private async Task MakeSlugUniqueAsync(User user)
+    {
+        if (!await _repo.ExistsBySlugAsync(user.Slug))
+            return;
+
+        // SlugHelper cuts at 180 characters: leave room, or a long name would lose its number.
+        var stem = user.Slug.Length > 170 ? user.Slug[..170] : user.Slug;
+        var suffix = 2;
+        while (await _repo.ExistsBySlugAsync(SlugHelper.Generate(stem, suffix)))
+            suffix++;
+
+        user.SetSlug(SlugHelper.Generate(stem, suffix), currentUserId: 0);
+    }
+
     public async Task<ServiceResult<LoginDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var ip = _accessor.HttpContext?.GetClientIp();
