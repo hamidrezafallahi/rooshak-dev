@@ -1,4 +1,5 @@
-﻿using Application.Common;
+﻿using OnlineShop.Domain.Common;
+using Application.Common;
 using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Services.Services.Uploader.DTO;
@@ -55,23 +56,31 @@ namespace Services.Services.Uploader
 
         {
 
-            if (request?.File is null || request.File.Length == 0 || request.File.Length > MaxVideoBytes)
+            if (request?.File is null)
 
                 return null;
+
+            EnsureNotEmpty(request.File.FileName, request.File.Length);
+
+            if (request.File.Length > MaxVideoBytes)
+
+                throw new FileUploadException(
+                    $"حجم ویدیوی «{request.File.FileName}» بیشتر از سقف مجاز ۳۰ مگابایت است.");
 
 
             var relativeDirectory = UploadPaths.Normalize(request.Path);
 
             if (string.IsNullOrWhiteSpace(relativeDirectory))
 
-                return null;
+                throw new FileUploadException("مسیر ذخیرهٔ فایل مشخص نشده است.");
 
 
             var ext = Path.GetExtension(request.File.FileName).TrimStart('.').ToLowerInvariant();
 
             if (!VideoTypes.Contains(ext))
 
-                return null;
+                throw new FileUploadException(
+                    $"فرمت فایل «{request.File.FileName}» پشتیبانی نمی‌شود؛ برای ویدیو فقط mp4 و webm مجاز است.");
 
 
             var rootPath = ResolveDirectory(relativeDirectory);
@@ -166,16 +175,19 @@ namespace Services.Services.Uploader
             string extension,
             Func<Image, Stream, Task> saveAsync)
         {
-            if (request?.File is null || request.File.Length == 0)
+            if (request?.File is null)
                 return null;
+
+            EnsureNotEmpty(request.File.FileName, request.File.Length);
 
             var relativeDirectory = UploadPaths.Normalize(request.Path);
             if (string.IsNullOrWhiteSpace(relativeDirectory))
-                return null;
+                throw new FileUploadException("مسیر ذخیرهٔ فایل مشخص نشده است.");
 
             var sourceExt = Path.GetExtension(request.File.FileName).TrimStart('.');
             if (!string.IsNullOrWhiteSpace(sourceExt) && !SupportedTypes.Contains(sourceExt))
-                return null;
+                throw new FileUploadException(
+                    $"فرمت فایل «{request.File.FileName}» پشتیبانی نمی‌شود؛ برای تصویر فقط jpg، jpeg، png و webp مجاز است.");
 
             var rootPath = ResolveDirectory(relativeDirectory);
             Directory.CreateDirectory(rootPath);
@@ -187,8 +199,8 @@ namespace Services.Services.Uploader
             var fileName = $"{Guid.NewGuid():N}_{safeBaseName}{extension}";
             var systemFilePath = Path.Combine(rootPath, fileName);
 
-            await using (var input = request.File.OpenReadStream())
-            using (var image = await Image.LoadAsync(input))
+            await using var input = request.File.OpenReadStream();
+            using var image = await LoadImageAsync(input, request.File.FileName);
             await using (var output = new FileStream(
                 systemFilePath,
                 FileMode.Create,
@@ -200,6 +212,26 @@ namespace Services.Services.Uploader
 
             // Canonical DB/public path: uploads/{entity}/{id}/file.webp (no leading slash)
             return $"{relativeDirectory}/{fileName}";
+        }
+
+        private static async Task<Image> LoadImageAsync(Stream input, string fileName)
+        {
+            try
+            {
+                return await Image.LoadAsync(input);
+            }
+            catch (Exception ex) when (ex is ImageFormatException or NotSupportedException)
+            {
+                throw new FileUploadException(
+                    $"فایل «{fileName}» تصویر معتبری نیست یا خراب است؛ یک فایل jpg، png یا webp سالم انتخاب کنید.",
+                    ex);
+            }
+        }
+
+        private static void EnsureNotEmpty(string fileName, long length)
+        {
+            if (length == 0)
+                throw new FileUploadException($"فایل «{fileName}» خالی است.");
         }
 
         private string ResolveWwwRoot()

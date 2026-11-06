@@ -1,9 +1,12 @@
-import {
-  ApiResponse,
-  PagedResponse,
-} from '@models/base';
+import { PagedResponse } from '@models/base';
 
 import { serverApiBaseUrl } from './api';
+import {
+  ApiRequestError,
+  describeStatus,
+  errorTextOf,
+  readApiResult,
+} from './apiError';
 import {
   authHeaders,
   handleServerUnauthorized,
@@ -25,6 +28,11 @@ function emptyPage<T>(error: string): PagedResponse<T> {
   };
 }
 
+/**
+ * Storefront calls answer a failure with an empty page whose `error` the page shows: these
+ * pages also render at build time, when there may be no API at all. Admin calls throw
+ * ApiRequestError instead, so error.tsx explains it and offers a retry.
+ */
 export async function getAll<T>(
   entity: string,
   {
@@ -55,6 +63,11 @@ export async function getAll<T>(
   // reading cookies would turn their ISR pages dynamic.
   const isAdmin = revalidate === false;
 
+  const fail = (message: string): PagedResponse<T> => {
+    if (isAdmin) throw new ApiRequestError(message);
+    return emptyPage<T>(message);
+  };
+
   let res: Response;
   let text: string;
   try {
@@ -66,8 +79,8 @@ export async function getAll<T>(
     );
     text = await res.text();
   } catch (e) {
-    console.error(`Invalid JSON response from ${url}`, e);
-    return emptyPage(`Invalid JSON response from ${url}`);
+    console.error(`getAll: no answer from ${url}`, e);
+    return fail(describeStatus(503));
   }
 
   // Outside the try: redirect() works by throwing.
@@ -75,17 +88,20 @@ export async function getAll<T>(
     await handleServerUnauthorized();
   }
 
-  if (!res.ok) {
-    console.error(`getAll failed: ${res.status} ${url}`, text.slice(0, 300));
-    return emptyPage(`HTTP ${res.status} from ${url}`);
-  }
-
+  let body: PagedResponse<T>;
   try {
-    return JSON.parse(text) as PagedResponse<T>;
+    body = JSON.parse(text) as PagedResponse<T>;
   } catch (e) {
     console.error(`Invalid JSON response from ${url}`, e);
-    return emptyPage(`Invalid JSON response from ${url}`);
+    return fail(describeStatus(res.ok ? 'PARSING_ERROR' : res.status));
   }
+
+  if (!res.ok || body?.isSuccess === false) {
+    console.error(`getAll failed: ${res.status} ${url}`, text.slice(0, 300));
+    return fail(errorTextOf(body) ?? describeStatus(res.ok ? 500 : res.status));
+  }
+
+  return body;
 }
 
 
@@ -99,35 +115,39 @@ export async function getById(entity: string, id: string): Promise<Record<string
       "Content-Type": 'application/json'
     },
     cache: "no-store",
+  }).catch((e) => {
+    console.error(`getById: no answer for ${entity}/${id}`, e);
+    return null;
   });
+  if (!res) {
+    throw new ApiRequestError(describeStatus(503));
+  }
   if (res.status === 401) {
     await handleServerUnauthorized();
-    throw new Error(`HTTP 401 from ${entity}/${id}`);
   }
-  const data: ApiResponse<any> = await res.json();
-  return data.data;
+  const result = await readApiResult<Record<string, any>>(res);
+  if (!result.isSuccess) {
+    throw new ApiRequestError(result.error ?? describeStatus(res.status));
+  }
+  return result.data;
 }
+
+/** Throws ApiRequestError: no page can be drawn without its form configuration. */
 export async function getFormConfigByEntityName(entity: string) {
   // Prefer EndPoint/EntityName casing from DB (usually camelCase starting lower).
   // Still pass through as-is; backend lookup is case-insensitive as a safety net.
   const url = `${serverApiBaseUrl}/EntityConfigs/entityFormConfig/${encodeURIComponent(entity)}`;
-  try {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) {
-      console.error(`getFormConfigByEntityName failed: ${res.status} ${url}`);
-      return null;
-    }
-    const data = await res.json();
-    if (!data?.isSuccess || !data?.data) {
-      console.error(
-        `getFormConfigByEntityName empty for ${entity}:`,
-        data?.error ?? 'no data',
-      );
-      return null;
-    }
-    return data.data;
-  } catch (e) {
-    console.error(`getFormConfigByEntityName error for ${entity}`, e);
+  const res = await fetch(url, { cache: 'no-store' }).catch((e) => {
+    console.error(`getFormConfigByEntityName: no answer for ${entity}`, e);
     return null;
+  });
+  if (!res) {
+    throw new ApiRequestError(describeStatus(503));
   }
+  const result = await readApiResult<any>(res);
+  if (!result.isSuccess || !result.data) {
+    console.error(`getFormConfigByEntityName failed for ${entity}:`, result.error);
+    throw new ApiRequestError(result.error ?? describeStatus(404));
+  }
+  return result.data;
 }

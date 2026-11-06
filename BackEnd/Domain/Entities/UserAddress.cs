@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 namespace OnlineShop.Domain.Entities
 {
     public class UserAddress : BaseEntity
@@ -27,21 +28,21 @@ namespace OnlineShop.Domain.Entities
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(city))
-                throw new ArgumentException("Name cannot be empty.", nameof(name));
+                throw new DomainException("نام گیرنده نمی‌تواند خالی باشد.");
             if (string.IsNullOrWhiteSpace(city))
-                throw new ArgumentException("PhoneNumber cannot be empty.", nameof(phoneNumber));
+                throw new DomainException("شماره موبایل نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(city))
-                throw new ArgumentException("City cannot be empty.", nameof(city));
+                throw new DomainException("شهر نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(state))
-                throw new ArgumentException("State cannot be empty.", nameof(state));
+                throw new DomainException("استان نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(postalCode))
-                throw new ArgumentException("PostalCode cannot be empty.", nameof(postalCode));
+                throw new DomainException("کد پستی نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(fullAddress))
-                throw new ArgumentException("FullAddress cannot be empty.", nameof(fullAddress));
+                throw new DomainException("آدرس کامل نمی‌تواند خالی باشد.");
 
             var address = new UserAddress
             {

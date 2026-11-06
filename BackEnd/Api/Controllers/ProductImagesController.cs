@@ -20,7 +20,7 @@ public class ProductImagesController : BaseController
     public async Task<ActionResult<IEnumerable<ProductImageDto>>> GetAll([FromQuery] GetAllProductImagesQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -30,7 +30,7 @@ public class ProductImagesController : BaseController
     public async Task<ActionResult<ProductImageDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetProductImagesByIdQuery { Id=id});
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -39,7 +39,7 @@ public class ProductImagesController : BaseController
     public async Task<ActionResult<ProductImageDto>> GetMainImage(int productId)
     {
         var result = await _mediator.Send(new GetMainImageByProductIdQuery(productId));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -49,7 +49,7 @@ public class ProductImagesController : BaseController
     public async Task<ActionResult<IdDto>> Add([FromForm] AddProductImageCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 
@@ -59,7 +59,7 @@ public class ProductImagesController : BaseController
     //public async Task<ActionResult<IdDto>> Update([FromForm] UpdateProductImageCommand command)
     //{
     //    var result = await _mediator.Send(command);
-    //    if (!result.IsSuccess && result.Error == "Unauthorized")
+    //    if (result.IsUnauthorized)
     //        return Unauthorized(result);
     //    return Ok(result);
 
@@ -73,7 +73,7 @@ public class ProductImagesController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -85,7 +85,7 @@ public class ProductImagesController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteProductImageCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

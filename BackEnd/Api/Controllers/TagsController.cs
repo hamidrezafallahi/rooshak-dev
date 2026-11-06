@@ -21,7 +21,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<ListDto<TagDto>>> GetAll([FromQuery] GetTagsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -30,7 +30,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4SelectOption([FromQuery] GetTags4selectOptionQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -41,7 +41,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<TagDto>> GetById(string slug)
     {
         var result = await _mediator.Send(new GetTagBySlugQuery { Slug= slug });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -50,7 +50,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IEnumerable<TagDto>>> GetTagByProductId(int id)
     {
         var result = await _mediator.Send(new GetTagsByProductOfferIdQuery { ProductId = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -59,7 +59,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IEnumerable<IdDto>>> GetAllTagIds()
     {
         var result = await _mediator.Send(new GetAllTagIdsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -68,7 +68,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllTagsSlugs()
     {
         var result = await _mediator.Send(new GetAllTagsSlugsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -77,7 +77,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IEnumerable<TagFamilyDto>>> GetFamilies()
     {
         var result = await _mediator.Send(new GetTagFamiliesQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -87,7 +87,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<TagPriceListDto>> GetPriceList(string idOrSlug)
     {
         var result = await _mediator.Send(new GetTagPriceListQuery { IdOrSlug = idOrSlug });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         if (!result.IsSuccess || result.Data is null) return NotFound(result);
 
         return Ok(result);
@@ -132,7 +132,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IdDto>> Create(CreateTagCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -145,7 +145,7 @@ public class TagsController : BaseController
     {
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -158,7 +158,7 @@ public class TagsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -170,7 +170,7 @@ public class TagsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteTagCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

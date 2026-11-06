@@ -1,4 +1,5 @@
-﻿namespace OnlineShop.Domain.Entities
+﻿using OnlineShop.Domain.Common;
+namespace OnlineShop.Domain.Entities
 {
 
     public class CartItem : BaseEntity
@@ -28,7 +29,7 @@
             int currentUserId)
         {
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
 
             var item = new CartItem
             {
@@ -49,7 +50,7 @@
       int currentUserId)
         {
             if (quantity < 0)
-                throw new ArgumentException("Quantity must be greater than zero.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
             ProductId = productId;
             ProductOfferId = productOfferId;
             Quantity = quantity;
@@ -59,7 +60,7 @@
         public void IncreaseQuantity(int quantity, int userId)
         {
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be positive.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
 
             Quantity += quantity;
             MarkUpdated(userId);
@@ -68,7 +69,7 @@
         public void DecreaseQuantity(int quantity, int userId)
         {
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be positive.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
 
             if (Quantity - quantity <= 0)
             {
@@ -82,7 +83,7 @@
         public void UpdateQuantity(int quantity, int userId)
         {
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be positive.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
 
            
 

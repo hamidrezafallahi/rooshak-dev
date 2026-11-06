@@ -96,7 +96,7 @@ namespace Application.Handler.QueryHandler
         {
             var key = (request.IdOrSlug ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(key))
-                return ServiceResult<UserDto?>.Failed("User not found");
+                return ServiceResult<UserDto?>.Failed("کاربر موردنظر پیدا نشد.");
 
             IQueryable<User> query = _repo.Query(u => !u.IsDeleted);
             if (int.TryParse(key, out var id))
@@ -261,7 +261,7 @@ namespace Application.Handler.QueryHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<List<UserAddressDto>>.Failed("Unauthorized");
+                return ServiceResult<List<UserAddressDto>>.Unauthorized();
             var data = await _userAddressRepository
                 .Query(a => a.UserId == userId.Value)
                 .ToListAsync(cancellationToken);
@@ -286,7 +286,7 @@ namespace Application.Handler.QueryHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<UserAddressDto>.Failed("Unauthorized");
+                return ServiceResult<UserAddressDto>.Unauthorized();
             var data = await _userAddressRepository
                 .Query()
                  .Include(a => a.User)

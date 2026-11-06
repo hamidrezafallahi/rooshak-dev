@@ -29,7 +29,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<ProductModel3DAdminDto>.Failed("Unauthorized");
+                return ServiceResult<ProductModel3DAdminDto>.Unauthorized();
 
             var product = await _products.GetByIdAsync(request.ProductId);
             if (product == null)
@@ -97,7 +97,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<ProductModel3DAdminDto>.Failed("Unauthorized");
+                return ServiceResult<ProductModel3DAdminDto>.Unauthorized();
 
             var existing = await _models.GetByProductIdAsync(request.ProductId);
             if (existing == null)
@@ -120,7 +120,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var existing = await _models.GetByProductIdAsync(request.ProductId);
             if (existing == null)
@@ -143,7 +143,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<ProductModel3DAdminDto>.Failed("Unauthorized");
+                return ServiceResult<ProductModel3DAdminDto>.Unauthorized();
 
             var product = await _products.GetByIdAsync(request.ProductId);
             if (product == null)
@@ -171,7 +171,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var source = await _scans.GetByIdAsync(request.Id);
             if (source == null)

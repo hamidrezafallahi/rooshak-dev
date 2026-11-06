@@ -12,6 +12,7 @@ import {
 } from '@lib/auth-cookies';
 import { clientIpHeaders } from '@lib/client-ip';
 import type { TokenPayload } from '@components/templates/register/type';
+import { describeStatus, errorTextOf } from '@lib/apiError';
 
 export async function POST(req: Request) {
   try {
@@ -46,10 +47,7 @@ console.log("http://localhost:8080/api/Identity/login",`${serverApiBaseUrl}/Iden
       return NextResponse.json(
         {
           isSuccess: false,
-          error:
-            response.status >= 500
-              ? 'Backend login failed (check JWT key length / backend logs)'
-              : 'Invalid login response',
+          error: describeStatus(response.ok ? 'PARSING_ERROR' : response.status),
         },
         { status: 502 },
       );
@@ -61,7 +59,7 @@ console.log("http://localhost:8080/api/Identity/login",`${serverApiBaseUrl}/Iden
           ? data
           : {
               isSuccess: false,
-              error: data?.error ?? 'Login failed',
+              error: errorTextOf(data) ?? describeStatus(response.status),
             },
         { status: response.ok ? 400 : response.status }
       );
@@ -93,10 +91,11 @@ console.log("http://localhost:8080/api/Identity/login",`${serverApiBaseUrl}/Iden
     res.cookies.set(SESSION_FLAG_COOKIE, '1', sessionFlagCookieOptions);
 
     return res;
-  } catch {
+  } catch (error) {
+    console.error('Login: no answer from the backend', error);
     return NextResponse.json(
-      { isSuccess: false, error: 'Login proxy failed' },
-      { status: 500 }
+      { isSuccess: false, error: describeStatus(503) },
+      { status: 502 }
     );
   }
 }

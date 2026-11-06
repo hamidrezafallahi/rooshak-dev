@@ -22,7 +22,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var existsTag = await _repo.ExistsByTagNameAsync(request.Name);
             if (existsTag)
@@ -48,12 +48,12 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var tag = await _repo
                       .Query(t => t.Id == request.Id)
                       .FirstOrDefaultAsync(cancellationToken);
             if (tag == null)
-                return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+                return ServiceResult<IdDto>.Failed("برچسب موردنظر پیدا نشد.");
 
             tag.Update(request.Name, userId.Value, request.Slug);
             if (string.IsNullOrWhiteSpace(tag.Slug)
@@ -70,10 +70,10 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var tag = await _repo.GetByIdAsync(request.Id);
             if (tag == null)
-                return ServiceResult<IdDto>.Failed("این کتگوری موجود نیست");
+                return ServiceResult<IdDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
             tag.SetActive(request.IsActive, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = tag.Id });
@@ -83,10 +83,10 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var tag = await _repo.GetByIdAsync(request.Id);
             if (tag == null)
-                return ServiceResult<IdDto>.Failed("این کتگوری موجود نیست");
+                return ServiceResult<IdDto>.Failed("دسته‌بندی موردنظر پیدا نشد.");
             tag.Delete(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = tag.Id });

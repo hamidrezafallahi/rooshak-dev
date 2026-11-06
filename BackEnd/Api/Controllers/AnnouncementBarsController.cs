@@ -36,7 +36,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<AnnouncementBarDto>>> GetAll([FromQuery] GetAllAnnouncementBarsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<AnnouncementBarDto>> GetById([FromRoute] int id)
         {
             var result = await _mediator.Send(new GetAnnouncementBarByIdQuery { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Create([FromForm] CreateAnnouncementBarCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             if (!result.IsSuccess)
                 return BadRequest(result);
@@ -75,7 +75,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             if (!result.IsSuccess)
                 return BadRequest(result);
@@ -91,7 +91,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -102,7 +102,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteAnnouncementBarCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);

@@ -1,4 +1,5 @@
-﻿using Application.Commands;
+﻿using OnlineShop.Domain.Common;
+using Application.Commands;
 using Application.Common;
 using Application.Common.Interfaces;
 using Common;
@@ -23,7 +24,7 @@ public class SlideCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         if (request.BannerUrl is null || request.BannerUrl.Length == 0)
             return ServiceResult<IdDto>.Failed("انتخاب تصویر بنر الزامی است");
@@ -81,7 +82,7 @@ public class SlideCommandHandler(
 
             return ServiceResult<IdDto>.Ok(new IdDto { Id = slide.Id });
         }
-        catch (ArgumentException ex)
+        catch (DomainException ex)
         {
             return ServiceResult<IdDto>.Failed(ex.Message);
         }
@@ -91,11 +92,11 @@ public class SlideCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var slide = await _slideRepository.GetByIdAsync(request.Id);
         if (slide == null)
-            return ServiceResult<IdDto>.Failed("slide پیدا نشد");
+            return ServiceResult<IdDto>.Failed("اسلاید موردنظر پیدا نشد.");
 
         string? bannerUrl = null;
         if (request.BannerUrl is not null && request.BannerUrl.Length > 0)
@@ -187,7 +188,7 @@ public class SlideCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var slide = await _slideRepository.GetByIdAsync(request.Id);
         if (slide == null)
@@ -202,7 +203,7 @@ public class SlideCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var slide = await _slideRepository.GetByIdAsync(request.Id);
         if (slide == null)
@@ -250,7 +251,7 @@ public class SlideCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var slides = await _slideRepository.Query(s => s.IsActive).ToListAsync();
         if (!slides.Any())

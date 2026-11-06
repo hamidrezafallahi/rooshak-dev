@@ -188,7 +188,7 @@ public class  DiscountQueryHandler(IDiscountRepository _repo, IEntityConfigRepos
             var discount = await _repo.GetDiscountByProductOfferIdAsync(request.ProductId);
 
             if (discount == null)
-                return ServiceResult<Discount?>.Failed("Discount not found");
+                return ServiceResult<Discount?>.Failed("تخفیف موردنظر پیدا نشد.");
 
             return ServiceResult<Discount?>.Ok(discount);
         }

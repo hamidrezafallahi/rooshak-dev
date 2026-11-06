@@ -67,7 +67,7 @@ public class SeoSettingQueryHandler(ISeoSettingRepository _repo, IEntityConfigRe
         var entity = await _repo.GetByIdAsync(request.Id);
         if (entity == null)
         {
-            return ServiceResult<SeoSettingDto>.Failed("Seo setting not found");
+            return ServiceResult<SeoSettingDto>.Failed("تنظیمات سئوی موردنظر پیدا نشد.");
         }
 
         return ServiceResult<SeoSettingDto>.Ok(MapDto(entity));

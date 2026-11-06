@@ -21,7 +21,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var method = ShippingMethod.Create(
                 request.Title,
                 request.Description ?? string.Empty,
@@ -49,7 +49,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var method = await _repo.GetByIdAsync(request.Id);
             if (method == null)
                 return ServiceResult<IdDto>.Failed("نحوه ارسال  یافت نشد");
@@ -77,7 +77,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var method = await _repo.GetByIdAsync(request.Id);
             if (method == null)
                 return ServiceResult<IdDto>.Failed("متد ارسال پیدا نشد");
@@ -90,7 +90,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var method = await _repo.GetByIdAsync(request.Id);
             if (method == null)
                 return ServiceResult<IdDto>.Failed("متد ارسال پیدا نشد");
@@ -103,7 +103,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var activeMethods = await _repo.GetAllAsync();
             if (!activeMethods.Any())

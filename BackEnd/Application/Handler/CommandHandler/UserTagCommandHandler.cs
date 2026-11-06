@@ -16,12 +16,12 @@ public class UserTagCommandHandler(IUserTagRepository _repo, IHttpContextAccesso
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var userTag = UserTag.Create(request.UserId, request.TagId, userId.Value);
         var exist = _repo.Query(pot => pot.TagId == request.TagId && pot.UserId == request.UserId).FirstOrDefault();
         if (exist is not null)
         {
-            return ServiceResult<IdDto>.Failed("it has same tag");
+            return ServiceResult<IdDto>.Failed("این برچسب قبلاً به این کاربر اضافه شده است.");
         }
         await _repo.AddAsync(userTag);
         await _repo.SaveChangesAsync(cancellationToken);
@@ -32,12 +32,12 @@ public class UserTagCommandHandler(IUserTagRepository _repo, IHttpContextAccesso
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var userTag = await _repo.GetByIdAsync(request.Id);
-        if (userTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (userTag == null) return ServiceResult<IdDto>.Failed("برچسب کاربر موردنظر پیدا نشد.");
         if (userTag.UserId == request.UserId && userTag.TagId == request.TagId)
         {
-            return ServiceResult<IdDto>.Failed("it has same tag");
+            return ServiceResult<IdDto>.Failed("این برچسب قبلاً به این کاربر اضافه شده است.");
         }
 
         userTag.Update(request.UserId, request.TagId, userId.Value);
@@ -50,9 +50,9 @@ public class UserTagCommandHandler(IUserTagRepository _repo, IHttpContextAccesso
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var userTag = await _repo.GetByIdAsync(request.Id);
-        if (userTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (userTag == null) return ServiceResult<IdDto>.Failed("برچسب کاربر موردنظر پیدا نشد.");
 
         userTag.SetActive(request.IsActive, userId.Value);
 
@@ -64,9 +64,9 @@ public class UserTagCommandHandler(IUserTagRepository _repo, IHttpContextAccesso
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var userTag = await _repo.GetByIdAsync(request.Id);
-        if (userTag == null) return ServiceResult<IdDto>.Failed("Not Found");
+        if (userTag == null) return ServiceResult<IdDto>.Failed("برچسب کاربر موردنظر پیدا نشد.");
 
         userTag.Delete(userId.Value);
 

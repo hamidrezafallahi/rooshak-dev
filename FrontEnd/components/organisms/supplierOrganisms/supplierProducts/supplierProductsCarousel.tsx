@@ -89,16 +89,20 @@ function ProductCard({ product }: { product: IDetailedProductOffer }) {
   const handleAddToCart = async (product: IDetailedProductOffer) => {
     if (isAuthenticated) {
       console.log(product)
-      const syncCartResponse = await addToShoppingCart({
-        url: '/CartItems',
-        body: {
-          productId: product.id,
-          productOfferId: product.id,
-          quantity: 1,
-        },
-      }).unwrap();
-      if (syncCartResponse.isSuccess) {
-        dispatch(synchronousCart(syncCartResponse.data));
+      try {
+        const syncCartResponse = await addToShoppingCart({
+          url: '/CartItems',
+          body: {
+            productId: product.id,
+            productOfferId: product.id,
+            quantity: 1,
+          },
+        }).unwrap();
+        if (syncCartResponse.isSuccess) {
+          dispatch(synchronousCart(syncCartResponse.data));
+        }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     } else {
 dispatch(addToCart({

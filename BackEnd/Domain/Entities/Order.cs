@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using OnlineShop.Domain.Common;
+using Domain.Enums;
 
 using OnlineShop.Domain.Enums;
 
@@ -95,10 +96,10 @@ namespace OnlineShop.Domain.Entities
         public void AddItem(ProductOffers offer,int quantity, int currentUserId)
         {
             if (Status != OrderStatus.Pending)
-                throw new InvalidOperationException("Cannot add items after order is confirmed.");
+                throw new DomainException("بعد از تأیید سفارش نمی‌توان کالایی به آن اضافه کرد.");
 
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero.");
+                throw new DomainException("تعداد باید بیشتر از صفر باشد.");
 
             var existing = Items.FirstOrDefault(i => i.OrderId == offer.Id);
             if (existing != null)
@@ -118,11 +119,11 @@ namespace OnlineShop.Domain.Entities
         public void RemoveItem(int productId, int currentUserId)
         {
             if (Status != OrderStatus.Pending)
-                throw new InvalidOperationException("Cannot remove items after order is confirmed.");
+                throw new DomainException("بعد از تأیید سفارش نمی‌توان کالایی از آن حذف کرد.");
 
             var item = Items.FirstOrDefault(i => i.ProductOfferId == productId);
             if (item == null)
-                throw new ArgumentException("Item not found in order.");
+                throw new DomainException("این کالا در سفارش پیدا نشد.");
 
             Items.Remove(item);
             RecalculateFinalPrice();
@@ -132,7 +133,7 @@ namespace OnlineShop.Domain.Entities
         public void ApplyDiscount(decimal discountAmount, int currentUserId)
         {
             if (discountAmount < 0)
-                throw new ArgumentException("Discount cannot be negative.");
+                throw new DomainException("مبلغ تخفیف نمی‌تواند منفی باشد.");
 
             DiscountAmount = discountAmount;
             RecalculateFinalPrice();
@@ -141,16 +142,16 @@ namespace OnlineShop.Domain.Entities
         public void ApplyDiscountCode(DiscountCode code, int currentUserId)
         {
             if (Status != OrderStatus.Pending)
-                throw new InvalidOperationException("Cannot apply discount code after order is confirmed.");
+                throw new DomainException("بعد از تأیید سفارش نمی‌توان کد تخفیف اعمال کرد.");
 
             if (code == null)
-                throw new ArgumentException("Invalid discount code.");
+                throw new DomainException("کد تخفیف نامعتبر است.");
 
             if (!code.IsValid)
-                throw new InvalidOperationException("Discount code is not valid.");
+                throw new DomainException("کد تخفیف معتبر نیست؛ ممکن است منقضی شده یا ظرفیت آن تمام شده باشد.");
 
             if (code.UserId != null && code.UserId != UserId)
-                throw new InvalidOperationException("This discount code is not for this user.");
+                throw new DomainException("این کد تخفیف متعلق به حساب شما نیست.");
 
             DiscountCodeId = code.Id;
 
@@ -186,10 +187,10 @@ namespace OnlineShop.Domain.Entities
         public void Confirm(int currentUserId)
         {
             if (!Items.Any())
-                throw new InvalidOperationException("Order must have at least one item.");
+                throw new DomainException("سفارش باید حداقل یک کالا داشته باشد.");
 
             if (Status != OrderStatus.Pending)
-                throw new InvalidOperationException("Only pending orders can be confirmed.");
+                throw new DomainException("فقط سفارش‌های در انتظار تأیید قابل تأیید هستند.");
 
             Status = OrderStatus.Confirmed;
             MarkUpdated(currentUserId);
@@ -198,7 +199,7 @@ namespace OnlineShop.Domain.Entities
         public void Pay(int currentUserId)
         {
             if (Status != OrderStatus.Confirmed)
-                throw new InvalidOperationException("Order must be confirmed before payment.");
+                throw new DomainException("سفارش باید پیش از پرداخت تأیید شود.");
 
             Status = OrderStatus.Paid;
             MarkUpdated(currentUserId);
@@ -207,7 +208,7 @@ namespace OnlineShop.Domain.Entities
         public void Ship(int currentUserId)
         {
             if (Status != OrderStatus.Paid)
-                throw new InvalidOperationException("Order must be paid before shipping.");
+                throw new DomainException("سفارش باید پیش از ارسال پرداخت شود.");
 
             Status = OrderStatus.Shipped;
             MarkUpdated(currentUserId);
@@ -216,7 +217,7 @@ namespace OnlineShop.Domain.Entities
         public void Deliver(int currentUserId)
         {
             if (Status != OrderStatus.Shipped)
-                throw new InvalidOperationException("Order must be shipped before delivery.");
+                throw new DomainException("سفارش باید پیش از تحویل ارسال شود.");
 
             Status = OrderStatus.Delivered;
             MarkUpdated(currentUserId);
@@ -225,7 +226,7 @@ namespace OnlineShop.Domain.Entities
         public void Cancel(int currentUserId)
         {
             if (Status == OrderStatus.Paid || Status == OrderStatus.Shipped || Status == OrderStatus.Delivered)
-                throw new InvalidOperationException("Cannot cancel after order is paid or shipped.");
+                throw new DomainException("سفارشی که پرداخت یا ارسال شده باشد قابل لغو نیست.");
 
             Status = OrderStatus.Cancelled;
             MarkUpdated(currentUserId);

@@ -21,7 +21,7 @@ public class UserTagsController : BaseController
     public async Task<ActionResult<ListDto<UserTagDto>>> GetAll([FromQuery] GetAllUserTagsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -29,7 +29,7 @@ public class UserTagsController : BaseController
     public async Task<ActionResult<UserTagDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetUserTagByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -39,7 +39,7 @@ public class UserTagsController : BaseController
     {
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -48,7 +48,7 @@ public class UserTagsController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] UpdateUserTagCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -59,7 +59,7 @@ public class UserTagsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -69,7 +69,7 @@ public class UserTagsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteUserTagCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

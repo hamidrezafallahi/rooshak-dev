@@ -39,7 +39,7 @@ interface IPaymentSuccessProps {
 export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
   const locale = useLocale();
   const t = useTranslations('paymentSuccess');
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
   const router = useRouter();
 
   const orderId = searchParams.get('orderId') || 'N/A';

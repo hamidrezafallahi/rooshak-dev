@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Commands;
 using Application.Common;
 using Application.Common.Interfaces;
@@ -27,14 +28,14 @@ namespace Application.Handler.CommandHandler
         {
             var userId = accessor.HttpContext?.GetUserId();
             if (userId == null)
-                return ServiceResult<CatalogItemIdsDto>.Failed("Unauthorized");
+                return ServiceResult<CatalogItemIdsDto>.Unauthorized();
 
             var validationError = Validate(request);
             if (validationError != null)
                 return ServiceResult<CatalogItemIdsDto>.Failed(validationError);
 
             if (await productRepository.ExistsByNameAndBrandAsync(request.Name, request.BrandId))
-                return ServiceResult<CatalogItemIdsDto>.Failed("A product with the same name and brand already exists.");
+                return ServiceResult<CatalogItemIdsDto>.Failed("محصولی با همین نام و برند از قبل وجود دارد.");
 
             await using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -107,35 +108,35 @@ namespace Application.Handler.CommandHandler
                     ImageId = image?.Id
                 });
             }
-            catch (OperationCanceledException)
+            catch (DomainException ex)
             {
-                await transaction.RollbackAsync(CancellationToken.None);
-                throw;
+                await transaction.RollbackAsync(cancellationToken);
+                return ServiceResult<CatalogItemIdsDto>.Failed(ex.Message, ex.Code);
             }
             catch
             {
-                await transaction.RollbackAsync(cancellationToken);
-                return ServiceResult<CatalogItemIdsDto>.Failed(
-                    "Catalog item could not be created as a complete Product+Offer unit.");
+                // Nothing was kept; the error middleware reports what happened.
+                await transaction.RollbackAsync(CancellationToken.None);
+                throw;
             }
         }
 
         private static string? Validate(CreateCatalogItemCommand request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-                return "Product name cannot be empty.";
+                return "نام محصول نمی‌تواند خالی باشد.";
             if (request.CategoryId <= 0)
-                return "Category is required.";
+                return "انتخاب دسته‌بندی الزامی است.";
             if (request.BrandId <= 0)
-                return "Brand is required.";
+                return "انتخاب برند الزامی است.";
             if (request.BasePrice <= 0)
-                return "Offer base price must be greater than zero.";
+                return "قیمت پایهٔ پیشنهاد باید بیشتر از صفر باشد.";
             if (request.Inventory < 0)
-                return "Offer inventory cannot be negative.";
+                return "موجودی پیشنهاد نمی‌تواند منفی باشد.";
             if (request.Diameter is < 0)
-                return "Diameter cannot be negative.";
+                return "قطر نمی‌تواند منفی باشد.";
             if (request.PieceCount is < 0)
-                return "Piece count cannot be negative.";
+                return "تعداد تکه نمی‌تواند منفی باشد.";
             return null;
         }
 
@@ -161,7 +162,7 @@ namespace Application.Handler.CommandHandler
                     Path = UploadPaths.Products(productId)
                 });
                 if (!UploadPaths.IsStoredPath(uploaded))
-                    throw new InvalidOperationException("Catalog item image upload failed.");
+                    throw new FileUploadException("آپلود تصویر محصول انجام نشد.");
 
                 return UploadPaths.Normalize(uploaded);
             }

@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<PaymentDto>>> GetAll([FromQuery] GetAllPaymentsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
             return Ok(result);
         }
 
@@ -31,7 +31,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> GetPaymentById(int id)
         {
             var result = await _mediator.Send(new GetPaymentByIdQuery { Id=id});
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -42,7 +42,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> GetPaymentsByOrderId(int orderId)
         {
             var result = await _mediator.Send(new GetPaymentsByOrderIdQuery { OrderId=orderId});
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -52,7 +52,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> CreatePayment([FromBody] CreatePaymentCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -62,7 +62,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PaymentStartDto>> StartPayment([FromBody] RequestPaymentCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -72,7 +72,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<PaymentVerifyResponseDto>> VerifyPayment([FromBody] VerifyPaymentCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -81,7 +81,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> MarkAsPaid([FromBody] MarkPaymentAsPaidCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -90,7 +90,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> MarkAsFailed([FromBody] MarkPaymentAsFailedCommand command )
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -99,7 +99,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> CancelPayment([FromBody]  CancelPaymentCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -110,7 +110,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -125,7 +125,7 @@ namespace WebApi.Controllers
             {
                 PaymentId = id,
             });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

@@ -19,6 +19,7 @@ import { useAppSelector } from '@store/index';
 import { showErrorToast } from '@utils/core';
 
 import { IProps } from '../type';
+import { describeThrown } from '@lib/apiError';
 
 const FinalizeOrder = React.lazy(
   () => import('@components/molecules/finalizeOrder')
@@ -84,10 +85,8 @@ function SubmitButton(_: IProps) {
       } else {
         showErrorToast(order.error ?? t('payment.payment_error'));
       }
-    } catch (err: any) {
-      showErrorToast(
-        err?.data?.error ?? err?.message ?? t('payment.payment_error')
-      );
+    } catch (err) {
+      showErrorToast(describeThrown(err));
     }
   };
 

@@ -12,10 +12,8 @@ import dynamic from 'next/dynamic';
 
 import QrDialog from '@components/molecules/qrDialog';
 import { browserApiBaseUrl } from '@lib/api';
-import {
-  fetchWithAuth,
-  forbiddenMessage,
-} from '@lib/client-auth';
+import { describeStatus, describeThrown, readApiResult } from '@lib/apiError';
+import { fetchWithAuth } from '@lib/client-auth';
 import { IProductModel3DAdmin } from '@models/product';
 import { toMediaUrl } from '@utils/toMediaUrl';
 
@@ -41,12 +39,9 @@ async function call<T>(url: string, init?: RequestInit): Promise<Envelope<T>> {
   try {
     // 401 → refresh + retry, or the login page when the session is over.
     const res = await fetchWithAuth(url, { cache: 'no-store', ...init });
-    if (res.status === 403) {
-      return { isSuccess: false, data: null, error: forbiddenMessage() };
-    }
-    return (await res.json()) as Envelope<T>;
+    return await readApiResult<T | null>(res);
   } catch (e) {
-    return { isSuccess: false, data: null, error: e instanceof Error ? e.message : 'Network error' };
+    return { isSuccess: false, data: null, error: describeThrown(e) };
   }
 }
 
@@ -108,7 +103,7 @@ export default function Product3DAdminPanel({
   const onModelLoad = useCallback((s: { x: number; y: number; z: number }) => setModelSize(s), []);
 
   const report = (res: Envelope<unknown>, okText = t('uploaded')) =>
-    setMessage(res.isSuccess ? { ok: true, text: okText } : { ok: false, text: res.error || 'Error' });
+    setMessage(res.isSuccess ? { ok: true, text: okText } : { ok: false, text: res.error || describeStatus(500) });
 
   const uploadModel = async () => {
     const model = modelInput.current?.files?.[0];

@@ -8,15 +8,18 @@ import Link from 'next/link';
 
 import MediaImage from '@components/atoms/MediaImage';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { IUser } from '@models/user';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function BrandSuppliers({ id }: { id: number }) {
   const result = await safeFetchJson<SimpleResponse<IUser[]>>(
     `${serverApiBaseUrl}/Brands/getProductsSuppliersByBrandId/${id}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
   const suppliers: IUser[] =
     result.ok && result.data?.isSuccess !== false ? result.data?.data || [] : [];
   const locale = await getLocale();

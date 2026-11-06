@@ -97,7 +97,7 @@ public class EntityConfigQueryHandler(IEntityConfigRepository _repo, IEntityConf
         {
             var config = await _repo.GetByIdAsync(request.Id);
             if (config == null)
-                return ServiceResult<EntityConfigDto?>.Failed("Config not found");
+                return ServiceResult<EntityConfigDto?>.Failed("پیکربندی موردنظر پیدا نشد.");
 
 
             var configDto = new EntityConfigDto
@@ -121,7 +121,7 @@ public class EntityConfigQueryHandler(IEntityConfigRepository _repo, IEntityConf
         {
             var config = await _repo.GetByEntityNameAsync(request.EntityName);
             if (config == null)
-                return ServiceResult<EntityConfigDto?>.Failed("Config not found");
+                return ServiceResult<EntityConfigDto?>.Failed("پیکربندی موردنظر پیدا نشد.");
 
             var configDto = new EntityConfigDto
             {
@@ -144,7 +144,7 @@ public class EntityConfigQueryHandler(IEntityConfigRepository _repo, IEntityConf
         {
             var config = await _repo.GetByEntityNameAsync(request.EntityName);
             if (config == null)
-                return ServiceResult<FormReadModel?>.Failed("form not found");
+                return ServiceResult<FormReadModel?>.Failed("پیکربندی فرم موردنظر پیدا نشد.");
 
             var configDto = new FormReadModel
             {

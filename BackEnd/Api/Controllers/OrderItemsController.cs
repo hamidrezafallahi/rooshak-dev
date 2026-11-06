@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<DisplayOrderItemDto>>> GetBlogs([FromQuery] GetOrderItemsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -30,7 +30,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<OrderItemDto>>> GetItemsByOrderId(int orderId)
         {
             var result = await _mediator.Send(new GetItemsByOrderIdQuery { OrderId = orderId });
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -40,7 +40,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<OrderItemDto>> GetById(int id)
         {
             var result = await _mediator.Send(new GetOrderItemByIdQuery { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
 
@@ -51,7 +51,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<decimal>> GetTotalPrice(int orderId)
         {
             var result = await _mediator.Send(new CalculateTotalPriceQuery { OrderId= orderId });
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -61,7 +61,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> AddOrderItem( [FromBody] AddOrderItemCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> UpdateOrderItem([FromBody] UpdateOrderItemCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -82,7 +82,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -91,7 +91,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteOrderItemCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

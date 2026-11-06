@@ -66,6 +66,8 @@ export const deleteCookie = (name: string) => {
 };
 export const showErrorToast = (message:string, title = "", time = 0) => {
   return toast(<ToastBox message={message} title={title} />, {
+    // The same failure can be reported twice (global handler + component): show it once.
+    toastId: message,
     className: "!rounded-2xl border-state-error7 border-[0.5px] !shadow-toast",
     position: "top-right",
     autoClose: time,

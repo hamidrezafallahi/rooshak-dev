@@ -1,4 +1,5 @@
-﻿using Application.Commands;
+﻿using OnlineShop.Domain.Common;
+using Application.Commands;
 using Application.Common;
 using Common;
 using Domain.Interfaces;
@@ -23,7 +24,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var user = _userRepo.Query(u => u.Id == userId).FirstOrDefault();
             var parentName = _repo.Query(u => u.Id == request.ParentId).Select(p => p.UserName).FirstOrDefault();
             string title = request.TargetType switch
@@ -43,7 +44,7 @@ namespace Application.Handler.CommandHandler
                                      .Select(p => p.Name)
                                      .FirstOrDefaultAsync(),
 
-                _ => throw new ArgumentException($"Unknown target type: {request.TargetType}")
+                _ => throw new DomainException($"نوع «{request.TargetType}» برای این عملیات پشتیبانی نمی‌شود.")
             };
 
 
@@ -68,7 +69,7 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var user = _userRepo.Query(u => u.Id == userId).FirstOrDefault();
             var parentName = _repo.Query(u => u.Id == request.ParentId).Select(p => p.UserName).FirstOrDefault();
             string title = request.TargetType switch
@@ -88,7 +89,7 @@ namespace Application.Handler.CommandHandler
                                      .Select(p => p.Name)
                                      .FirstOrDefaultAsync(),
 
-                _ => throw new ArgumentException($"Unknown target type: {request.TargetType}")
+                _ => throw new DomainException($"نوع «{request.TargetType}» برای این عملیات پشتیبانی نمی‌شود.")
             };
             var comment = Comment.Create(
                 userId: userId.Value,
@@ -111,11 +112,11 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var comment = await _repo.GetByIdAsync(request.Id);
             if (comment == null)
-                return ServiceResult<IdDto>.Failed("Comment not found");
+                return ServiceResult<IdDto>.Failed("نظر موردنظر پیدا نشد.");
 
             comment.Approve(request.IsApprove, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
@@ -126,11 +127,11 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
 
             var comment = await _repo.GetByIdAsync(request.Id);
             if (comment == null)
-                return ServiceResult<IdDto>.Failed("Comment not found");
+                return ServiceResult<IdDto>.Failed("نظر موردنظر پیدا نشد.");
             comment.SetActive(request.IsActive, userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
 
@@ -141,9 +142,9 @@ namespace Application.Handler.CommandHandler
         {
             var comment = await _repo.GetByIdAsync(request.CommentId);
             if (comment == null)
-                return ServiceResult<IdDto>.Failed("Comment not found");
+                return ServiceResult<IdDto>.Failed("نظر موردنظر پیدا نشد.");
             if (comment.UserId != request.UserId)
-                return ServiceResult<IdDto>.Failed("Cannot edit others comment");
+                return ServiceResult<IdDto>.Failed("فقط نویسندهٔ نظر می‌تواند آن را ویرایش کند.");
             comment.Edit(request.Content, request.UserId);
             await _repo.SaveChangesAsync(cancellationToken);
 
@@ -153,10 +154,10 @@ namespace Application.Handler.CommandHandler
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var comment = await _repo.GetByIdAsync(request.Id);
             if (comment == null)
-                return ServiceResult<IdDto>.Failed("Comment not found");
+                return ServiceResult<IdDto>.Failed("نظر موردنظر پیدا نشد.");
             comment.Delete(userId.Value);
 
             await _repo.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using OnlineShop.Domain.Common;
+using Domain.Entities;
 
 
 namespace OnlineShop.Domain.Entities
@@ -32,16 +33,16 @@ namespace OnlineShop.Domain.Entities
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("Discount title cannot be empty.", nameof(title));
+                throw new DomainException("عنوان تخفیف نمی‌تواند خالی باشد.");
 
             if (amount <= 0)
-                throw new ArgumentException("Amount must be greater than zero.");
+                throw new DomainException("مبلغ تخفیف باید بیشتر از صفر باشد.");
 
             if (isPercent && amount > 100)
-                throw new ArgumentException("Percentage discount cannot exceed 100.");
+                throw new DomainException("تخفیف درصدی نمی‌تواند بیشتر از ۱۰۰ باشد.");
 
             if (endDate <= startDate)
-                throw new ArgumentException("End date must be greater than start date.");
+                throw new DomainException("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
             var discount = new Discount
             {
@@ -73,9 +74,9 @@ namespace OnlineShop.Domain.Entities
             if (amount.HasValue)
             {
                 if (amount.Value <= 0)
-                    throw new ArgumentException("Amount must be greater than zero.");
+                    throw new DomainException("مبلغ تخفیف باید بیشتر از صفر باشد.");
                 if (isPercent == true && amount.Value > 100)
-                    throw new ArgumentException("Percentage discount cannot exceed 100.");
+                    throw new DomainException("تخفیف درصدی نمی‌تواند بیشتر از ۱۰۰ باشد.");
 
                 Amount = amount.Value;
             }
@@ -88,14 +89,14 @@ namespace OnlineShop.Domain.Entities
             if (startDate.HasValue && endDate.HasValue)
             {
                 if (endDate.Value <= startDate.Value)
-                    throw new ArgumentException("End date must be greater than start date.");
+                    throw new DomainException("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
                 StartDate = startDate.Value;
                 EndDate = endDate.Value;
             }
             else if (startDate.HasValue || endDate.HasValue)
             {
-                throw new ArgumentException("Both StartDate and EndDate must be provided together.");
+                throw new DomainException("تاریخ شروع و پایان تخفیف باید با هم وارد شوند.");
             }
 
             MarkUpdated(currentUserId);

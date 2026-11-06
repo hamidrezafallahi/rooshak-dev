@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 
 namespace Domain.ValueObjects
 {
@@ -14,7 +15,7 @@ namespace Domain.ValueObjects
         public static RateValue Create(int value)
         {
             if (value < 1 || value > 5)
-                throw new ArgumentOutOfRangeException(nameof(value), "Rate must be between 1 and 5");
+                throw new DomainException("امتیاز باید بین ۱ تا ۵ باشد.");
 
             return new RateValue(value);
         }

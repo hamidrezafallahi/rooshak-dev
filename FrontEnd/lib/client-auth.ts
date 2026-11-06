@@ -19,16 +19,6 @@ let refreshing: Promise<RefreshOutcome> | null = null;
 let lastRefreshAt = 0;
 let redirecting = false;
 
-// Runs outside React (no next-intl hooks), so pick the copy from the URL locale.
-export function forbiddenMessage(): string {
-  const isEn =
-    typeof window !== 'undefined' &&
-    /^\/en(\/|$)/.test(window.location.pathname);
-  return isEn
-    ? 'You do not have permission to do this.'
-    : 'شما دسترسی لازم برای انجام این کار را ندارید';
-}
-
 /** One /auth/refresh call at a time; concurrent 401s wait for the same one. */
 export function refreshSession(): Promise<RefreshOutcome> {
   refreshing ??= requestRefresh().finally(() => {

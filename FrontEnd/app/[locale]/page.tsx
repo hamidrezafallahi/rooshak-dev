@@ -119,7 +119,10 @@ export default async function Home({ params }: Props) {
         <LandingSlider slides={rest} />
         <LandingBrands />
         <TheMostProducts />
-        <LandingCategory categories={categories?.data.records ?? []} />
+        <LandingCategory
+          categories={categories.data?.records ?? []}
+          error={categories.isSuccess ? null : categories.error}
+        />
         <LandingSpecialOffer />
         <TrustSection />
         <USPSection />

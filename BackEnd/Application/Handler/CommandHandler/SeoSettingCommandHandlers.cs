@@ -14,7 +14,7 @@ public class SeoSettingCommandHandlers(ISeoSettingRepository _repo, IHttpContext
     public async Task<ServiceResult<IdDto>> Handle(CreateSeoSettingCommand request, CancellationToken cancellationToken)
     {
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var entity = OnlineShop.Domain.Entities.SeoSetting.Create(
             request.RoutePath,
@@ -42,10 +42,10 @@ public class SeoSettingCommandHandlers(ISeoSettingRepository _repo, IHttpContext
     public async Task<ServiceResult<IdDto>> Handle(UpdateSeoSettingCommand request, CancellationToken cancellationToken)
     {
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var entity = await _repo.GetByIdAsync(request.Id);
-        if (entity == null) return ServiceResult<IdDto>.Failed("Seo setting not found");
+        if (entity == null) return ServiceResult<IdDto>.Failed("تنظیمات سئوی موردنظر پیدا نشد.");
 
         entity.Update(
             userId.Value,
@@ -76,10 +76,10 @@ public class SeoSettingCommandHandlers(ISeoSettingRepository _repo, IHttpContext
     public async Task<ServiceResult<IdDto>> Handle(ActiveSeoSettingCommand request, CancellationToken cancellationToken)
     {
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var entity = await _repo.GetByIdAsync(request.Id);
-        if (entity == null) return ServiceResult<IdDto>.Failed("Seo setting not found");
+        if (entity == null) return ServiceResult<IdDto>.Failed("تنظیمات سئوی موردنظر پیدا نشد.");
 
         entity.SetActive(request.IsActive, userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
@@ -90,10 +90,10 @@ public class SeoSettingCommandHandlers(ISeoSettingRepository _repo, IHttpContext
     public async Task<ServiceResult<IdDto>> Handle(DeleteSeoSettingCommand request, CancellationToken cancellationToken)
     {
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var entity = await _repo.GetByIdAsync(request.Id);
-        if (entity == null) return ServiceResult<IdDto>.Failed("Seo setting not found");
+        if (entity == null) return ServiceResult<IdDto>.Failed("تنظیمات سئوی موردنظر پیدا نشد.");
 
         entity.Delete(userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);

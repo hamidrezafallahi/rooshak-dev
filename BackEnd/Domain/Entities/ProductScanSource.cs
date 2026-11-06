@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 namespace OnlineShop.Domain.Entities
 {
     /// <summary>
@@ -20,7 +21,7 @@ namespace OnlineShop.Domain.Entities
         public static ProductScanSource Create(int productId, string fileUrl, string kind, long sizeBytes, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(fileUrl))
-                throw new ArgumentException("FileUrl cannot be empty.", nameof(fileUrl));
+                throw new DomainException("نشانی فایل نمی‌تواند خالی باشد.");
 
             var source = new ProductScanSource
             {

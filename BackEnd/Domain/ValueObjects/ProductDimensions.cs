@@ -1,4 +1,5 @@
-﻿namespace OnlineShop.Domain.ValueObjects
+﻿using OnlineShop.Domain.Common;
+namespace OnlineShop.Domain.ValueObjects
 {
     public class ProductDimensions
     {
@@ -12,10 +13,10 @@
         public ProductDimensions(decimal? width, decimal? height, decimal? depth, decimal? weight)
         {
             if (width < 0 || height < 0 || depth < 0)
-                throw new ArgumentException("Dimensions must be positive.");
+                throw new DomainException("ابعاد باید بیشتر از صفر باشند.");
 
             if (weight < 0)
-                throw new ArgumentException("Weight cannot be negative.");
+                throw new DomainException("وزن نمی‌تواند منفی باشد.");
 
             Width = width;
             Height = height;

@@ -22,6 +22,7 @@ function ShippingMethod() {
   const [methods, setMethods] = useState<IShippingMethod[]>([]);
   const { data } = useGetData<any>({
     url: "/ShippingMethods",
+    reportFailure: true,
   });
   const handleChangeShippingMethod = (el:IShippingMethod) => {
     if(shippingMethod?.id !== el.id){

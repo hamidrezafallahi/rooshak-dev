@@ -17,7 +17,7 @@ interface IProps extends Omit<SwitchProps, 'id' | 'checked' | 'onChange'> {
 }
 
 function ActiveComponent({ id, checked, ...props }: IProps) {
-  const params = useParams();
+  const params = useParams()!;
   const router = useRouter();
   const [active, { isLoading }] = useGetConditionallyMutation();
   const [isActive, setIsActive] = useState(() => Boolean(checked));
@@ -54,10 +54,10 @@ function ActiveComponent({ id, checked, ...props }: IProps) {
         method: 'PUT',
       });
 
-      if ('error' in res && res.error) {
+      // A refusal can also come as a normal answer with isSuccess false.
+      if (('error' in res && res.error) || res.data?.isSuccess === false) {
         isActiveRef.current = previous;
         setIsActive(previous);
-        console.error(res.error);
         return;
       }
 

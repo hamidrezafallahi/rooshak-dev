@@ -66,7 +66,7 @@ public class BlogTagQueryHandler(IBlogTagRepository _repo,
                 .FirstOrDefaultAsync(pot => pot.Id == request.Id, cancellationToken);
 
             if (BlogTag == null)
-                return ServiceResult<BlogTagDto>.Failed("BlogTag not found");
+                return ServiceResult<BlogTagDto>.Failed("برچسب مقالهٔ موردنظر پیدا نشد.");
             var dto = new BlogTagDto
             {
                 Id = BlogTag.Id,

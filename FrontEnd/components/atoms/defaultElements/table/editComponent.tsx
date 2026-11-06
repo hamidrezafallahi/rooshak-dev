@@ -9,7 +9,7 @@ import { EditIcon } from '../../iconComponents';
 function EditComponent({ ...props }: { id: string }) {
   const locale = useLocale();
   const { id } = props;
-  const params = useParams();
+  const params = useParams()!;
   return (
     <Link
       href={`/${locale}/admin/${params.field}/${id}`}

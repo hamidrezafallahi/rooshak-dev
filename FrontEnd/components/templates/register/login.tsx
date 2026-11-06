@@ -38,6 +38,11 @@ import {
   ILoginResponse,
   IProps,
 } from './type';
+import {
+  describeStatus,
+  describeThrown,
+  readApiResult,
+} from '@lib/apiError';
 
 export function LoginForm({
   className,
@@ -67,7 +72,7 @@ export function LoginForm({
 
   const dispatch = useDispatch();
 
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()!;
 
   const redirectUrl =
     searchParams.get("redirect") || "/";
@@ -85,11 +90,10 @@ export function LoginForm({
       });
 
 
-      const data: IBaseQueryResponse<ILoginResponse> =
-        await res.json();
+      const data = await readApiResult<ILoginResponse>(res);
 
       if (!data.isSuccess) {
-        showErrorToast(data.error);
+        showErrorToast(data.error ?? describeStatus(res.status));
         return;
       }
 
@@ -128,11 +132,7 @@ export function LoginForm({
     } catch (error) {
       console.error("Login error:", error);
 
-      showErrorToast(
-        typeof error === "string"
-          ? error
-          : "Login failed",
-      );
+      showErrorToast(describeThrown(error));
     } finally {
       setIsLoading(false);
     }

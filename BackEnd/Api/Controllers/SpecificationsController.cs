@@ -21,7 +21,7 @@ public class SpecificationsController : BaseController
     public async Task<ActionResult<ListDto<SpecificationsDto>>> GetAll([FromQuery] GetProductSpecificationsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
 
         return Ok(result);
@@ -30,7 +30,7 @@ public class SpecificationsController : BaseController
     public async Task<ActionResult<SpecificationsDto>> GetSpecificationsById(int id)
     {
         var result = await _mediator.Send(new GetProductSpecificationByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -42,7 +42,7 @@ public class SpecificationsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -57,7 +57,7 @@ public class SpecificationsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -71,7 +71,7 @@ public class SpecificationsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -83,7 +83,7 @@ public class SpecificationsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteProductSpecificationCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Common.Interfaces;
 
 namespace Application.DataTransfer.Excel
@@ -184,10 +185,8 @@ namespace Application.DataTransfer.Excel
 
         private static string Describe(Exception ex)
         {
-            if (ex is ExcelRowException) return ex.Message;
-            var inner = ex;
-            while (inner.InnerException is not null) inner = inner.InnerException;
-            return inner.Message;
+            if (ex is ExcelRowException or DomainException) return ex.Message;
+            return $"این ردیف به‌دلیل یک خطای پیش‌بینی‌نشده ثبت نشد: {ex.GetBaseException().Message}";
         }
     }
 }

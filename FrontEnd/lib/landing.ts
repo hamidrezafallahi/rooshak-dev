@@ -3,6 +3,7 @@ import 'server-only';
 import { ILandingProduct } from '@models/product';
 
  import { requireAbsoluteUrl, serverApiBaseUrl } from './api';
+import { describeStatus, errorTextOf } from './apiError';
 import { logger } from './logger';
 
 type LandingTab = 'BestSeller' | 'TheNewest' | 'Discounters';
@@ -78,7 +79,7 @@ export function splitHeroSlide(slides: LandingSlide[]): {
  */
 export async function getLandingProducts(
   tab: LandingTab,
-): Promise<ILandingProduct[]> {
+): Promise<{ products: ILandingProduct[]; error: string | null }> {
   const params = new URLSearchParams({
     BestSeller: String(tab === 'BestSeller'),
     TheNewest: String(tab === 'TheNewest'),
@@ -91,23 +92,29 @@ export async function getLandingProducts(
     const res = await fetch(url, {
       next: { revalidate: 60, tags: ['Products/landings'] },
     });
+    const payload = (await res.json().catch(() => null)) as
+      | LandingProductsEnvelope
+      | ILandingProduct[]
+      | null;
     if (!res.ok) {
       console.error(`getLandingProducts failed: ${res.status} ${url}`);
-      return [];
+      return {
+        products: [],
+        error: errorTextOf(payload) ?? describeStatus(res.status),
+      };
     }
 
-    const payload = (await res.json()) as LandingProductsEnvelope | ILandingProduct[];
-    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload)) return { products: payload, error: null };
     if (payload?.isSuccess === false) {
       console.error(
         `getLandingProducts error: ${payload.error ?? 'unknown'} ${url}`,
       );
-      return [];
+      return { products: [], error: errorTextOf(payload) ?? describeStatus(500) };
     }
-    return payload?.data ?? [];
+    return { products: payload?.data ?? [], error: null };
   } catch (e) {
     console.error(`getLandingProducts error for ${tab}`, e);
-    return [];
+    return { products: [], error: describeStatus(503) };
   }
 }
 
@@ -118,5 +125,10 @@ export async function getLandingProductsByTabs() {
     getLandingProducts('Discounters'),
   ]);
 
-  return { bestSeller, theNewest, discounters };
+  return {
+    bestSeller: bestSeller.products,
+    theNewest: theNewest.products,
+    discounters: discounters.products,
+    error: bestSeller.error ?? theNewest.error ?? discounters.error,
+  };
 }

@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 using System;
 
 namespace OnlineShop.Domain.Entities
@@ -37,7 +38,7 @@ namespace OnlineShop.Domain.Entities
         public void AddItem(int productId,int productOfferId, int quantity, decimal unitPrice, int currentUserId)
         {
             if (Status != CartStatus.Active)
-                throw new InvalidOperationException("Cannot add items to a non-active cart.");
+                throw new DomainException("این سبد خرید دیگر فعال نیست و نمی‌توان کالایی به آن اضافه کرد.");
 
             var existingItem = Items.FirstOrDefault(i => i.ProductOfferId == productOfferId);
             if (existingItem is null)
@@ -100,7 +101,7 @@ namespace OnlineShop.Domain.Entities
         {
             var item = Items.FirstOrDefault(i => i.ProductOfferId == productOfferId);
             if (item is null)
-                throw new InvalidOperationException("Item not found in cart.");
+                throw new DomainException("این کالا در سبد خرید پیدا نشد.");
 
             Items.Remove(item);
             MarkUpdated(currentUserId);
@@ -109,7 +110,7 @@ namespace OnlineShop.Domain.Entities
         public void Checkout(int currentUserId)
         {
             if (!Items.Any(i => !i.IsDeleted))
-                throw new InvalidOperationException("Cannot checkout an empty cart.");
+                throw new DomainException("سبد خرید شما خالی است و نمی‌توان سفارش ثبت کرد.");
 
             Status = CartStatus.Checkout;
             MarkUpdated(currentUserId);
@@ -118,7 +119,7 @@ namespace OnlineShop.Domain.Entities
         public void MarkAsPaid(int currentUserId)
         {
             if (Status != CartStatus.Checkout)
-                throw new InvalidOperationException("Only checkout carts can be marked as paid.");
+                throw new DomainException("فقط سبدی که در مرحلهٔ تسویه است می‌تواند پرداخت‌شده ثبت شود.");
 
             Status = CartStatus.Paid;
             MarkUpdated(currentUserId);
@@ -127,7 +128,7 @@ namespace OnlineShop.Domain.Entities
         public void Cancel(int currentUserId)
         {
             if (Status == CartStatus.Paid)
-                throw new InvalidOperationException("Paid carts cannot be cancelled.");
+                throw new DomainException("سبد خریدی که پرداخت شده قابل لغو نیست.");
 
             Status = CartStatus.Cancelled;
             MarkUpdated(currentUserId);

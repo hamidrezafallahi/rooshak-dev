@@ -19,15 +19,15 @@ public class ProductOfferCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var product = await _productRepo.GetByIdAsync(request.ProductId);
         if (product == null || product.IsDeleted)
-            return ServiceResult<IdDto>.Failed("Product not found");
+            return ServiceResult<IdDto>.Failed("محصول موردنظر پیدا نشد.");
 
         var exists = await _offerRepo.ExistsAsync(request.ProductId, userId.Value);
         if (exists)
-            return ServiceResult<IdDto>.Failed("You already have an offer for this product");
+            return ServiceResult<IdDto>.Failed("شما قبلاً برای این محصول پیشنهاد ثبت کرده‌اید.");
 
         var offer = ProductOffers.Create(
             productId: request.ProductId,
@@ -46,14 +46,14 @@ public class ProductOfferCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var offer = await _offerRepo.GetByIdAsync(request.Id);
         if (offer == null || offer.IsDeleted)
-            return ServiceResult<IdDto>.Failed("Offer not found");
+            return ServiceResult<IdDto>.Failed("پیشنهاد محصول موردنظر پیدا نشد.");
 
         if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Failed("این پیشنهاد متعلق به شما نیست و اجازهٔ تغییر آن را ندارید.", ErrorCodes.Forbidden);
 
         offer.Update(
             basePrice: request.BasePrice,
@@ -72,13 +72,13 @@ public class ProductOfferCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var offer = await _offerRepo.GetByIdAsync(request.Id);
         if (offer == null || offer.IsDeleted)
-            return ServiceResult<IdDto>.Failed("Offer not found");
+            return ServiceResult<IdDto>.Failed("پیشنهاد محصول موردنظر پیدا نشد.");
         if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Failed("این پیشنهاد متعلق به شما نیست و اجازهٔ تغییر آن را ندارید.", ErrorCodes.Forbidden);
 
         offer.SetActive(request.IsActive, userId.Value);
         await _offerRepo.SaveChangesAsync(cancellationToken);
@@ -89,13 +89,13 @@ public class ProductOfferCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var offer = await _offerRepo.GetByIdAsync(request.Id);
         if (offer == null || offer.IsDeleted)
-            return ServiceResult<IdDto>.Failed("Offer not found");
+            return ServiceResult<IdDto>.Failed("پیشنهاد محصول موردنظر پیدا نشد.");
         if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Failed("این پیشنهاد متعلق به شما نیست و اجازهٔ تغییر آن را ندارید.", ErrorCodes.Forbidden);
 
         offer.Delete(userId.Value);
         await _offerRepo.SaveChangesAsync(cancellationToken);

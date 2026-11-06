@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 using Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ public class SampleSeedService : ISampleSeedService
     {
         _logger = logger;
         _connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
+            ?? throw new DependencyFailureException("رشتهٔ اتصال پایگاه داده در تنظیمات سرور تعریف نشده است.");
 
         var configured = configuration["Seed:SampleDirectory"];
         _seedsDirectory = string.IsNullOrWhiteSpace(configured)
@@ -49,7 +50,7 @@ public class SampleSeedService : ISampleSeedService
         {
             return new SampleSeedResultDto(
                 false,
-                $"No seed SQL files found in {_seedsDirectory}",
+                $"هیچ فایل SQL نمونه‌ای در مسیر «{_seedsDirectory}» پیدا نشد.",
                 Array.Empty<string>());
         }
 

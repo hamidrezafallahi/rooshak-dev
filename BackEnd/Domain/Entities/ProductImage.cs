@@ -1,4 +1,5 @@
-﻿
+﻿using OnlineShop.Domain.Common;
+
 
 namespace OnlineShop.Domain.Entities
 {
@@ -16,7 +17,7 @@ namespace OnlineShop.Domain.Entities
         public static ProductImage Create(int productId, string imageUrl, bool isMain, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
-                throw new ArgumentException("ImageUrl cannot be empty.", nameof(imageUrl));
+                throw new DomainException("تصویر نمی‌تواند خالی باشد.");
 
             var image = new ProductImage
             {
@@ -39,7 +40,7 @@ namespace OnlineShop.Domain.Entities
         public void UpdateUrl(string newUrl, int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(newUrl))
-                throw new ArgumentException("ImageUrl cannot be empty.", nameof(newUrl));
+                throw new DomainException("تصویر نمی‌تواند خالی باشد.");
 
             ImageUrl = newUrl;
             MarkUpdated(currentUserId);

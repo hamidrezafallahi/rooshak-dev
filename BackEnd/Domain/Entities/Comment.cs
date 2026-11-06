@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using OnlineShop.Domain.Common;
+using Domain.Enums;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -40,7 +41,7 @@ namespace OnlineShop.Domain.Entities
         )
         {
             if (string.IsNullOrWhiteSpace(content))
-                throw new ArgumentException("Comment content is required");
+                throw new DomainException("متن نظر الزامی است.");
 
             var comment = new Comment
             {
@@ -67,7 +68,7 @@ namespace OnlineShop.Domain.Entities
         public void Edit(string content, int userId)
         {
             if (userId != UserId)
-                throw new InvalidOperationException("Cannot edit others comment");
+                throw new DomainException("فقط نویسندهٔ نظر می‌تواند آن را ویرایش کند.");
 
             Content = content;
             MarkUpdated(userId);

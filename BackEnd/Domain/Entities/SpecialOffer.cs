@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using OnlineShop.Domain.Common;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -31,7 +32,7 @@ namespace OnlineShop.Domain.Entities
             int displayOrder = 0)
         {
             if (endDate <= startDate)
-                throw new ArgumentException("End date must be after start date.");
+                throw new DomainException("تاریخ پایان باید بعد از تاریخ شروع باشد.");
 
             var offer = new SpecialOffer
             {

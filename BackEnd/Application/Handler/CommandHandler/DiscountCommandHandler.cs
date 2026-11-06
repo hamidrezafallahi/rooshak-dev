@@ -18,7 +18,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var discount = Discount.Create(
          title: request.Title,
          amount: request.Amount,      
@@ -37,7 +37,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var discount = await _repo.GetByIdAsync(request.Id);
             if (discount == null)
                 return ServiceResult<IdDto>.Failed("تخفیف پیدا نشد");
@@ -59,7 +59,7 @@ using OnlineShop.Domain.Interfaces;
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
         var discount = await _repo.GetByIdAsync(request.Id);
         if (discount == null)
             return ServiceResult<IdDto>.Failed("تخفیف پیدا نشد");
@@ -74,7 +74,7 @@ using OnlineShop.Domain.Interfaces;
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<IdDto>.Failed("Unauthorized");
+                return ServiceResult<IdDto>.Unauthorized();
             var discount = await _repo.GetByIdAsync(request.Id);
             if (discount == null)
                 return ServiceResult<IdDto>.Failed("تخفیف پیدا نشد");

@@ -23,7 +23,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<ListDto<DiscountDto>>> GetAll([FromQuery] GetAllDiscountsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -32,7 +32,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<IEnumerable<IdDto>>> GetAllDiscountIds()
     {
         var result = await _mediator.Send(new GetAllDiscountsIdQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -41,7 +41,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllDiscountSlugs()
     {
         var result = await _mediator.Send(new GetAllDiscountsSlugsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -50,7 +50,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<ListDto<SelectOptionDto>>> Get4selectOption([FromQuery] GetDiscounts4selectOptionQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -60,7 +60,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<IEnumerable<DiscountDto>>> GetActive()
     {
         var result = await _mediator.Send(new GetActiveDiscountsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -69,7 +69,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<DiscountDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetDiscountByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -79,7 +79,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<Discount>> GetByProductOfferId([FromQuery] GetDiscountByProductOfferIdQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -88,7 +88,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<ValidDiscountDto>> IsValid([FromQuery] IsDiscountValidQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -102,7 +102,7 @@ public class DiscountsController : BaseController
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -114,7 +114,7 @@ public class DiscountsController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] UpdateDiscountCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -127,7 +127,7 @@ public class DiscountsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -140,7 +140,7 @@ public class DiscountsController : BaseController
     {
         var command = new DeleteDiscountCommand { Id = id};
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

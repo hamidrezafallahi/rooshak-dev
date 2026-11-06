@@ -20,16 +20,20 @@ export default function ProductCTA({
   const dispatch = useDispatch();
   const handleAddToCart = async () => {
     if (isAuthenticated) {
-      const syncCartResponse = await addToShoppingCart({
-        url: '/CartItems',
-        body: {
-          productId,
-          productOfferId: id,
-          quantity: 1,
-        },
-      }).unwrap();
-      if (syncCartResponse.isSuccess) {
-        dispatch(synchronousCart(syncCartResponse.data));
+      try {
+        const syncCartResponse = await addToShoppingCart({
+          url: '/CartItems',
+          body: {
+            productId,
+            productOfferId: id,
+            quantity: 1,
+          },
+        }).unwrap();
+        if (syncCartResponse.isSuccess) {
+          dispatch(synchronousCart(syncCartResponse.data));
+        }
+      } catch {
+        // baseQueryByToken already showed the reason.
       }
     } else {
       // dispatch(addToCart({ product: product }));

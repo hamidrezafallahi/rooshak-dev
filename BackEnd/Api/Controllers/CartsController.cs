@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<List<CartDto>>> GetAll([FromQuery] GetAllCartsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<CartDto>> GetById(int id)
         {
             var result = await _mediator.Send(new GetCartByIdQuery { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
 
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
           
 
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
         {
  
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -68,7 +68,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<int>> CreateCart([FromBody] CreateCartCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -79,7 +79,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> SyncCart([FromBody] SyncCartCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -89,7 +89,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult> ClearCart([FromBody] ClearCartCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -104,7 +104,7 @@ namespace WebApi.Controllers
  
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -117,7 +117,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -126,7 +126,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteCartCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

@@ -16,11 +16,11 @@ public class RoleCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var role = await _repo.GetByIdAsync(request.Id);
         if (role == null)
-            return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            return ServiceResult<IdDto>.Failed("نقش کاربری موردنظر پیدا نشد.");
 
         role.SetActive(request.IsActive, userId.Value);
 
@@ -32,11 +32,11 @@ public class RoleCommandHandler(
     {
         var userId = _accessor.HttpContext.GetUserId();
         if (userId == null)
-            return ServiceResult<IdDto>.Failed("Unauthorized");
+            return ServiceResult<IdDto>.Unauthorized();
 
         var role = await _repo.GetByIdAsync(request.Id);
         if (role == null)
-            return ServiceResult<IdDto>.Failed("مورد پیدا نشد");
+            return ServiceResult<IdDto>.Failed("نقش کاربری موردنظر پیدا نشد.");
 
         role.Delete(userId.Value);
 

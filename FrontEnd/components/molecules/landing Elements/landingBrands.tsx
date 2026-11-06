@@ -7,6 +7,7 @@ import { getAll } from '@lib/getAll';
 import { IBrand } from '@models/brand';
 
 import BrandCard from '../brandCard';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export default async function LandingBrands() {
   const locale = await getLocale();
@@ -17,7 +18,13 @@ export default async function LandingBrands() {
     byConfig: false,
   });
   const brands = response?.data?.records ?? [];
-  if (!brands.length) return null;
+  if (!brands.length) {
+    return response.isSuccess ? null : (
+      <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 w-full max-w-[1440px]">
+        <ApiErrorNotice message={response.error} />
+      </section>
+    );
+  }
 
   return (
     <section className="mx-auto px-4 sm:px-6 lg:px-10 py-14 md:py-20 w-full max-w-[1440px]">

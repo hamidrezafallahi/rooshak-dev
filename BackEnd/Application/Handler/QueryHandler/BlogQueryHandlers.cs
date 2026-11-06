@@ -198,7 +198,7 @@ public class BlogQueryHandler(
                    .FirstOrDefault();
 
         if (x == null)
-            return ServiceResult<BlogDto?>.Failed("Blog not found");
+            return ServiceResult<BlogDto?>.Failed("مقالهٔ موردنظر پیدا نشد.");
         var blogDto = new BlogDto
         {
             Id = x.Id,
@@ -231,7 +231,7 @@ public class BlogQueryHandler(
                    .FirstOrDefaultAsync();
 
         if (x == null)
-            return ServiceResult<BlogDto?>.Failed("Blog not found");
+            return ServiceResult<BlogDto?>.Failed("مقالهٔ موردنظر پیدا نشد.");
         var blogDto = new BlogDto
         {
             Id = x.Id,

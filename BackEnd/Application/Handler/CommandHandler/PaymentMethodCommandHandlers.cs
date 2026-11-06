@@ -16,7 +16,7 @@ using OnlineShop.Domain.Interfaces;
         public async Task<ServiceResult<IdDto>> Handle(CreatePaymentMethodCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var entity = PaymentMethod.Create(
                 request.Title,
@@ -35,10 +35,10 @@ using OnlineShop.Domain.Interfaces;
         public async Task<ServiceResult<IdDto>> Handle(UpdatePaymentMethodCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
             var entity = await _repo.GetByIdAsync(request.Id);
-            if (entity == null) return ServiceResult<IdDto>.Failed("Payment method not found");
+            if (entity == null) return ServiceResult<IdDto>.Failed("روش پرداخت موردنظر پیدا نشد.");
 
             entity.Update(
                 request.Title ?? entity.Title,
@@ -61,9 +61,9 @@ using OnlineShop.Domain.Interfaces;
         public async Task<ServiceResult<IdDto>> Handle(ActivePaymentMethodCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
-            if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+            if (userId == null) return ServiceResult<IdDto>.Unauthorized();
             var entity = await _repo.GetByIdAsync(request.Id);
-            if (entity == null) return ServiceResult<IdDto>.Failed("Payment method not found");
+            if (entity == null) return ServiceResult<IdDto>.Failed("روش پرداخت موردنظر پیدا نشد.");
         entity.SetActive(request.IsActive, userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);
         return ServiceResult<IdDto>.Ok(new IdDto { Id = entity.Id });
@@ -71,10 +71,10 @@ using OnlineShop.Domain.Interfaces;
     public async Task<ServiceResult<IdDto>> Handle(DeletePaymentMethodCommand request, CancellationToken cancellationToken)
     {
         var userId = _accessor.HttpContext.GetUserId();
-        if (userId == null) return ServiceResult<IdDto>.Failed("Unauthorized");
+        if (userId == null) return ServiceResult<IdDto>.Unauthorized();
 
         var entity = await _repo.GetByIdAsync(request.Id);
-        if (entity == null) return ServiceResult<IdDto>.Failed("Payment method not found");
+        if (entity == null) return ServiceResult<IdDto>.Failed("روش پرداخت موردنظر پیدا نشد.");
 
         entity.Delete(userId.Value);
         await _repo.SaveChangesAsync(cancellationToken);

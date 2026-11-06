@@ -60,8 +60,8 @@ const CustomPaginationInner: React.FC<PaginationProps> = ({
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname()!;
+  const searchParams = useSearchParams()!;
 
   useEffect(() => {
     setPage(current);

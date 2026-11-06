@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using OnlineShop.Domain.Common;
+using Domain.Enums;
 using OnlineShop.Domain.Entities;
 
 public class DiscountCode : BaseEntity
@@ -34,7 +35,7 @@ public class DiscountCode : BaseEntity
     int currentUserId)
     {
         if (string.IsNullOrWhiteSpace(code))
-            throw new ArgumentException("Code is required");
+            throw new DomainException("کد تخفیف الزامی است.");
 
         var discountCode = new DiscountCode
         {
@@ -76,7 +77,7 @@ public class DiscountCode : BaseEntity
     public void Use(int currentUserId)
     {
         if (!IsValid)
-            throw new InvalidOperationException("Discount code is not valid.");
+            throw new DomainException("کد تخفیف معتبر نیست؛ ممکن است منقضی شده یا ظرفیت آن تمام شده باشد.");
 
         UsedCount++;
         MarkUpdated(currentUserId);

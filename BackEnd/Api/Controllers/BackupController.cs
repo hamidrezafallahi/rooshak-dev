@@ -49,15 +49,8 @@ public class BackupController : BaseController
     [HttpPost("full")]
     public async Task<ActionResult<ServiceResult<BackupFileDto>>> CreateFull(CancellationToken cancellationToken)
     {
-        try
-        {
-            var file = await _backupService.CreateFullAsync(cancellationToken);
-            return Ok(ServiceResult<BackupFileDto>.Ok(file));
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return BadRequest(ServiceResult<BackupFileDto>.Failed(ex.Message));
-        }
+        var file = await _backupService.CreateFullAsync(cancellationToken);
+        return Ok(ServiceResult<BackupFileDto>.Ok(file));
     }
 
     /// <summary>Replaces the database and uploads with the content of a full backup zip. SuperAdmin only.</summary>
@@ -71,21 +64,14 @@ public class BackupController : BaseController
         CancellationToken cancellationToken)
     {
         if (!string.Equals(confirm?.Trim(), RestoreConfirmation, StringComparison.Ordinal))
-            return BadRequest(ServiceResult<RestoreResultDto>.Failed("Restore confirmation text is missing or incorrect."));
+            return BadRequest(ServiceResult<RestoreResultDto>.Failed("متن تأیید بازیابی وارد نشده یا درست نیست."));
 
         if (file is null || file.Length == 0)
-            return BadRequest(ServiceResult<RestoreResultDto>.Failed("Backup file is required."));
+            return BadRequest(ServiceResult<RestoreResultDto>.Failed("فایل پشتیبان انتخاب نشده است."));
 
-        try
-        {
-            await using var stream = file.OpenReadStream();
-            var result = await _backupService.RestoreFullAsync(stream, cancellationToken);
-            return Ok(ServiceResult<RestoreResultDto>.Ok(result));
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return BadRequest(ServiceResult<RestoreResultDto>.Failed(ex.Message));
-        }
+        await using var stream = file.OpenReadStream();
+        var result = await _backupService.RestoreFullAsync(stream, cancellationToken);
+        return Ok(ServiceResult<RestoreResultDto>.Ok(result));
     }
 
     [HttpGet("settings")]
@@ -121,7 +107,7 @@ public class BackupController : BaseController
         var result = await _mediator.Send(new DeleteBackupCommand { FileName = fileName }, cancellationToken);
         if (!result.IsSuccess)
         {
-            if (string.Equals(result.Error, "Backup file not found", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(result.Error, "فایل پشتیبان موردنظر پیدا نشد.", StringComparison.OrdinalIgnoreCase))
                 return NotFound(result);
 
             return BadRequest(result);

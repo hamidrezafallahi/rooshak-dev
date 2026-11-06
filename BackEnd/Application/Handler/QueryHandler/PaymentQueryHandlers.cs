@@ -83,7 +83,7 @@ public class PaymentQueryHandlers(IPaymentRepository _repo,IEntityConfigReposito
     public async Task<ServiceResult<PaymentDto?>> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
     {
         var payment = await _repo.GetByIdAsync(request.Id);
-        if (payment == null) return ServiceResult<PaymentDto?>.Failed("Payment not found");
+        if (payment == null) return ServiceResult<PaymentDto?>.Failed("پرداخت موردنظر پیدا نشد.");
         var dto = new PaymentDto
         {
             Amount = payment.Amount,

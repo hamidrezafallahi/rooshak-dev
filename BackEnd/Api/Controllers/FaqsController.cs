@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<FaqDto>>> GetAll([FromQuery] GetAllFaqsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<FaqDto>> GetById([FromRoute] int id)
         {
             var result = await _mediator.Send(new GetFaqByIdQuery { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Create([FromBody] CreateFaqCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Update([FromBody] UpdateFaqCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -73,7 +73,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -84,7 +84,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteFaqCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);

@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<ShippingMethodDto>>> GetAll([FromQuery] GetAllShippingMethodsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
             {
                 Id = id
             });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -53,7 +53,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Create([FromBody] CreateShippingMethodCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -66,7 +66,7 @@ namespace WebApi.Controllers
         {
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -79,7 +79,7 @@ namespace WebApi.Controllers
                 ShippingMethodId = shippingMethodId
             };
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -92,7 +92,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -104,7 +104,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteShippingMethodCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
 

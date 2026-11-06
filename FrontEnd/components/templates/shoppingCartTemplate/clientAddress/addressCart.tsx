@@ -57,7 +57,9 @@ function AddressCart({...props}: IProps) {
       if (res.isSuccess) {
         refetch();
       }
-    } catch {}
+    } catch {
+      // baseQueryByToken already showed the reason.
+    }
   };
   const handleDeleteAddress = async (addressId: number) => {
     try {
@@ -69,7 +71,9 @@ function AddressCart({...props}: IProps) {
       if (res.isSuccess) {
         refetch();
       }
-    } catch {}
+    } catch {
+      // baseQueryByToken already showed the reason.
+    }
   };
 
   return (

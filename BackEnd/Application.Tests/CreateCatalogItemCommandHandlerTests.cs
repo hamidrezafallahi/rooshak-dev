@@ -21,10 +21,9 @@ public class CreateCatalogItemCommandHandlerTests
         var store = new FakeCatalogStore { ThrowOnOfferAdd = true };
         var handler = CreateHandler(store, userId: 7);
 
-        var result = await handler.Handle(ValidCommand(), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => handler.Handle(ValidCommand(), CancellationToken.None));
 
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Catalog item could not be created as a complete Product+Offer unit.", result.Error);
         Assert.Empty(store.Products);
         Assert.Empty(store.Offers);
         Assert.Empty(store.Images);
@@ -82,7 +81,7 @@ public class CreateCatalogItemCommandHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.False(result.IsSuccess);
-        Assert.Equal("Offer base price must be greater than zero.", result.Error);
+        Assert.Equal("قیمت پایهٔ پیشنهاد باید بیشتر از صفر باشد.", result.Error);
         Assert.Equal(0, unitOfWork.BeginCount);
         Assert.Empty(store.Products);
     }
@@ -98,7 +97,7 @@ public class CreateCatalogItemCommandHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.False(result.IsSuccess);
-        Assert.Equal("Catalog item could not be created as a complete Product+Offer unit.", result.Error);
+        Assert.Equal("آپلود تصویر محصول انجام نشد.", result.Error);
         Assert.Empty(store.Products);
         Assert.Empty(store.Offers);
         Assert.Empty(store.Images);

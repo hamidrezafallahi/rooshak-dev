@@ -1,4 +1,6 @@
-﻿using OnlineShop.Infrastructure.Security;
+﻿using Api.Errors;
+using Common;
+using OnlineShop.Infrastructure.Security;
 
 public class BlacklistMiddleware
 {
@@ -21,8 +23,11 @@ public class BlacklistMiddleware
         var isBlacklisted = await securityService.IsIpBlacklistedAsync(ip);
         if (isBlacklisted)
         {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Access denied: IP is blacklisted.");
+            await ApiErrorWriter.WriteAsync(
+                context,
+                StatusCodes.Status403Forbidden,
+                ErrorCodes.IpBlocked,
+                "دسترسی آی‌پی شما به این سرویس مسدود شده است.");
             return;
         }
 

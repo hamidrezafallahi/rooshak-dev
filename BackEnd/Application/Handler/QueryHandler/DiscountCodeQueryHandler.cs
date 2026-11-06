@@ -15,7 +15,7 @@ public class DiscountCodeQueryHandler(IDiscountCodeRepository _repo, IEntityConf
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-                return ServiceResult<DiscountCodeDto?>.Failed("Unauthorized");
+                return ServiceResult<DiscountCodeDto?>.Unauthorized();
             var now = DateTime.Now;
             var discountCode = _repo.Query(DC => DC.Code  == request.Code.ToLower() ).FirstOrDefault();
             if (discountCode == null)
@@ -56,7 +56,7 @@ public class DiscountCodeQueryHandler(IDiscountCodeRepository _repo, IEntityConf
         {
             var userId = _accessor.HttpContext.GetUserId();
             if (userId == null)
-            return ServiceResult<DiscountCodeDto?>.Failed("Unauthorized");
+            return ServiceResult<DiscountCodeDto?>.Unauthorized();
             var now = DateTime.Now;
             var discountCode = _repo.Query(DC => DC.Id == request.Id).FirstOrDefault();
             if (discountCode == null)

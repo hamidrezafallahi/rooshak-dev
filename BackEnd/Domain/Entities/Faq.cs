@@ -1,4 +1,5 @@
-﻿namespace OnlineShop.Domain.Entities
+﻿using OnlineShop.Domain.Common;
+namespace OnlineShop.Domain.Entities
 {
     /// <summary>
     /// سوالات متداول سایت (پرسش و پاسخ) که در فرانت به صورت لیست نمایش داده می شود.
@@ -23,10 +24,10 @@
             int currentUserId)
         {
             if (string.IsNullOrWhiteSpace(question))
-                throw new ArgumentException("Question cannot be empty.", nameof(question));
+                throw new DomainException("متن پرسش نمی‌تواند خالی باشد.");
 
             if (string.IsNullOrWhiteSpace(answer))
-                throw new ArgumentException("Answer cannot be empty.", nameof(answer));
+                throw new DomainException("متن پاسخ نمی‌تواند خالی باشد.");
 
             var faq = new Faq
             {

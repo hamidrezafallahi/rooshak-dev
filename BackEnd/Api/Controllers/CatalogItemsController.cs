@@ -31,7 +31,7 @@ public class CatalogItemsController : BaseController
     private async Task<ActionResult<CatalogItemIdsDto>> Create(CreateCatalogItemCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -43,7 +43,7 @@ public class CatalogItemsController : BaseController
         [FromBody] SetCatalogItemActiveCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);

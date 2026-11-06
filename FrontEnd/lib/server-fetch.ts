@@ -7,6 +7,7 @@ import {
 import { redirect } from 'next/navigation';
 
 import { requireAbsoluteUrl, serverApiBaseUrl } from './api';
+import { ApiRequestError, readApiResult } from './apiError';
 import {
   ACCESS_COOKIE,
   LOGIN_PATH,
@@ -30,7 +31,7 @@ type FetchOptions = {
  * Backend call for Server Actions and Route Handlers, which may write cookies
  * (Server Components may not: see lib/server-auth.ts). On 401 it gets new tokens,
  * stores them and retries once; if the refresh token is rejected it clears the
- * session and redirects to the login page. Throws on any other non-2xx answer.
+ * session and redirects to the login page. Any other non-2xx answer throws ApiRequestError.
  */
 export async function authenticatedFetch<T>({
   endpoint,
@@ -81,16 +82,6 @@ export async function authenticatedFetch<T>({
     }
   }
 
-  if (response.status === 403) {
-    logger.warn('authenticatedFetch forbidden', {
-      scope: 'server-fetch',
-      source: 'server',
-      url,
-      status: 403,
-    });
-    throw new Error('FORBIDDEN');
-  }
-
   if (!response.ok) {
     logger.error('authenticatedFetch HTTP error', {
       scope: 'server-fetch',
@@ -98,9 +89,8 @@ export async function authenticatedFetch<T>({
       url,
       status: response.status,
     });
-    throw new Error(
-      `HTTP ${response.status}: ${response.statusText}`
-    );
+    const { error } = await readApiResult(response);
+    throw new ApiRequestError(error ?? '');
   }
 
   return response.json();

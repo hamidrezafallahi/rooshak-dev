@@ -20,7 +20,7 @@ public class LandingController : BaseController
     public async Task<ActionResult<ListDto<LandingSliderDto>>> GetBlogs([FromQuery] GetAllLandingSlidesQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -30,7 +30,7 @@ public class LandingController : BaseController
     public async Task<ActionResult<LandingSliderDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetLandingSlideByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -49,7 +49,7 @@ public class LandingController : BaseController
     public async Task<ActionResult<IdDto>> CreateSlide([FromForm] CreateSlideCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         if (!result.IsSuccess)
             return BadRequest(result);
@@ -68,7 +68,7 @@ public class LandingController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         if (!result.IsSuccess)
             return BadRequest(result);
@@ -80,7 +80,7 @@ public class LandingController : BaseController
     public async Task<ActionResult<IdDto>> SetHeroBanner([FromBody] SetHeroBannerCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -94,7 +94,7 @@ public class LandingController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -107,7 +107,7 @@ public class LandingController : BaseController
 
         var command = new DeleteSlideCommand { Id = id };
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }

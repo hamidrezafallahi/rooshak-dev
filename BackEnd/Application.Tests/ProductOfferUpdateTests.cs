@@ -1,3 +1,4 @@
+using Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Claims;
@@ -76,7 +77,7 @@ public class ProductOfferUpdateTests
             CancellationToken.None);
 
         Assert.False(result.IsSuccess);
-        Assert.Equal("Unauthorized", result.Error);
+        Assert.Equal(ErrorCodes.Forbidden, result.ErrorCode);
         Assert.Equal(1_000_000, store.Offer.BasePrice);
     }
 

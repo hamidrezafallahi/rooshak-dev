@@ -10,6 +10,7 @@ import PageHeader from '@components/molecules/storefront/PageHeader';
 import { getAll } from '@lib/getAll';
 import { buildPageMetadata } from '@lib/seo';
 import { IBrand } from '@models/brand';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -57,7 +58,9 @@ export default async function Page({ searchParams, params }: Props) {
         align="center"
       />
 
-      {brands.length === 0 ? (
+      {!response.isSuccess ? (
+        <ApiErrorNotice message={response.error} />
+      ) : brands.length === 0 ? (
         <EmptyState title={t('empty')} description={t('emptyHint')} />
       ) : (
         <EntityGrid cols="dense">

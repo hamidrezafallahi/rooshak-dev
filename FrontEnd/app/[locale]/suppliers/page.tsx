@@ -9,6 +9,7 @@ import SupplierCard from '@components/molecules/supplierCard';
 import { getAll } from '@lib/getAll';
 import { buildPageMetadata } from '@lib/seo';
 import { IUser } from '@models/user';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -55,7 +56,9 @@ export default async function Page({ params, searchParams }: Props) {
     <article className="store-page !pt-6">
       <PageHeader title={t('title')} description={t('description')} />
 
-      {suppliers.length === 0 ? (
+      {!response.isSuccess ? (
+        <ApiErrorNotice message={response.error} />
+      ) : suppliers.length === 0 ? (
         <EmptyState title={t('empty')} description={t('emptyHint')} />
       ) : (
         <EntityGrid cols="cards">

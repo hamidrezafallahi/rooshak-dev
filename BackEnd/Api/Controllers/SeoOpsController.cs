@@ -69,7 +69,7 @@ public class SeoOpsController(ISeoOpsService seoOpsService) : BaseController
     {
         var result = await seoOpsService.SuggestInternalLinksAsync(blogId, take, cancellationToken);
         if (result is null)
-            return NotFound(new { isSuccess = false, error = "Blog not found" });
+            return NotFound(new { isSuccess = false, error = "مقالهٔ موردنظر پیدا نشد." });
 
         return Ok(new { isSuccess = true, data = result });
     }

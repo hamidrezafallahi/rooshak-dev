@@ -20,7 +20,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<List<UserAddressDto>>> GetAll([FromQuery] GetAddressesQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -29,7 +29,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<UserAddressDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetUserAddressByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -37,7 +37,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<UserAddressDto>> GetByUserId(int userId)
     {
         var result = await _mediator.Send(new GetUserAddressByUserIdQuery { UserId = userId });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -45,7 +45,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<UserAddressDto>> GetUseraddress()
     {
         var result = await _mediator.Send(new GetUserAddressByUserQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -54,7 +54,7 @@ public class AddressController : BaseController
     {
         var query = new GetDefaultUserAddressByUserIdQuery();
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -64,7 +64,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<IdDto>> AddAddress([FromBody] AddUserAddressCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -74,7 +74,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<IdDto>> UpdateAddress([FromBody] UpdateUserAddressCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -86,7 +86,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<IdDto>> SetDefaultAddress([FromBody] SetDefaultUserAddressCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -98,7 +98,7 @@ public class AddressController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -108,7 +108,7 @@ public class AddressController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteUserAddressCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

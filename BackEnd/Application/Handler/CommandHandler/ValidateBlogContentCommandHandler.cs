@@ -19,7 +19,7 @@ public class ValidateBlogContentCommandHandler(
     {
         var userId = accessor.HttpContext.GetUserId();
         if (userId is null)
-            return ServiceResult<BlogContentQualityResultDto>.Failed("Unauthorized");
+            return ServiceResult<BlogContentQualityResultDto>.Unauthorized();
 
         var result = await qualityService.ValidateAsync(request.Payload, cancellationToken);
         return ServiceResult<BlogContentQualityResultDto>.Ok(result);

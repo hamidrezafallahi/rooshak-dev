@@ -8,6 +8,7 @@ import { safeFetchJson } from '@lib/safeFetch';
 import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
+import { ApiRequestError } from '@lib/apiError';
 
 export const revalidate = 60;
 
@@ -36,7 +37,12 @@ async function fetchDiscount(slug: string): Promise<DiscountItem | null> {
     { next: { revalidate: 60 } },
   );
 
-  if (!result.ok || !result.data) return null;
+  if (!result.ok) {
+    // This route takes a numeric id: any other address is a missing page, not a failure.
+    if (result.status === 400 || result.status === 404) return null;
+    throw new ApiRequestError(result.error);
+  }
+  if (!result.data) return null;
   const envelope = result.data as SimpleResponse<DiscountItem>;
   if (envelope && typeof envelope === 'object' && 'data' in envelope) {
     if (envelope.isSuccess === false) return null;

@@ -74,7 +74,7 @@ public class ProductOfferTagQueryHandler(IProductOfferTagRepository _repo,
                 .Include(pot => pot.Tag)
                 .FirstOrDefaultAsync(pot => pot.Id == request.Id, cancellationToken);
             if (productOfferTag == null)
-                return ServiceResult<ProductOfferTagDetailDto>.Failed("productOfferTag not found");
+                return ServiceResult<ProductOfferTagDetailDto>.Failed("برچسب پیشنهاد محصول پیدا نشد.");
             var mainImageUrl = productOfferTag.ProductOffer.Product.Images
                 .FirstOrDefault(i => i.IsMain)?.ImageUrl;
             var mainImagePath = mainImageUrl.TrimStart('/');

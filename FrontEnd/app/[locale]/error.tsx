@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { reportClientError } from '@components/organisms/runtimeErrorBridge';
+import { messageFromDigest } from '@lib/apiError';
 
 type Props = {
   error: Error & { digest?: string };
@@ -10,6 +11,8 @@ type Props = {
 };
 
 export default function LocaleError({ error, reset }: Props) {
+  // Server errors reach production builds without their message; ours carry it in the digest.
+  const explanation = messageFromDigest(error.digest);
   useEffect(() => {
     reportClientError(error.message, error, {
       scope: 'app/[locale]/error',
@@ -23,11 +26,12 @@ export default function LocaleError({ error, reset }: Props) {
         خطایی رخ داد
       </h1>
       <p className="text-store-subtle text-sm leading-relaxed">
-        {process.env.NODE_ENV === 'development'
-          ? error.message
-          : 'لطفاً دوباره تلاش کنید. اگر مشکل ادامه داشت با پشتیبانی تماس بگیرید.'}
+        {explanation ??
+          (process.env.NODE_ENV === 'development'
+            ? error.message
+            : 'لطفاً دوباره تلاش کنید. اگر مشکل ادامه داشت با پشتیبانی تماس بگیرید.')}
       </p>
-      {process.env.NODE_ENV === 'development' && error.digest ? (
+      {process.env.NODE_ENV === 'development' && error.digest && !explanation ? (
         <p className="opacity-70 font-mono text-xs">digest: {error.digest}</p>
       ) : null}
       <button type="button" className="bg-primary hover:bg-transparent px-8 py-3 border border-primary text-primary-foreground hover:text-store-text text-sm transition-colors" onClick={reset}>

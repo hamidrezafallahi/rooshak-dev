@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
+
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryByToken } from '@services/customBaseQuery';
+import { showErrorToast } from '@utils/core';
 
 import { endpoints } from './endpoints';
 import type {
@@ -205,6 +208,7 @@ export const useGetData = <T, K = unknown>({
   method="GET",
   id = "All",
   skip = false,
+  reportFailure = false,
 }: IService<T, K>) => {
   const { data, ...rest } = useGetQuery(
     {
@@ -221,6 +225,11 @@ export const useGetData = <T, K = unknown>({
       }),
     }
   );
+
+  const failure = reportFailure && data?.isSuccess === false ? data.error : null;
+  useEffect(() => {
+    if (failure) showErrorToast(failure, '', 6000);
+  }, [failure]);
 
   return {
     data,

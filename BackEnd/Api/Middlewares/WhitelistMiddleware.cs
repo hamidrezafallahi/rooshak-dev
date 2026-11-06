@@ -1,4 +1,6 @@
-﻿using OnlineShop.Infrastructure.Security;
+﻿using Api.Errors;
+using Common;
+using OnlineShop.Infrastructure.Security;
 
 public class WhitelistMiddleware
 {
@@ -21,8 +23,11 @@ public class WhitelistMiddleware
         var isAllowed = await securityService.IsIpAllowedAsync(ip);
         if (!isAllowed)
         {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsync("Access denied: IP not in whitelist.");
+            await ApiErrorWriter.WriteAsync(
+                context,
+                StatusCodes.Status403Forbidden,
+                ErrorCodes.IpBlocked,
+                "آی‌پی شما در فهرست مجاز این سرویس نیست.");
             return;
         }
 

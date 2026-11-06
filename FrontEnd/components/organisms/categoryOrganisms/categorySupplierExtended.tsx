@@ -6,9 +6,10 @@ import {
   SimpleSupplierCard,
 } from '@components/molecules/supplierCard/simpleSupplierCard';
 import { serverApiBaseUrl } from '@lib/api';
-import { safeFetchJson } from '@lib/safeFetch';
+import { loadFailure, safeFetchJson } from '@lib/safeFetch';
 import { SimpleResponse } from '@models/base';
 import { IUser } from '@models/user';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export async function CategorySupplierExtended({ id }: { id: number }) {
   const t = await getTranslations();
@@ -19,6 +20,8 @@ export async function CategorySupplierExtended({ id }: { id: number }) {
     `${serverApiBaseUrl}/productOffers/getSuppliersByCategoryId?CategoryId=${id}`,
     { next: { revalidate: 36 } },
   );
+  const failure = loadFailure(result);
+  if (failure) return <ApiErrorNotice message={failure} />;
 
   if (!result.ok || !result.data) {
     return <div>{t('category.noCategorySupplier')}</div>;

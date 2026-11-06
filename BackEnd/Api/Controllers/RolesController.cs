@@ -21,7 +21,7 @@ public class RolesController : BaseController
     public async Task<ActionResult<List<UserRoleDto>>> GetAll([FromQuery] GetRolesQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -31,7 +31,7 @@ public class RolesController : BaseController
     public async Task<ActionResult<UserRoleDto?>> GetById(int id)
     {
         var result = await _mediator.Send(new GetRoleByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
 
         return Ok(result);
@@ -45,7 +45,7 @@ public class RolesController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -57,7 +57,7 @@ public class RolesController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteRoleCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

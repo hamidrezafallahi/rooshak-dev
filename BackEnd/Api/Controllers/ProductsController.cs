@@ -22,7 +22,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<ListDto<ProductDto>>> GetAll([FromQuery] GetAllProductsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -33,7 +33,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<List<ProductByDetailDto>>> Getlandings([FromQuery] GetLandingProductsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -42,7 +42,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<ListDto<SelectOptionDto>>> GetParent4selectOption([FromQuery] GetProducts4selectOptionQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -52,7 +52,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<ProductByDetailDto>>> GetAllByDetail()
     {
         var result = await _mediator.Send(new GetAllProductsByDetailQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -60,7 +60,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<IdDto>>> GetAllProductIds()
     {
         var result = await _mediator.Send(new GetAllProductsIdQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -69,7 +69,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<SlugDto>>> GetAllProductSlugs()
     {
         var result = await _mediator.Send(new GetAllProductsSlugsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         return Ok(result);
     }
 
@@ -77,7 +77,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<ProductByDetailDto>> GetByIdOrSlug(string idOrSlug)
     {
         var result = await _mediator.Send(new GetProductByIdQuery { IdOrSlug = idOrSlug });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
         if (!result.IsSuccess || result.Data is null) return NotFound(result);
 
         return Ok(result);
@@ -86,7 +86,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<ProductDto>> GetSpecificationsById(int id)
     {
         var result = await _mediator.Send(new GetProductSpecialsByIdQuery(id));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -95,7 +95,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetByCategory(int categoryId)
     {
         var result = await _mediator.Send(new GetProductsByCategoryIdQuery(categoryId));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -103,7 +103,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetDiscounted()
     {
         var result = await _mediator.Send(new GetDiscountedProductsQuery());
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -112,7 +112,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IEnumerable<ProductDto>>> Search([FromQuery] string keyword)
     {
         var result = await _mediator.Send(new SearchProductsByNameQuery(keyword));
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -123,7 +123,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IdDto>> Create([FromBody] CreateProductCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -134,7 +134,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] UpdateProductCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -147,7 +147,7 @@ public class ProductsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -159,7 +159,7 @@ public class ProductsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteProductCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

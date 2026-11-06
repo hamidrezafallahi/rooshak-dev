@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ListDto<DiscountCodeDto>>> GetAll([FromQuery] GetAllDiscountCodesQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -34,7 +34,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<DiscountCodeDto>> GetById(int id)
         {
             var result = await _mediator.Send(new GetDiscountCodeByIdQuery { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+            if (result.IsUnauthorized) return Unauthorized(result);
 
             return Ok(result);
         }
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
             {
                 Code = code
             });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -60,7 +60,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Create([FromBody] CreateDiscountCodeCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -72,7 +72,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Update([FromBody] UpdateDiscountCodeCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -96,7 +96,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteDiscountCodeCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

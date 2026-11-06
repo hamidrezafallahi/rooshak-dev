@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using OnlineShop.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using OnlineShop.Domain.Entities;
 using OnlineShop.Domain.Interfaces;
 using OnlineShop.Domain.ValueObjects;
@@ -92,7 +93,7 @@ namespace OnlineShop.Infrastructure.Repositories
         {
             var product = await GetProductByIdAsync(productId);
             if (product == null)
-                throw new KeyNotFoundException("Product not found");
+                throw new NotFoundException("محصول موردنظر پیدا نشد.");
 
             product.AddSpecification(key, value);
             await UpdateAsync(product);
@@ -102,7 +103,7 @@ namespace OnlineShop.Infrastructure.Repositories
         {
             var product = await GetProductByIdAsync(productId);
             if (product == null)
-                throw new KeyNotFoundException("Product not found");
+                throw new NotFoundException("محصول موردنظر پیدا نشد.");
 
             product.RemoveSpecification(key, userId);
             await UpdateAsync(product);
@@ -119,7 +120,7 @@ namespace OnlineShop.Infrastructure.Repositories
         {
             var product = await GetProductByIdAsync(productId);
             if (product == null)
-                throw new KeyNotFoundException("Product not found");
+                throw new NotFoundException("محصول موردنظر پیدا نشد.");
 
             product.SetDimensions(new ProductDimensions(width, height, depth, weight));
             await UpdateAsync(product);

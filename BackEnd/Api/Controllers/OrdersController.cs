@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         {
             var query = new GetOrdersByUserIdQuery();
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<OrderReadModel>> GetOrderWithItems(int id)
         {
             var result = await _mediator.Send(new GetOrderWithItemsQuery(id));
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -45,7 +45,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOpenOrders()
         {
             var result = await _mediator.Send(new GetOpenOrdersQuery());
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -53,7 +53,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<OrderIdDto>> handler(CheckoutCartCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -63,7 +63,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> ConfirmOrder([FromBody] ConfirmOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -74,7 +74,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> PayOrder([FromBody] PayOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> CancelOrder([FromBody] CancelOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -98,7 +98,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> ShipOrder([FromBody] ShipOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -109,7 +109,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> DeliverOrder([FromBody] DeliverOrderCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -119,7 +119,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> ApplyDiscountCode([FromBody] ApplyDiscountCodeCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -129,7 +129,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> RemoveDiscountCode( [FromBody] RemoveDiscountCodeCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -138,7 +138,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> AddOrderItem([FromBody] AddOrderItemCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -151,7 +151,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -161,7 +161,7 @@ namespace WebApi.Controllers
         {
             var command = new DeleteOrderCommand { Id = orderId };
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }
@@ -176,7 +176,7 @@ namespace WebApi.Controllers
             };
 
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);
@@ -185,7 +185,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IdDto>> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteOrderCommand { Id = id });
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
             return Ok(result);
         }

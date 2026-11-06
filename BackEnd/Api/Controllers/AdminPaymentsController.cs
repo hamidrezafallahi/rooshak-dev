@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         public async Task<ActionResult<ServiceResult<ListDto<PaymentDto>>>> GetPayments([FromQuery] GetAllPaymentsQuery query)
         {
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess && result.Error == "Unauthorized")
+            if (result.IsUnauthorized)
                 return Unauthorized(result);
 
             return Ok(result);

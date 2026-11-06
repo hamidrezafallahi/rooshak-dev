@@ -26,6 +26,7 @@ import {
   FormField,
   FormGeneratorProps,
 } from './type';
+import { describeThrown } from '@lib/apiError';
 
 export default function FormGenerator({
   entityFormConfig,
@@ -41,6 +42,7 @@ export default function FormGenerator({
     handleSubmit,
     formState: { errors },
     setValue,
+    setError,
     getValues,
     resetField,
     reset,
@@ -91,7 +93,11 @@ export default function FormGenerator({
     }
     field.Rules?.forEach((r) => {
       if (r.Rule === "required" && r.Condition) {
-        rules.required = r.Message || `${field.Caption} is required`;
+        // Stored rule texts may be English; the form always speaks the page's language.
+        rules.required =
+          locale === 'fa' && !/[\u0600-\u06FF]/.test(r.Message ?? '')
+            ? t('common.fieldRequired')
+            : r.Message || t('common.fieldRequired');
       }
     });
     return rules;
@@ -179,6 +185,13 @@ export default function FormGenerator({
             route.push(`/${locale}/admin/${entityFormConfig.endPoint}`);
             route.refresh();
           } else {
+            // Marks each refused field under its input; the toast carries the explanation.
+            res?.fieldErrors?.forEach((fe) => {
+              const field = formFields.find(
+                (f) => f.Name.toLowerCase() === fe.field.toLowerCase(),
+              );
+              if (field) setError(field.Name, { type: 'server', message: fe.message });
+            });
             const { showErrorToast } = await import('@utils/core');
             showErrorToast(
               res?.error || t('common.saveFailed'),
@@ -188,9 +201,7 @@ export default function FormGenerator({
           }
         } catch (err) {
           const { showErrorToast } = await import('@utils/core');
-          const message =
-            err instanceof Error ? err.message : t('common.saveFailed');
-          showErrorToast(message, '', 5000);
+          showErrorToast(describeThrown(err), '', 5000);
         }
       })();
     });

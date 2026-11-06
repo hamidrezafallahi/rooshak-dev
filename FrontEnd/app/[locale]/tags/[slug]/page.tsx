@@ -10,6 +10,7 @@ import { buildPageMetadata } from '@lib/seo';
 import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
 import { ITag } from '@models/tag';
+import { ApiRequestError } from '@lib/apiError';
 
 type Props = {
   params: Promise<{ slug: string; locale: string }>;
@@ -25,7 +26,11 @@ async function fetchTag(slug: string): Promise<ITag | null> {
     { next: { revalidate: 36 } },
   );
 
-  if (!result.ok || !result.data?.data) return null;
+  if (!result.ok) {
+    if (result.status === 404) return null;
+    throw new ApiRequestError(result.error);
+  }
+  if (!result.data?.data) return null;
   if (result.data.isSuccess === false) return null;
   return result.data.data;
 }

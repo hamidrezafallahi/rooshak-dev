@@ -18,6 +18,7 @@ import { fetchStaticSlugParams } from '@lib/staticParams';
 import { SimpleResponse } from '@models/base';
 import { IDetailedProduct } from '@models/product';
 import { toMediaUrl } from '@utils/toMediaUrl';
+import { ApiRequestError, describeStatus } from '@lib/apiError';
 
 export const dynamicParams = true;
 
@@ -34,7 +35,7 @@ function toAbsoluteImage(url?: string | null) {
 
 async function fetchProduct(
   slug: string,
-): Promise<{ status: number; product: IDetailedProduct | null }> {
+): Promise<{ status: number; product: IDetailedProduct | null; error?: string }> {
   const result = await safeFetchJson<
     SimpleResponse<IDetailedProduct> | IDetailedProduct
   >(`${serverApiBaseUrl}/Products/${slug}`, {
@@ -42,7 +43,7 @@ async function fetchProduct(
   });
 
   if (!result.ok) {
-    return { status: result.status || 500, product: null };
+    return { status: result.status || 500, product: null, error: result.error };
   }
 
   const envelope = result.data as SimpleResponse<IDetailedProduct>;
@@ -116,23 +117,16 @@ export default async function ProductPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  const tStore = await getTranslations({ locale, namespace: 'store' });
-  const { status, product } = await fetchProduct(slug);
+  const { status, product, error } = await fetchProduct(slug);
 
   // A real 404 status, not a 200 "not found" page (soft 404).
   if (status === 404) {
     notFound();
   }
 
+  // API down / 5xx: error status instead of an indexable 200 page.
   if (!product) {
-    return (
-      <div className="store-page">
-        <div className="store-empty">
-          <h1 className="store-empty-title">{tStore('loadError')}</h1>
-          <p className="store-empty-desc">{tStore('loadErrorHint')}</p>
-        </div>
-      </div>
-    );
+    throw new ApiRequestError(error ?? describeStatus(status));
   }
 
   // Legacy numeric URLs → permanent SEO slug (must not be inside a broad try/catch).

@@ -1,3 +1,4 @@
+using OnlineShop.Domain.Common;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -14,7 +15,7 @@ namespace OnlineShop.Domain.Entities
         public static Tag Create(string name, int currentUserId, string? slug = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Tag name cannot be empty.", nameof(name));
+                throw new DomainException("نام برچسب نمی‌تواند خالی باشد.");
 
             var tag = new Tag
             {

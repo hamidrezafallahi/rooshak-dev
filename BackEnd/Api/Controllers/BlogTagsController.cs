@@ -22,7 +22,7 @@ public class BlogTagsController : BaseController
     public async Task<ActionResult<ListDto<BlogTagDto>>> GetAll([FromQuery] GetAllBlogTagsQuery query)
     {
         var result = await _mediator.Send(query);
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -30,7 +30,7 @@ public class BlogTagsController : BaseController
     public async Task<ActionResult<BlogTagDto>> GetById(int id)
     {
         var result = await _mediator.Send(new GetBlogTagByIdQuery { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized") return Unauthorized(result);
+        if (result.IsUnauthorized) return Unauthorized(result);
 
         return Ok(result);
     }
@@ -42,7 +42,7 @@ public class BlogTagsController : BaseController
     {
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -53,7 +53,7 @@ public class BlogTagsController : BaseController
     public async Task<ActionResult<IdDto>> Update([FromBody] UpdateBlogTagCommand command)
     {
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
     }
@@ -66,7 +66,7 @@ public class BlogTagsController : BaseController
             return BadRequest(ModelState);
 
         var result = await _mediator.Send(command);
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
 
         return Ok(result);
@@ -78,7 +78,7 @@ public class BlogTagsController : BaseController
     public async Task<ActionResult<IdDto>> Delete(int id)
     {
         var result = await _mediator.Send(new DeleteBlogTagCommand { Id = id });
-        if (!result.IsSuccess && result.Error == "Unauthorized")
+        if (result.IsUnauthorized)
             return Unauthorized(result);
         return Ok(result);
 

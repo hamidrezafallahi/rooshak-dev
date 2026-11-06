@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 import { getMenu } from '@lib/config';
+import ApiErrorNotice from '@components/molecules/apiErrorNotice';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,8 @@ export default async function AdminPage() {
           {t('admin.openStore')}
         </Link>
       </header>
+
+      <ApiErrorNotice message={menu.error} />
 
       <section className="gap-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <div className="admin-stat-card">
