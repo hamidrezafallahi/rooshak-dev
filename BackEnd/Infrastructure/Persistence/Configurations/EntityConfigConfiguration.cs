@@ -1337,6 +1337,7 @@ namespace OnlineShop.Infrastructure.Configurations
                     new JsonDefinition { Header = "نام محصول", Accessor = "productName", Type = "text", Sortable = false, Filterable = false,  },
                     new JsonDefinition { Header = "نام تامین کننده", Accessor = "supplierName", Type = "text", Sortable = false, Filterable = false,  },
                     new JsonDefinition { Header = "تصویر تامین کننده", Accessor = "supplierImage", Type = "image", Sortable = false, Filterable = false},
+                    new JsonDefinition { Header = "تنوع", Accessor = "variantValue", Type = "text", Sortable = false, Filterable = false },
                     new JsonDefinition { Header = "قیمت پایه", Accessor = "basePrice", Type = "price", Sortable = false, Filterable = false },
                     new JsonDefinition { Header = "قیمت نهایی", Accessor = "finalPrice", Type = "price", Sortable = false, Filterable = false },
                     new JsonDefinition { Header = "موجودی", Accessor = "inventory", Type = "number", Sortable = false, Filterable = false },
@@ -1355,6 +1356,30 @@ namespace OnlineShop.Infrastructure.Configurations
                         Rules = new List<ValidationRule>
                         {
                             new ValidationRule { Rule = "required", Condition = "true", Message = " محصول الزامی است" }
+                        }
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name = "variantName",
+                        Caption = "عنوان تنوع",
+                        Type = "text",
+                        PlaceHolder = "مثلاً: سایز",
+                        Help = "اختیاری. اگر محصول چند مدل با قیمت متفاوت دارد (مثل سایز یا رنگ‌های مختلف)، برای هر مدل یک سفارش فروش جدا بسازید.",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "maxLength", Condition = "50", Message = "حداکثر ۵۰ کاراکتر" }
+                        }
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name = "variantValue",
+                        Caption = "مقدار تنوع",
+                        Type = "text",
+                        PlaceHolder = "مثلاً: ۲۴ سانتی‌متر",
+                        Help = "روی کارت محصول به‌صورت دکمهٔ قابل انتخاب نمایش داده می‌شود و قیمت همین سفارش فروش را نشان می‌دهد.",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "maxLength", Condition = "50", Message = "حداکثر ۵۰ کاراکتر" }
                         }
                     },
                     new FormFieldDefinition

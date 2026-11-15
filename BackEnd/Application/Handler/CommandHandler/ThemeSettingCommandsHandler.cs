@@ -24,7 +24,7 @@ namespace Application.Handler.CommandHandler
 
             try
             {
-                var theme = ThemeSetting.Create(request.Name, ToPalette(request), userId.Value);
+                var theme = ThemeSetting.Create(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily);
 
                 // تم تازه فعال نمی‌شود تا سایت ناخواسته عوض نشود؛ ادمین با «فعال‌سازی» آن را انتخاب می‌کند.
                 theme.SetActive(false, userId.Value);
@@ -51,7 +51,7 @@ namespace Application.Handler.CommandHandler
 
             try
             {
-                theme.Update(request.Name, ToPalette(request), userId.Value);
+                theme.Update(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily);
             }
             catch (DomainException ex)
             {

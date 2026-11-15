@@ -17,6 +17,9 @@ export interface ISupplier {
   basePrice: number;
   finalPrice: number;
   inventory: number;
+  /** Option this offer sells, e.g. «سایز» / «۲۴ سانتی‌متر». */
+  variantName?: string | null;
+  variantValue?: string | null;
   isActive: true;
   createdAt: string;
   activeDiscounts: [];
@@ -78,11 +81,19 @@ export async function SupplierCardGrid({
           </p>
         ) : null}
 
-        {inStock ? (
-          <span className="mb-3 bg-store-muted px-2 py-1 w-fit text-store-subtle text-xs">
-            {t('common.inStock')}
-          </span>
-        ) : null}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {supplier.variantValue ? (
+            <span className="bg-store-text px-2 py-1 w-fit text-store-surface text-xs">
+              {supplier.variantName ? `${supplier.variantName} ` : ''}
+              <span dir="ltr">{supplier.variantValue}</span>
+            </span>
+          ) : null}
+          {inStock ? (
+            <span className="bg-store-muted px-2 py-1 w-fit text-store-subtle text-xs">
+              {t('common.inStock')}
+            </span>
+          ) : null}
+        </div>
 
         <div className="flex flex-wrap items-baseline gap-1 mt-auto mb-3">
           <span className="font-medium text-lg">

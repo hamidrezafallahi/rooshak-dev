@@ -126,7 +126,7 @@ namespace OnlineShop.Infrastructure.Persistence.Repositories
                             CartItemId=i.Id,
                             ProductId = product.Id,
                             ProductOfferId = offer.Id,
-                            Name = product.Name,
+                            Name = ProductOffers.BuildDisplayName(product.Name, offer.VariantName, offer.VariantValue),
                             BasePrice = offer.BasePrice,
                             Quantity = i.Quantity,
                             Description = product.Description,

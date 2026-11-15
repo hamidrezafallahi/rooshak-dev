@@ -15,6 +15,15 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import {
+  DEFAULT_FONT_KEY,
+  DEFAULT_HEADING_FONT_KEY,
+  findFont,
+  FONT_CATEGORIES,
+  FONT_OPTIONS,
+  fontStack,
+  headingFontStack,
+} from '@lib/fontCatalog';
 import { saveEntity } from '@lib/saveEntity';
 import {
   showErrorToast,
@@ -51,7 +60,13 @@ type StudioProps = {
   isActive?: boolean;
   initialName: string;
   initialPalette: Palette;
+  /** Main font key (lib/fontCatalog.ts); defaults to the site's current font. */
+  initialFont?: string | null;
+  /** Heading font key; defaults to the site's current heading face. */
+  initialHeadingFont?: string | null;
 };
+
+type FontTarget = 'body' | 'heading';
 
 const samePalette = (a: Palette, b: Palette) => COLOR_KEYS.every((key) => a[key] === b[key]);
 
@@ -151,7 +166,80 @@ function ColorRow({
   );
 }
 
-export default function ThemeStudio({ id, isActive = false, initialName, initialPalette }: StudioProps) {
+function FontPicker({
+  value,
+  onChange,
+  target,
+}: {
+  value: string;
+  onChange: (key: string) => void;
+  target: FontTarget;
+}) {
+  const t = useTranslations('admin.themeSettings');
+  const locale = useLocale();
+  const heading = target === 'heading';
+
+  return (
+    <div className="flex flex-col gap-6" role="radiogroup" aria-label={t(`fontTargets.${target}`)}>
+      {FONT_CATEGORIES.map((category) => (
+        <div key={category}>
+          <p className="mb-2 font-medium text-[13px] text-[var(--admin-text-muted)]">
+            {t(`fontCategories.${category}`)}
+          </p>
+          <ul className="gap-2 grid grid-cols-1 sm:grid-cols-2">
+            {FONT_OPTIONS.filter((font) => font.category === category).map((font) => {
+              const selected = font.key === value;
+              return (
+                <li key={font.key}>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => onChange(font.key)}
+                    className={`flex flex-col items-start gap-1.5 px-3.5 py-3 border w-full h-full text-start transition-colors ${
+                      selected
+                        ? 'border-[var(--admin-text)] ring-1 ring-[color:var(--admin-text)]'
+                        : 'border-[var(--admin-border)] hover:border-[var(--admin-text)]'
+                    }`}
+                  >
+                    <span className="flex justify-between items-baseline gap-2 w-full text-[13px] text-[var(--admin-text-muted)]">
+                      <span>
+                        {locale === 'fa' ? font.fa : font.en}
+                        {locale === 'fa' && (
+                          <span dir="ltr" className="ms-1.5 text-[11px]">
+                            {font.en}
+                          </span>
+                        )}
+                      </span>
+                      {selected && (
+                        <span className="admin-badge admin-badge-success shrink-0">{t('fontCurrent')}</span>
+                      )}
+                    </span>
+                    <span
+                      className={`text-[var(--admin-text)] leading-relaxed ${heading ? 'text-[22px]' : 'text-[17px]'}`}
+                      style={{ fontFamily: heading ? headingFontStack(font.key) : fontStack(font.key) }}
+                    >
+                      {t(heading ? 'fontHeadingSample' : 'fontSample')}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function ThemeStudio({
+  id,
+  isActive = false,
+  initialName,
+  initialPalette,
+  initialFont,
+  initialHeadingFont,
+}: StudioProps) {
   const t = useTranslations('admin.themeSettings');
   const locale = useLocale();
   const router = useRouter();
@@ -159,6 +247,11 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
 
   const [name, setName] = useState(initialName);
   const [palette, setPalette] = useState<Palette>(initialPalette);
+  const startFont = findFont(initialFont)?.key ?? DEFAULT_FONT_KEY;
+  const [font, setFont] = useState<string>(startFont);
+  const startHeadingFont = findFont(initialHeadingFont)?.key ?? DEFAULT_HEADING_FONT_KEY;
+  const [headingFont, setHeadingFont] = useState<string>(startHeadingFont);
+  const [fontTarget, setFontTarget] = useState<FontTarget>('body');
   const [focusKey, setFocusKey] = useState<ColorKey | null>(null);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [mobileTab, setMobileTab] = useState<'colors' | 'preview'>('colors');
@@ -168,7 +261,11 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
   const nameRef = useRef<HTMLInputElement>(null);
   const leavingRef = useRef(false);
 
-  const dirty = name !== initialName || !samePalette(palette, initialPalette);
+  const dirty =
+    name !== initialName ||
+    !samePalette(palette, initialPalette) ||
+    font !== startFont ||
+    headingFont !== startHeadingFont;
   const number = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }), [locale]);
 
   const checks = CONTRAST_CHECKS.map((check) => {
@@ -205,6 +302,8 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
   const reset = () => {
     setName(initialName);
     setPalette(initialPalette);
+    setFont(startFont);
+    setHeadingFont(startHeadingFont);
     setNameError(false);
   };
 
@@ -221,7 +320,7 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
     const res = await saveEntity({
       endPoint: THEME_ENDPOINT,
       method: id ? 'PUT' : 'POST',
-      body: { ...(id ? { id } : {}), name: name.trim(), ...palette },
+      body: { ...(id ? { id } : {}), name: name.trim(), ...palette, fontFamily: font, headingFontFamily: headingFont },
     });
     if (res?.isSuccess) {
       showSuccessToast(t(isActive ? 'savedLive' : 'saved'), '', 4000);
@@ -399,6 +498,41 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
           ))}
 
           <section className="p-4 sm:p-5 admin-panel">
+            <h2 className="font-semibold text-[var(--admin-text)] text-sm">{t('fontTitle')}</h2>
+            <p className="mt-1 mb-4 text-[var(--admin-text-muted)] text-xs leading-5">{t('fontHint')}</p>
+            <div
+              className="inline-flex bg-[var(--admin-surface-muted)] mb-4 p-0.5 border border-[var(--admin-border)] rounded-lg"
+              role="tablist"
+              aria-label={t('fontTitle')}
+            >
+              {(['body', 'heading'] as const).map((target) => (
+                <button
+                  key={target}
+                  type="button"
+                  role="tab"
+                  aria-selected={fontTarget === target}
+                  onClick={() => setFontTarget(target)}
+                  className={`px-3 h-8 rounded-md text-xs transition-colors ${
+                    fontTarget === target
+                      ? 'bg-[var(--admin-surface-elevated)] text-[var(--primary-color)] shadow-sm font-semibold'
+                      : 'text-[var(--admin-text-muted)]'
+                  }`}
+                >
+                  {t(`fontTargets.${target}`)}
+                  <span className="ms-1.5 opacity-75">
+                    ({findFont(target === 'body' ? font : headingFont)?.[locale === 'fa' ? 'fa' : 'en']})
+                  </span>
+                </button>
+              ))}
+            </div>
+            {fontTarget === 'body' ? (
+              <FontPicker target="body" value={font} onChange={setFont} />
+            ) : (
+              <FontPicker target="heading" value={headingFont} onChange={setHeadingFont} />
+            )}
+          </section>
+
+          <section className="p-4 sm:p-5 admin-panel">
             <header className="flex justify-between items-center gap-3">
               <div>
                 <h2 className="font-semibold text-[var(--admin-text)] text-sm">{t('contrastTitle')}</h2>
@@ -490,7 +624,14 @@ export default function ThemeStudio({ id, isActive = false, initialName, initial
                   </span>
                   <span className="w-12 shrink-0" />
                 </div>
-                <div className="bg-[var(--admin-surface-muted)] lg:max-h-[calc(100dvh-16rem)] overflow-y-auto">
+                <div
+                  className="bg-[var(--admin-surface-muted)] lg:max-h-[calc(100dvh-16rem)] overflow-y-auto"
+                  style={{
+                    ['--font-body' as string]: fontStack(font),
+                    ['--font-display' as string]: headingFontStack(headingFont),
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
                   <StorefrontPreview palette={palette} device={device} focusKey={focusKey} />
                 </div>
               </div>

@@ -19,6 +19,7 @@ import {
   deleteTheme,
   refreshStorefrontTheme,
 } from './api';
+import { findFont, fontStack, headingFontStack } from '@lib/fontCatalog';
 import {
   Glint,
   Glyph,
@@ -197,8 +198,21 @@ export default function ThemeGallery({ themes }: { themes: ThemeRecord[] | null 
                 <div className="flex flex-col flex-1 gap-3 p-4">
                   <div className="flex justify-between items-start gap-3">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-[var(--admin-text)] truncate">{theme.name}</h3>
+                      <h3
+                        className="font-semibold text-[var(--admin-text)] truncate"
+                        style={{ fontFamily: headingFontStack(theme.headingFontFamily) }}
+                      >
+                        {theme.name}
+                      </h3>
                       <p className="text-[var(--admin-text-muted)] text-xs">{t('themeId', { id: theme.id })}</p>
+                      <p
+                        className="text-[var(--admin-text-muted)] text-xs truncate"
+                        style={{ fontFamily: fontStack(theme.fontFamily) }}
+                      >
+                        {t('fontTitle')}: {findFont(theme.fontFamily)?.[locale === 'fa' ? 'fa' : 'en']}
+                        {' · '}
+                        {t('fontTargets.heading')}: {findFont(theme.headingFontFamily)?.[locale === 'fa' ? 'fa' : 'en']}
+                      </p>
                     </div>
                     <SwatchStack colors={[theme.primaryColor, theme.highlightColor, theme.surfaceColor, theme.textColor]} />
                   </div>

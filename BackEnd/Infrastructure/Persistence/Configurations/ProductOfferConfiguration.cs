@@ -17,6 +17,12 @@ namespace Infrastructure.Persistence.Configurations
                    .HasColumnType("decimal(18,2)")
                    .IsRequired();
 
+            builder.Property(po => po.VariantName)
+                   .HasMaxLength(ProductOffers.VariantMaxLength);
+
+            builder.Property(po => po.VariantValue)
+                   .HasMaxLength(ProductOffers.VariantMaxLength);
+
             // ===== Product =====
             builder.HasOne(po => po.Product)
                    .WithMany()

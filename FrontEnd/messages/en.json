@@ -461,6 +461,20 @@
       "deviceDesktop": "Desktop view",
       "deviceMobile": "Mobile view",
       "previewHint": "Hover a colour to outline where the store uses it.",
+      "fontTitle": "Fonts",
+      "fontHint": "Pick the typeface for body text and for headings separately. Fonts are self-hosted and visitors only download the ones you pick.",
+      "fontTargets": {
+        "body": "Body text",
+        "heading": "Headings"
+      },
+      "fontHeadingSample": "Rooshak crystal & decor — ظروف کریستال روشاک",
+      "fontSample": "Handmade crystal vase, 30 cm — گلدان کریستال دست‌ساز",
+      "fontCurrent": "Selected",
+      "fontCategories": {
+        "general": "General",
+        "formal": "Formal",
+        "fancy": "Decorative"
+      },
       "contrastTitle": "Readability",
       "contrastHint": "Contrast checked against WCAG AA",
       "contrastScore": "{passed} of {total} pass",
@@ -847,6 +861,8 @@
     "yourRate": "Your rate"
   },
   "product": {
+    "variantDefaultLabel": "Option",
+    "variantGroupAria": "Choose {name}",
     "width": "Width",
     "height": "Height",
     "depth": "Depth",

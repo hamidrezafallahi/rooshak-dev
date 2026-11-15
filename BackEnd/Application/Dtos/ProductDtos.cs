@@ -57,6 +57,8 @@ namespace Application.Dtos
         public int? BestOfferId { get; set; }
         public int Inventory { get; set; }
         public bool InStock { get; set; }
+        /// <summary>تنوع‌های قابل‌انتخاب (مثلاً بزرگنمایی‌ها)؛ خالی یعنی محصول تنوع ندارد.</summary>
+        public List<ProductVariantDto> Variants { get; set; } = new();
         public string Currency { get; set; } = "IRR";
         public double AverageRate { get; set; }
         public int RateCount { get; set; }
@@ -146,9 +148,25 @@ namespace Application.Dtos
         public string? MainImage { get; set; }
         public double AverageRate { get; set; }
         public int RateCount { get; set; }
+        /// <summary>تنوع‌های قابل‌انتخاب (مثلاً بزرگنمایی‌ها)؛ خالی یعنی محصول تنوع ندارد.</summary>
+        public List<ProductVariantDto> Variants { get; set; } = new();
+    }
 
-
-
+    /// <summary>
+    /// یک تنوع از محصول (مثلاً بزرگنمایی 3.5x). بهترین پیشنهاد فعال همان تنوع را نشان می‌دهد؛
+    /// OfferId همان چیزی است که به سبد خرید فرستاده می‌شود.
+    /// </summary>
+    public class ProductVariantDto
+    {
+        public int OfferId { get; set; }
+        public string? Name { get; set; }
+        public string Value { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal FinalPrice { get; set; }
+        public bool? DiscountIsPercent { get; set; }
+        public decimal? DiscountAmount { get; set; }
+        public int Inventory { get; set; }
+        public bool InStock { get; set; }
     }
 
 

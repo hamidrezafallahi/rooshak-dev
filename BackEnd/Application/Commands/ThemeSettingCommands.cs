@@ -19,6 +19,10 @@ namespace Application.Commands
         public string? BorderColor { get; set; }
         public string? TextColor { get; set; }
         public string? TextMutedColor { get; set; }
+        /// <summary>کلید فونت اصلی (مثلاً vazirmatn)؛ خالی یعنی بدون تغییر.</summary>
+        public string? FontFamily { get; set; }
+        /// <summary>کلید فونت تیترها؛ خالی یعنی بدون تغییر.</summary>
+        public string? HeadingFontFamily { get; set; }
     }
 
     public class UpdateThemeSettingCommand : IRequest<ServiceResult<IdDto>>
@@ -38,6 +42,10 @@ namespace Application.Commands
         public string? BorderColor { get; set; }
         public string? TextColor { get; set; }
         public string? TextMutedColor { get; set; }
+        /// <summary>کلید فونت اصلی (مثلاً vazirmatn)؛ خالی یعنی بدون تغییر.</summary>
+        public string? FontFamily { get; set; }
+        /// <summary>کلید فونت تیترها؛ خالی یعنی بدون تغییر.</summary>
+        public string? HeadingFontFamily { get; set; }
     }
 
     /// <summary>فعال‌کردن یک تم، بقیه‌ی تم‌ها را غیرفعال می‌کند (فقط یک تم فعال).</summary>

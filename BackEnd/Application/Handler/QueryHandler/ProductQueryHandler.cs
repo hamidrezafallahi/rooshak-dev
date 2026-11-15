@@ -1,3 +1,4 @@
+using Application.Common;
 using Application.Dtos;
 using Common;
 using Domain.Enums;
@@ -277,6 +278,7 @@ public class ProductQueryHandler(IProductRepository _repo,
             BestOfferId = bestOffer?.Id,
             Inventory = totalInventory,
             InStock = totalInventory > 0,
+            Variants = ProductVariantMapper.Build(product.ProductOffers, now),
             Currency = "IRR",
             AverageRate = rate.Average,
             RateCount = rate.Count,
@@ -504,7 +506,8 @@ public class ProductQueryHandler(IProductRepository _repo,
                     .FirstOrDefault(),
 
                 AverageRate = rate.Average,
-                RateCount = rate.Count
+                RateCount = rate.Count,
+                Variants = ProductVariantMapper.Build(p.ProductOffers, now),
             });
         }
 

@@ -25,16 +25,20 @@ public class ProductOfferCommandHandler(
         if (product == null || product.IsDeleted)
             return ServiceResult<IdDto>.Failed("محصول موردنظر پیدا نشد.");
 
-        var exists = await _offerRepo.ExistsAsync(request.ProductId, userId.Value);
+        var exists = await _offerRepo.ExistsAsync(request.ProductId, userId.Value, request.VariantValue);
         if (exists)
-            return ServiceResult<IdDto>.Failed("شما قبلاً برای این محصول پیشنهاد ثبت کرده‌اید.");
+            return ServiceResult<IdDto>.Failed(string.IsNullOrWhiteSpace(request.VariantValue)
+                ? "شما قبلاً برای این محصول پیشنهاد ثبت کرده‌اید."
+                : $"شما قبلاً برای تنوع «{request.VariantValue.Trim()}» این محصول پیشنهاد ثبت کرده‌اید.");
 
         var offer = ProductOffers.Create(
             productId: request.ProductId,
             supplierId: userId.Value,
             basePrice: request.BasePrice,
             inventory: request.Inventory,
-            currentUserId: userId.Value
+            currentUserId: userId.Value,
+            variantName: request.VariantName,
+            variantValue: request.VariantValue
         );
 
         await _offerRepo.AddAsync(offer);
@@ -55,10 +59,17 @@ public class ProductOfferCommandHandler(
         if (offer.SupplierId != userId.Value && _accessor.HttpContext?.IsCatalogStaff() != true)
             return ServiceResult<IdDto>.Failed("این پیشنهاد متعلق به شما نیست و اجازهٔ تغییر آن را ندارید.", ErrorCodes.Forbidden);
 
+        if (request.VariantValue != null
+            && !string.Equals(request.VariantValue.Trim(), offer.VariantValue ?? string.Empty, StringComparison.Ordinal)
+            && await _offerRepo.ExistsAsync(offer.ProductId, offer.SupplierId, request.VariantValue))
+            return ServiceResult<IdDto>.Failed($"برای تنوع «{request.VariantValue.Trim()}» این محصول قبلاً پیشنهاد ثبت شده است.");
+
         offer.Update(
             basePrice: request.BasePrice,
             inventory: request.Inventory,
-            currentUserId: userId.Value
+            currentUserId: userId.Value,
+            variantName: request.VariantName,
+            variantValue: request.VariantValue
         );
 
         if (request.IsActive.HasValue)

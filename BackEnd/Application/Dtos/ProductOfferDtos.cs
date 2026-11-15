@@ -37,6 +37,8 @@ namespace Application.Dtos
         public decimal FinalPrice { get; set; }
         public int Inventory { get; set; }
         public bool IsActive { get; set; }
+        public string? VariantName { get; set; }
+        public string? VariantValue { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<DiscountDto> ActiveDiscounts { get; set; } = new();
         public List<TagDto> Tags { get; set; } = new();

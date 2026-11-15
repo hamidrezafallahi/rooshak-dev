@@ -35,12 +35,18 @@ namespace OnlineShop.Infrastructure.Repositories
                     !o.IsDeleted);
         }
 
-        public async Task<bool> ExistsAsync(int productId, int supplierId)
+        /// <summary>
+        /// یک تأمین‌کننده برای هر تنوع (مثلاً هر بزرگنمایی) فقط یک پیشنهاد فعال دارد.
+        /// پیشنهاد بدون تنوع با پیشنهاد بدون تنوع دیگر تکراری حساب می‌شود.
+        /// </summary>
+        public async Task<bool> ExistsAsync(int productId, int supplierId, string? variantValue = null)
         {
+            var value = string.IsNullOrWhiteSpace(variantValue) ? null : variantValue.Trim();
             return await _context.ProductOffers
                 .AnyAsync(o =>
                     o.ProductId == productId &&
                     o.SupplierId == supplierId &&
+                    o.VariantValue == value &&
                     !o.IsDeleted);
         }
         public async Task<bool> HasActiveOfferAsync(int productId, int supplierId)

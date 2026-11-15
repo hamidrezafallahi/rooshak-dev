@@ -3,22 +3,14 @@ import React, {
   useRef,
 } from 'react';
 
-import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { useDispatch } from 'react-redux';
+import { useTranslations } from 'next-intl';
 
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@components/atoms/iconComponents';
-import MediaImage from '@components/atoms/MediaImage';
+import VariantProductCard from '@components/molecules/productCard/variantProductCard';
 import { ILandingProduct } from '@models/product';
-import { useGetConditionallyMutation } from '@services/base';
-import {
-  addToCart,
-  synchronousCart,
-} from '@slice/shoppingCartSlice';
-import { getCookie } from '@utils/core';
 
 interface ProductsCarouselProps {
   items: ILandingProduct[] | undefined;
@@ -68,7 +60,7 @@ export default function ProductsCarousel({
                 key={p.id}
                 className="flex-shrink-0 snap-start w-[62%] sm:w-[34%] lg:w-[23.5%]"
               >
-                <ProductCard product={p} />
+                <VariantProductCard product={p} />
               </div>
             ))}
       </div>
@@ -82,106 +74,6 @@ export default function ProductsCarousel({
         <ChevronRightIcon />
       </button>
     </div>
-  );
-}
-
-function formatMoney(value: number, locale: string) {
-  return new Intl.NumberFormat(locale === 'fa' ? 'fa-IR' : 'en-US').format(value);
-}
-
-function ProductCard({ product }: { product: ILandingProduct }) {
-  const t = useTranslations();
-  const isAuthenticated = Boolean(getCookie('candySession'));
-  const locale = useLocale();
-  const [addToShoppingCart] = useGetConditionallyMutation();
-  const dispatch = useDispatch();
-  const handleAddToCart = async (product: ILandingProduct) => {
-    if (isAuthenticated) {
-      try {
-        const syncCartResponse = await addToShoppingCart({
-          url: '/CartItems',
-          body: {
-            productId: product.id,
-            productOfferId: product.bestOfferId,
-            quantity: 1,
-          },
-        }).unwrap();
-        if (syncCartResponse.isSuccess) {
-          dispatch(synchronousCart(syncCartResponse.data));
-        }
-      } catch {
-        // baseQueryByToken already showed the reason.
-      }
-    } else {
-      dispatch(
-        addToCart({
-          product: {
-            id: product.id,
-            productOfferId: product.bestOfferId,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            discountAmount: product.discountAmount,
-            discountIsPercent: product.discountIsPercent,
-            finalPrice: product.finalPrice,
-            quantity: 1,
-            mainImage: product.mainImage,
-          },
-        }),
-      );
-    }
-  };
-
-  const href = `/${locale}/products/${product.slug || product.id}`;
-  const hasDiscount = product.discountAmount > 0;
-
-  return (
-    <article className="group flex flex-col h-full text-store-text">
-      <Link href={href} className="block relative bg-store-muted aspect-[4/5] overflow-hidden">
-        <MediaImage
-          src={product.mainImage}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-          sizes="(max-width: 640px) 62vw, (max-width: 1024px) 34vw, 24vw"
-          loading="lazy"
-        />
-        {hasDiscount && (
-          <span className="top-3 start-3 absolute bg-primary px-2.5 py-1 font-medium text-[0.7rem] text-primary-foreground">
-            -{product.discountAmount}
-            {product.discountIsPercent && '%'}
-          </span>
-        )}
-      </Link>
-      <div className="flex flex-col flex-1 gap-1 pt-4">
-        <p className="text-store-subtle text-xs">{product.brand}</p>
-        <h3 className="font-normal text-sm sm:text-base line-clamp-2">
-          <Link href={href} className="hover:underline underline-offset-4">
-            {product.name}
-          </Link>
-        </h3>
-        <div className="flex flex-wrap items-baseline gap-x-2 mt-1 text-sm">
-          <span className="font-medium">
-            {formatMoney(product.finalPrice, locale)} {t('common.currency')}
-          </span>
-          {hasDiscount && (
-            <span className="text-store-subtle text-xs line-through">
-              {formatMoney(product.price, locale)}
-            </span>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            handleAddToCart(product);
-          }}
-          aria-label={t('common.addToCartAria', { name: product.name })}
-          className="self-start mt-3 pb-0.5 border-current border-b font-medium text-sm hover:opacity-60 transition-opacity"
-        >
-          {t('common.addToCart')}
-        </button>
-      </div>
-    </article>
   );
 }
 

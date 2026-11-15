@@ -77,11 +77,12 @@ export const ShoppingCartReducer = createSlice({
     },
     synchronousCart: (state, action: PayloadAction<SynchronousResponse>) => {
       const { items, finalTotal, totalDiscount, totalPrice } = action.payload;
-      const dbMap = new Map(items.map((ci) => [ci.productId, ci]));
+      // Keyed by offer: two variants of one product (e.g. 2.5x and 3.5x) are separate lines.
+      const dbMap = new Map(items.map((ci) => [ci.productOfferId, ci]));
       const updatedProducts = state.products
-        .filter((product) => dbMap.has(product.id))
+        .filter((product) => dbMap.has(product.productOfferId))
         .map((product) => {
-          const dbItem = dbMap.get(product.id)!;
+          const dbItem = dbMap.get(product.productOfferId)!;
           return {
             ...product,
             ...{
@@ -97,7 +98,7 @@ export const ShoppingCartReducer = createSlice({
         });
 
       items.forEach((dbItem) => {
-        const exists = updatedProducts.some((p) => p.id === dbItem.productId);
+        const exists = updatedProducts.some((p) => p.productOfferId === dbItem.productOfferId);
         if (!exists) {
           updatedProducts.push({
             id: dbItem.productId,
@@ -148,8 +149,9 @@ export const ShoppingCartReducer = createSlice({
       if ((item.quantity || 1) > 1) {
         item.quantity!--;
       } else {
+        // Remove only this line; other variants (offers) of the same product stay.
         state.products = state.products.filter(
-          (p) => p.id !== id && p.productOfferId !== productOfferId,
+          (p) => !(p.id === id && p.productOfferId === productOfferId),
         );
       }
       calculateTotals(state);
@@ -160,8 +162,9 @@ export const ShoppingCartReducer = createSlice({
     ) => {
       const { id, productOfferId } = action.payload;
 
+      // Remove only this line; other variants (offers) of the same product stay.
       state.products = state.products.filter(
-        (p) => p.id !== id && p.productOfferId !== productOfferId,
+        (p) => !(p.id === id && p.productOfferId === productOfferId),
       );
       calculateTotals(state);
     },
