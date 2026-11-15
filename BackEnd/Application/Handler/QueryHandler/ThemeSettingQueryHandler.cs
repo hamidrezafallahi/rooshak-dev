@@ -89,6 +89,8 @@ namespace Application.Handler.QueryHandler
             BorderColor = t.BorderColor,
             TextColor = t.TextColor,
             TextMutedColor = t.TextMutedColor,
+            FontFamily = t.FontFamily,
+            HeadingFontFamily = t.HeadingFontFamily,
         };
     }
 }

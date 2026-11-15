@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 
+import { DEFAULT_FONT_KEY, DEFAULT_HEADING_FONT_KEY, findFont } from '@lib/fontCatalog';
+
 /**
  * Palette model of the theme studio. Mirrors ThemeSettingDto (BackEnd) and
  * SiteTheme (lib/theme.ts); every colour is a lower-case #RRGGBB string.
@@ -22,7 +24,7 @@ export const COLOR_KEYS = [
 
 export type ColorKey = (typeof COLOR_KEYS)[number];
 export type Palette = Record<ColorKey, string>;
-export type ThemeRecord = Palette & { id: number; name: string; isActive: boolean };
+export type ThemeRecord = Palette & { id: number; name: string; isActive: boolean; fontFamily: string; headingFontFamily: string };
 
 export const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -153,6 +155,12 @@ export function toThemeRecord(row: Record<string, unknown> | null | undefined): 
     id: row.id,
     name: typeof row.name === 'string' ? row.name : '',
     isActive: Boolean(row.isActive),
+    fontFamily:
+      typeof row.fontFamily === 'string' && findFont(row.fontFamily) ? row.fontFamily : DEFAULT_FONT_KEY,
+    headingFontFamily:
+      typeof row.headingFontFamily === 'string' && findFont(row.headingFontFamily)
+        ? row.headingFontFamily
+        : DEFAULT_HEADING_FONT_KEY,
   };
 }
 

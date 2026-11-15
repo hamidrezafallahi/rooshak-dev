@@ -20,5 +20,8 @@ namespace Application.Dtos
         public string BorderColor { get; set; } = string.Empty;
         public string TextColor { get; set; } = string.Empty;
         public string TextMutedColor { get; set; } = string.Empty;
+
+        public string FontFamily { get; set; } = string.Empty;
+        public string HeadingFontFamily { get; set; } = string.Empty;
     }
 }

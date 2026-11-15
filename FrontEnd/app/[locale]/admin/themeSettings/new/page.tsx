@@ -29,6 +29,8 @@ export default async function NewThemePage({
     <ThemeStudio
       initialName={source ? t('copyName', { name: source.name }) : ''}
       initialPalette={source ? pickPalette(source) : DEFAULT_PALETTE}
+      initialFont={source?.fontFamily}
+      initialHeadingFont={source?.headingFontFamily}
     />
   );
 }

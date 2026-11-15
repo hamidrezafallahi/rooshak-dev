@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { serverApiBaseUrl } from './api';
+import { findFont, fontStack, headingFontStack } from './fontCatalog';
 import { logger } from './logger';
 
 /** Mirrors ThemeSettingDto (BackEnd). Every colour is a #RRGGBB string. */
@@ -20,6 +21,10 @@ export type SiteTheme = {
   borderColor: string;
   textColor: string;
   textMutedColor: string;
+  /** Key from lib/fontCatalog.ts (e.g. "vazirmatn"); unknown keys are ignored. */
+  fontFamily?: string | null;
+  /** Heading font key (--font-display); unknown keys are ignored. */
+  headingFontFamily?: string | null;
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -42,9 +47,11 @@ export async function getActiveTheme(): Promise<SiteTheme | null> {
 }
 
 /**
- * CSS variables for :root. Doubled selector (`:root:root`) so it wins over the
+ * CSS variables for :root (colours, plus --font-body / --font-display for the chosen fonts).
+ * Doubled selector (`:root:root`) so it wins over the
  * fallback palette in globals.css regardless of stylesheet order. Values are
- * re-validated as hex, so nothing but colours can ever reach the <style> tag.
+ * re-validated as hex and the font key against lib/fontCatalog.ts, so nothing
+ * else can ever reach the <style> tag.
  */
 export function themeToCss(theme: SiteTheme | null): string {
   if (!theme) return '';
@@ -67,10 +74,17 @@ export function themeToCss(theme: SiteTheme | null): string {
     ['--store-text-muted', theme.textMutedColor],
   ];
 
-  const body = pairs
+  const colors = pairs
     .filter(([, value]) => HEX.test(value ?? ''))
-    .map(([name, value]) => `${name}:${value}`)
-    .join(';');
+    .map(([name, value]) => `${name}:${value}`);
+
+  // Only whitelisted keys become a font stack, so the value can't inject CSS.
+  if (findFont(theme.fontFamily)) colors.push(`--font-body:${fontStack(theme.fontFamily)}`);
+  if (findFont(theme.headingFontFamily)) {
+    colors.push(`--font-display:${headingFontStack(theme.headingFontFamily)}`);
+  }
+
+  const body = colors.join(';');
 
   return body ? `:root:root{${body}}` : '';
 }

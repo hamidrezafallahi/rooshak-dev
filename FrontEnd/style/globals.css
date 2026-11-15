@@ -12,6 +12,9 @@
   --error-color: #c8102e;
   --warning-color: #b45309;
   --info-color: #3b82f6;
+  /* فونت‌ها؛ تم فعال (پنل ادمین → تم سایت) این دو را بازنویسی می‌کند. */
+  --font-body: var(--IRANSans-font, 'IRANSans'), Tahoma, sans-serif;
+  --font-display: var(--font-body);
 }
 
 /* ================== Dark Theme — Onyx ================== */
@@ -122,6 +125,10 @@ html[data-theme="dark"] [data-surface="admin"] {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 }
 

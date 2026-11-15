@@ -218,7 +218,7 @@ public class SetCatalogItemActiveCommandHandlerTests
         public Task<List<int>> GetAllIds() => throw new NotImplementedException();
         public Task<ProductOffers?> GetByIdWithDetailsAsync(int offerId) => throw new NotImplementedException();
         public Task<ProductOffers?> GetByProductAndSupplierAsync(int productId, int supplierId) => throw new NotImplementedException();
-        public Task<bool> ExistsAsync(int productId, int supplierId) => throw new NotImplementedException();
+        public Task<bool> ExistsAsync(int productId, int supplierId, string? variantValue = null) => throw new NotImplementedException();
         public Task<bool> HasActiveOfferAsync(int productId, int supplierId) => throw new NotImplementedException();
     }
 

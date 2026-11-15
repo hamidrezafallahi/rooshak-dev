@@ -47,7 +47,7 @@ public class CartRepository : Repository<Cart>, ICartRepository
                 {
                     ProductId = product.Id,
                     ProductOfferId = offer.Id,
-                    Name = product.Name,
+                    Name = ProductOffers.BuildDisplayName(product.Name, offer.VariantName, offer.VariantValue),
                     BasePrice = offer.BasePrice,
                     Quantity = i.Quantity,
                     Description = product.Description,

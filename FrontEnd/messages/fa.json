@@ -461,6 +461,20 @@
       "deviceDesktop": "نمای دسکتاپ",
       "deviceMobile": "نمای موبایل",
       "previewHint": "نشانگر را روی یک رنگ نگه دارید تا جاهایی که در فروشگاه به کار رفته مشخص شود.",
+      "fontTitle": "فونت",
+      "fontHint": "فونت متن‌ها و فونت تیترهای سایت را جدا انتخاب کنید. فونت‌ها روی سرور خود سایت میزبانی می‌شوند و فقط فونت‌های انتخاب‌شده برای بازدیدکننده دانلود می‌شوند.",
+      "fontTargets": {
+        "body": "متن",
+        "heading": "تیترها"
+      },
+      "fontHeadingSample": "ظروف کریستال و دکوری روشاک",
+      "fontSample": "گلدان کریستال دست‌ساز با ارتفاع ۳۰ سانتی‌متر",
+      "fontCurrent": "انتخاب‌شده",
+      "fontCategories": {
+        "general": "عمومی",
+        "formal": "رسمی",
+        "fancy": "فانتزی و تزئینی"
+      },
       "contrastTitle": "خوانایی",
       "contrastHint": "سنجش کنتراست بر اساس استاندارد WCAG AA",
       "contrastScore": "{passed} از {total} قبول",
@@ -847,6 +861,8 @@
     "yourRate": "امتیاز شما"
   },
   "product": {
+    "variantDefaultLabel": "مدل",
+    "variantGroupAria": "انتخاب {name}",
     "width": "عرض",
     "height": "ارتفاع",
     "depth": "عمق",

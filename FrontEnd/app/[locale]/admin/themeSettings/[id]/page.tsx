@@ -28,6 +28,8 @@ export default async function EditThemePage({
       isActive={theme.isActive}
       initialName={theme.name}
       initialPalette={pickPalette(theme)}
+      initialFont={theme.fontFamily}
+      initialHeadingFont={theme.headingFontFamily}
     />
   );
 }

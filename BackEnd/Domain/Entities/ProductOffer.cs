@@ -13,6 +13,24 @@ public class ProductOffers : BaseEntity
     public decimal BasePrice { get; private set; }
     public int Inventory { get; private set; }
 
+    // ==== Variant (تنوع) ====
+    // هر پیشنهاد می‌تواند یک تنوع از محصول باشد (مثلاً «بزرگنمایی» = «3.5x») با قیمت و موجودی خودش.
+    // سبد خرید و سفارش به ProductOfferId وصل‌اند، پس هر تنوع بدون تغییر در آن‌ها قابل خرید است.
+    public const int VariantMaxLength = 50;
+    public string? VariantName { get; private set; }
+    public string? VariantValue { get; private set; }
+
+    public bool HasVariant => !string.IsNullOrWhiteSpace(VariantValue);
+
+    /// <summary>«نام محصول - بزرگنمایی 3.5x» برای سبد خرید و سفارش؛ بدون تنوع همان نام محصول.</summary>
+    public static string BuildDisplayName(string productName, string? variantName, string? variantValue)
+    {
+        if (string.IsNullOrWhiteSpace(variantValue))
+            return productName;
+        var label = string.IsNullOrWhiteSpace(variantName) ? variantValue.Trim() : $"{variantName.Trim()} {variantValue.Trim()}";
+        return $"{productName} - {label}";
+    }
+
     public ICollection<ProductOfferTag> ProductOfferTags { get; private set; } = new List<ProductOfferTag>();
     public ICollection<ProductOfferDiscount> Discounts { get; private set; } = new List<ProductOfferDiscount>();
 
@@ -24,7 +42,9 @@ public class ProductOffers : BaseEntity
       int supplierId,
       decimal basePrice,
       int inventory,
-      int currentUserId)
+      int currentUserId,
+      string? variantName = null,
+      string? variantValue = null)
     {
         var offer = new ProductOffers
         {
@@ -33,6 +53,7 @@ public class ProductOffers : BaseEntity
             BasePrice = basePrice,
             Inventory = inventory
         };
+        offer.SetVariant(variantName, variantValue);
 
         offer.MarkCreated(currentUserId);
         return offer;
@@ -41,7 +62,9 @@ public class ProductOffers : BaseEntity
     public void Update(
         decimal? basePrice,
         int? inventory,
-        int currentUserId)
+        int currentUserId,
+        string? variantName = null,
+        string? variantValue = null)
     {
         if (basePrice.HasValue)
             BasePrice = basePrice.Value;
@@ -49,7 +72,25 @@ public class ProductOffers : BaseEntity
         if (inventory.HasValue)
             Inventory = inventory.Value;
 
+        // null یعنی «تغییر نده»؛ رشتهٔ خالی یعنی «تنوع را پاک کن».
+        if (variantName != null || variantValue != null)
+            SetVariant(variantName ?? VariantName, variantValue ?? VariantValue);
+
         MarkUpdated(currentUserId);
+    }
+
+    private void SetVariant(string? variantName, string? variantValue)
+    {
+        var name = string.IsNullOrWhiteSpace(variantName) ? null : variantName.Trim();
+        var value = string.IsNullOrWhiteSpace(variantValue) ? null : variantValue.Trim();
+
+        if (name?.Length > VariantMaxLength || value?.Length > VariantMaxLength)
+            throw new DomainException($"عنوان و مقدار تنوع حداکثر {VariantMaxLength} کاراکتر است.");
+        if (name != null && value == null)
+            throw new DomainException("برای تنوع، مقدار (مثلاً 3.5x) را هم وارد کنید.");
+
+        VariantName = name;
+        VariantValue = value;
     }
 
     public decimal GetFinalPrice(DateTime now)

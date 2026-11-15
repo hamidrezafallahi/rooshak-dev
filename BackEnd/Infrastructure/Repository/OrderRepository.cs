@@ -43,7 +43,7 @@ namespace OnlineShop.Infrastructure.Repositories
                     UnitPrice = i.UnitPrice,
                     Product = new ProductReadModel
                     {
-                        Name = i.ProductOffer.Product.Name,
+                        Name = ProductOffers.BuildDisplayName(i.ProductOffer.Product.Name, i.ProductOffer.VariantName, i.ProductOffer.VariantValue),
                         Description = i.ProductOffer.Product.Description
                     }
                 }).ToList()
@@ -101,7 +101,7 @@ namespace OnlineShop.Infrastructure.Repositories
                     UnitPrice = i.UnitPrice,
                     Product = new ProductReadModel
                     {
-                        Name = i.ProductOffer.Product.Name,
+                        Name = ProductOffers.BuildDisplayName(i.ProductOffer.Product.Name, i.ProductOffer.VariantName, i.ProductOffer.VariantValue),
                         Image = i.ProductOffer.Product.Images.FirstOrDefault(img => img.IsMain)?.ImageUrl,
                         Description = i.ProductOffer.Product.Description
                     }

@@ -12,6 +12,21 @@ export interface ISpecificationResponse {
     name: string;
     specifications: Record<string, string>[]
 }
+/** One selectable option of a product (e.g. magnification 3.5x); mirrors ProductVariantDto. */
+export interface IProductVariant {
+    /** The product offer that is put in the cart when this option is chosen. */
+    offerId: number;
+    /** Option group title, e.g. «بزرگنمایی». */
+    name?: string | null;
+    /** Option value shown on the chip, e.g. «3.5x». */
+    value: string;
+    price: number;
+    finalPrice: number;
+    discountIsPercent?: boolean | null;
+    discountAmount?: number | null;
+    inventory: number;
+    inStock: boolean;
+}
 export interface IDetailedProduct {
     name: string;
     description: string;
@@ -34,6 +49,7 @@ export interface IDetailedProduct {
     discountAmount?: number | null;
     inventory?: number;
     inStock?: boolean;
+    variants?: IProductVariant[];
     currency?: string;
     averageRate?: number;
     rateCount?: number;
@@ -101,6 +117,7 @@ export interface ILandingProduct {
     mainImage: string
     averageRate: number
     rateCount: number
+    variants?: IProductVariant[]
 }
 export interface DBCartItems {
     cartItemId: number

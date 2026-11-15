@@ -5,7 +5,7 @@ import {
 
 import { IDetailedProduct } from '@models/product';
 
-import ProductPrice from './productPrice';
+import ProductPurchase from './productPurchase';
 import ProductRate from './productRate';
 
 export default async function ProductInfo({ product }: { product: IDetailedProduct }) {
@@ -39,20 +39,13 @@ export default async function ProductInfo({ product }: { product: IDetailedProdu
         <p className="text-store-subtle leading-relaxed line-clamp-4">{product.description}</p>
       )}
 
-      <ProductPrice
-        price={product.price}
-        finalPrice={product.finalPrice}
-        currency={product.currency}
-        inStock={product.inStock}
-        inventory={product.inventory}
-        locale={locale}
-      />
-
       <ProductRate
         id={product.id}
         average={product.averageRate}
         count={product.rateCount}
       />
+
+      <ProductPurchase product={product} />
 
       {product.dimensions && (
         <div className="flex flex-wrap gap-x-6 gap-y-2 pt-5 border-t border-store-border text-store-subtle text-sm">

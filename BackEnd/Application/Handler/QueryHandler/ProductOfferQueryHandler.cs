@@ -83,6 +83,8 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
             FinalPrice = offer.GetFinalPrice(now),
             Inventory = offer.Inventory,
             IsActive = offer.IsActive,
+            VariantName = offer.VariantName,
+            VariantValue = offer.VariantValue,
             CreatedAt = offer.CreatedAt,
             Tags = offer.ProductOfferTags
                 .Where(pot => pot.Tag != null && pot.Tag.IsActive)
@@ -134,8 +136,8 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
         var flatDtos = pagedProductOffers.Select(c => new SelectOptionDto
         {
             Id = c.Id,
-            PersianLabel = $"{c.Product.Name} - {c.Supplier.FullName}",
-            EnglishLabel = $"{c.Product.Name} - {c.Supplier.FullName}"
+            PersianLabel = $"{ProductOffers.BuildDisplayName(c.Product.Name, c.VariantName, c.VariantValue)} - {c.Supplier.FullName}",
+            EnglishLabel = $"{ProductOffers.BuildDisplayName(c.Product.Name, c.VariantName, c.VariantValue)} - {c.Supplier.FullName}"
         }).ToList();
         var resultDto = new ListDto<SelectOptionDto>
         {
@@ -169,6 +171,8 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
             FinalPrice = offer.GetFinalPrice(now),
             Inventory = offer.Inventory,
             IsActive = offer.IsActive,
+            VariantName = offer.VariantName,
+            VariantValue = offer.VariantValue,
             CreatedAt = offer.CreatedAt,
             AllDiscounts = offer.Discounts
                 .Where(pd => !pd.IsDeleted && !pd.Discount.IsDeleted)
@@ -225,6 +229,8 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
             FinalPrice = offer.GetFinalPrice(now),
             Inventory = offer.Inventory,
             IsActive = offer.IsActive,
+            VariantName = offer.VariantName,
+            VariantValue = offer.VariantValue,
             CreatedAt = offer.CreatedAt,
             ActiveDiscounts = offer.Discounts
                      .Where(pd => pd.IsActive && !pd.IsDeleted &&
@@ -267,6 +273,8 @@ public class ProductOfferQueryHandler(IProductOfferRepository _offerRepo,IEntity
             FinalPrice = offer.GetFinalPrice(now),
             Inventory = offer.Inventory,
             IsActive = offer.IsActive,
+            VariantName = offer.VariantName,
+            VariantValue = offer.VariantValue,
             CreatedAt = offer.CreatedAt,
             ActiveDiscounts = offer.Discounts
                  .Where(pd => pd.IsActive && !pd.IsDeleted &&

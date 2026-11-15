@@ -9,7 +9,7 @@ public interface IProductOfferRepository : IRepository<ProductOffers>
         int supplierId);
 
     // ===== Business =====
-    Task<bool> ExistsAsync(int productId, int supplierId);
+    Task<bool> ExistsAsync(int productId, int supplierId, string? variantValue = null);
     Task<bool> HasActiveOfferAsync(int productId, int supplierId);
 
 }

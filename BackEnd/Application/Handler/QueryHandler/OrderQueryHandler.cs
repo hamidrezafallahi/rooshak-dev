@@ -176,7 +176,7 @@ using OnlineShop.Domain.Interfaces;
                 Quantity = oi.Quantity,
                 UnitPrice = oi.UnitPrice,
                 TotalPrice = oi.UnitPrice* oi.Quantity,
-                ProductName = oi.ProductOffer.Product.Name,
+                ProductName = ProductOffers.BuildDisplayName(oi.ProductOffer.Product.Name, oi.ProductOffer.VariantName, oi.ProductOffer.VariantValue),
                 ProductImage = productImageUrl,
                 OrderStatus = oi.Order.Status.OrderStatusToDisplay(),
                 IsActive=oi.IsActive
