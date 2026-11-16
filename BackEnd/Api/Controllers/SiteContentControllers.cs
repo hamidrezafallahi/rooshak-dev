@@ -86,7 +86,7 @@ namespace WebApi.Controllers
 
         [HttpPut]
         [Authorize(Roles = AdminRoles)]
-        public async Task<ActionResult<IdDto>> Update([FromForm] UpdateAboutSectionCommand command)
+        public async Task<ActionResult<IdDto>> Update([FromBody] UpdateAboutSectionCommand command)
         {
             var result = await _mediator.Send(command);
             if (result.IsUnauthorized) return Unauthorized(result);
