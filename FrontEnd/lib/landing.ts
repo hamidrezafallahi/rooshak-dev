@@ -25,6 +25,8 @@ export type LandingSlide = {
   /** Text of the optional second link, per locale (both are required when secondUrl is set). */
   secondUrlTextFa?: string;
   secondUrlTextEn?: string;
+  /** 0..100: opacity of the banner title and description (100 = fully visible). */
+  titleOpacity?: number;
   bannerTitle?: string;
   bannerDescription?: string;
   isHero?: boolean;

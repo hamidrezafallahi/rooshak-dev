@@ -95,6 +95,8 @@ namespace Application.Handler.QueryHandler
             BodyTextSizePx = t.BodyTextSizePx,
             HeadingTextSize = t.HeadingTextSize,
             HeadingTextSizePx = t.HeadingTextSizePx,
+            BodyFontWeight = t.BodyFontWeight,
+            HeadingFontWeight = t.HeadingFontWeight,
         };
     }
 }

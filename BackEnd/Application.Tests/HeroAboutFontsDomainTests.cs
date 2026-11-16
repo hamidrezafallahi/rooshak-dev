@@ -157,4 +157,42 @@ public class HeroAboutFontsDomainTests
         Assert.Equal("Shabnam", font.NameFa);
         Assert.Equal("formal", font.Category);
     }
+
+    [Fact]
+    public void Theme_font_weights_default_and_validate()
+    {
+        var theme = ThemeSetting.Create("x", Palette(), 1);
+        Assert.Equal(ThemeFontWeights.DefaultBody, theme.BodyFontWeight);
+        Assert.Equal(ThemeFontWeights.DefaultHeading, theme.HeadingFontWeight);
+
+        theme.Update(null, Palette(), 1, typography: new ThemeTypography(null, null, null, null, 300, 800));
+        Assert.Equal(300, theme.BodyFontWeight);
+        Assert.Equal(800, theme.HeadingFontWeight);
+
+        // null keeps the stored weight
+        theme.Update(null, Palette(), 1, typography: new ThemeTypography(null, null, null, null));
+        Assert.Equal(300, theme.BodyFontWeight);
+
+        Assert.Throws<DomainException>(() =>
+            theme.Update(null, Palette(), 1, typography: new ThemeTypography(null, null, null, null, 450, null)));
+        Assert.Throws<DomainException>(() =>
+            theme.Update(null, Palette(), 1, typography: new ThemeTypography(null, null, null, null, null, 1000)));
+    }
+
+    [Fact]
+    public void Hero_title_opacity_defaults_to_full_and_stays_in_range()
+    {
+        var slide = Slide.Create(1, "products", null, "Title", null);
+        Assert.Equal(100, slide.TitleOpacity);
+
+        slide.Update(1, null, null, null, null, null, titleOpacity: 0);
+        Assert.Equal(0, slide.TitleOpacity);
+        Assert.Equal("Title", slide.BannerTitle);
+
+        slide.Update(1, null, null, null, null, null);
+        Assert.Equal(0, slide.TitleOpacity);
+
+        Assert.Throws<DomainException>(() => slide.Update(1, null, null, null, null, null, titleOpacity: 101));
+        Assert.Throws<DomainException>(() => Slide.Create(1, "products", null, null, null, titleOpacity: -1));
+    }
 }

@@ -49,6 +49,11 @@ namespace OnlineShop.Domain.Entities
         /// <summary>اندازه‌ی تیتر اصلی (H1) به پیکسل؛ فقط وقتی HeadingTextSize = custom.</summary>
         public int? HeadingTextSizePx { get; private set; }
 
+        /// <summary>ضخامت پایه‌ی متن‌ها (۱۰۰ تا ۹۰۰، مضرب ۱۰۰)؛ بقیه‌ی وزن‌های سایت به همان نسبت جابه‌جا می‌شوند.</summary>
+        public int BodyFontWeight { get; private set; } = ThemeFontWeights.DefaultBody;
+        /// <summary>ضخامت پایه‌ی تیترها (۱۰۰ تا ۹۰۰، مضرب ۱۰۰).</summary>
+        public int HeadingFontWeight { get; private set; } = ThemeFontWeights.DefaultHeading;
+
         public static bool IsValidHex(string? value) =>
             !string.IsNullOrWhiteSpace(value) && HexColor.IsMatch(value.Trim());
 
@@ -125,6 +130,16 @@ namespace OnlineShop.Domain.Entities
             (HeadingTextSize, HeadingTextSizePx) = PickSize(
                 HeadingTextSize, HeadingTextSizePx, t.HeadingSize, t.HeadingSizePx,
                 ThemeTextSizes.MinHeadingPx, ThemeTextSizes.MaxHeadingPx, "تیتر");
+            BodyFontWeight = PickWeight(BodyFontWeight, t.BodyWeight, "متن");
+            HeadingFontWeight = PickWeight(HeadingFontWeight, t.HeadingWeight, "تیتر");
+        }
+
+        private static int PickWeight(int current, int? incoming, string label)
+        {
+            if (incoming is null) return current;
+            if (!ThemeFontWeights.IsValid(incoming.Value))
+                throw new DomainException($"ضخامت {label} باید یکی از ۱۰۰ تا ۹۰۰ (مضرب ۱۰۰) باشد");
+            return incoming.Value;
         }
 
         private static (string size, int? px) PickSize(
@@ -223,12 +238,28 @@ namespace OnlineShop.Domain.Entities
             key is Small or Medium or Large or Custom;
     }
 
-    /// <summary>تنظیمات اندازه‌ی متن یک تم؛ هر مقدار null یعنی «بدون تغییر».</summary>
+    /// <summary>
+    /// ضخامت فونت متن و تیترها. فرانت‌اند فاصله‌ی وزن انتخابی تا پیش‌فرض را به همه‌ی
+    /// وزن‌های سایت اضافه می‌کند (postcss/font-scale.cjs) تا سلسله‌مراتب حفظ شود.
+    /// </summary>
+    public static class ThemeFontWeights
+    {
+        public const int DefaultBody = 400;
+        public const int DefaultHeading = 400;
+        public const int Min = 100;
+        public const int Max = 900;
+
+        public static bool IsValid(int weight) => weight >= Min && weight <= Max && weight % 100 == 0;
+    }
+
+    /// <summary>تنظیمات اندازه و ضخامت متن یک تم؛ هر مقدار null یعنی «بدون تغییر».</summary>
     public sealed record ThemeTypography(
         string? BodySize,
         int? BodySizePx,
         string? HeadingSize,
-        int? HeadingSizePx);
+        int? HeadingSizePx,
+        int? BodyWeight = null,
+        int? HeadingWeight = null);
 
     /// <summary>مجموعه‌ی رنگ‌های یک تم (value object برای جلوگیری از لیست طولانی پارامتر).</summary>
     public sealed record ThemePalette(

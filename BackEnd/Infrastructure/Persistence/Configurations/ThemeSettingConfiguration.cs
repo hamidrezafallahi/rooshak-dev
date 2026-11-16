@@ -48,6 +48,13 @@ namespace OnlineShop.Infrastructure.Persistence.Configurations
                    .HasMaxLength(ThemeTextSizes.MaxLength)
                    .HasDefaultValue(ThemeTextSizes.Medium);
 
+            // ردیف‌های موجود همان ضخامت فعلی سایت را می‌گیرند.
+            builder.Property(x => x.BodyFontWeight)
+                   .HasDefaultValue(ThemeFontWeights.DefaultBody);
+
+            builder.Property(x => x.HeadingFontWeight)
+                   .HasDefaultValue(ThemeFontWeights.DefaultHeading);
+
             builder.ToTable("ThemeSettings");
 
             // تم پیش‌فرض (همان پالت مونوکروم فعلی سایت) تا سایت از روز اول رنگ‌هایش را از دیتابیس بگیرد.
@@ -72,6 +79,8 @@ namespace OnlineShop.Infrastructure.Persistence.Configurations
                 HeadingFontFamily = ThemeFonts.DefaultHeading,
                 BodyTextSize = ThemeTextSizes.Medium,
                 HeadingTextSize = ThemeTextSizes.Medium,
+                BodyFontWeight = ThemeFontWeights.DefaultBody,
+                HeadingFontWeight = ThemeFontWeights.DefaultHeading,
                 IsActive = true,
                 IsDeleted = false,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),

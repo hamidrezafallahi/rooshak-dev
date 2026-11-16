@@ -178,7 +178,7 @@ export default function StorefrontPreview({ palette, device = 'desktop', focusKe
           <p data-c="highlightColor" className="font-medium text-[11px] text-[var(--t-highlight)]">
             {t('eyebrow')}
           </p>
-          <p data-c="textColor" className="mt-1.5 font-semibold text-[var(--t-text)] text-lg leading-8">
+          <p data-c="textColor" className="mt-1.5 font-display font-semibold text-[var(--t-text)] text-lg leading-8">
             {t('heroTitle')}
           </p>
           <p data-c="textMutedColor" className="mt-1.5 text-[11.5px] text-[var(--t-text-muted)] leading-6">

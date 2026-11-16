@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,7 @@ namespace Application.Dtos
         public string SecondUrl { get; set; } = string.Empty;
         public string SecondUrlTextFa { get; set; } = string.Empty;
         public string SecondUrlTextEn { get; set; } = string.Empty;
+        public int TitleOpacity { get; set; } = 100;
         public string VideoUrl { get; set; } = string.Empty;
         public string MobileBannerUrl { get; set; } = string.Empty;
         public string MobileVideoUrl { get; set; } = string.Empty;

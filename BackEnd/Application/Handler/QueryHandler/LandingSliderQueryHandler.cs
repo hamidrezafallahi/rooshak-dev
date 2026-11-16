@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Application.Queries;
 using Common;
 using Domain.Interfaces;
@@ -38,7 +38,7 @@ public class GetLandingSlideQueryHandler(ISlideRepository _repo,IEntityConfigRep
                 FirstUrl = entity.FirstUrl,
                 SecondUrl = entity.SecondUrl,
             SecondUrlTextFa = entity.SecondUrlTextFa,
-            SecondUrlTextEn = entity.SecondUrlTextEn,
+            SecondUrlTextEn = entity.SecondUrlTextEn, TitleOpacity = entity.TitleOpacity,
                 VideoUrl = entity.VideoUrl,
                 MobileBannerUrl = entity.MobileBannerUrl,
                 MobileVideoUrl = entity.MobileVideoUrl,
@@ -79,7 +79,7 @@ public class GetLandingSlideQueryHandler(ISlideRepository _repo,IEntityConfigRep
             FirstUrl = entity.FirstUrl,
             SecondUrl = entity.SecondUrl,
             SecondUrlTextFa = entity.SecondUrlTextFa,
-            SecondUrlTextEn = entity.SecondUrlTextEn,
+            SecondUrlTextEn = entity.SecondUrlTextEn, TitleOpacity = entity.TitleOpacity,
                 VideoUrl = entity.VideoUrl,
                 MobileBannerUrl = entity.MobileBannerUrl,
                 MobileVideoUrl = entity.MobileVideoUrl,
@@ -116,7 +116,7 @@ public class GetLandingSlideQueryHandler(ISlideRepository _repo,IEntityConfigRep
             FirstUrl = entity.FirstUrl,
             SecondUrl = entity.SecondUrl,
             SecondUrlTextFa = entity.SecondUrlTextFa,
-            SecondUrlTextEn = entity.SecondUrlTextEn,
+            SecondUrlTextEn = entity.SecondUrlTextEn, TitleOpacity = entity.TitleOpacity,
                 VideoUrl = entity.VideoUrl,
                 MobileBannerUrl = entity.MobileBannerUrl,
                 MobileVideoUrl = entity.MobileVideoUrl,

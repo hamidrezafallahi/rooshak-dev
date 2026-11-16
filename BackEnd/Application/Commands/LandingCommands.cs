@@ -1,4 +1,4 @@
-﻿using Common;
+using Common;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -22,6 +22,8 @@ namespace Application.Commands
         public string? SecondUrl { get; set; }
         public string? SecondUrlTextFa { get; set; }
         public string? SecondUrlTextEn { get; set; }
+        /// <summary>0..100: opacity of the banner title and description; null = unchanged (100 on create).</summary>
+        public int? TitleOpacity { get; set; }
     }
 
     public class UpdateSlideCommand : IRequest<ServiceResult<IdDto>>
@@ -40,6 +42,8 @@ namespace Application.Commands
         public string? SecondUrl { get; set; }
         public string? SecondUrlTextFa { get; set; }
         public string? SecondUrlTextEn { get; set; }
+        /// <summary>0..100: opacity of the banner title and description; null = unchanged (100 on create).</summary>
+        public int? TitleOpacity { get; set; }
     }
 
     public class DeleteSlideCommand : IRequest<ServiceResult<IdDto>>

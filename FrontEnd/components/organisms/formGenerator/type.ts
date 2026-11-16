@@ -26,7 +26,7 @@ export interface FormFieldRendererProps {
   }
   
 export interface FormFieldRule {
-    Rule: "required";
+    Rule: "required" | "min" | "max";
     Condition: boolean;
     Message: string;
   }

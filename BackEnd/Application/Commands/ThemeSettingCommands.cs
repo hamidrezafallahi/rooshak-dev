@@ -28,6 +28,9 @@ namespace Application.Commands
         public int? BodyTextSizePx { get; set; }
         public string? HeadingTextSize { get; set; }
         public int? HeadingTextSizePx { get; set; }
+        /// <summary>100..900 (multiple of 100); null = unchanged.</summary>
+        public int? BodyFontWeight { get; set; }
+        public int? HeadingFontWeight { get; set; }
     }
 
     public class UpdateThemeSettingCommand : IRequest<ServiceResult<IdDto>>
@@ -56,6 +59,9 @@ namespace Application.Commands
         public int? BodyTextSizePx { get; set; }
         public string? HeadingTextSize { get; set; }
         public int? HeadingTextSizePx { get; set; }
+        /// <summary>100..900 (multiple of 100); null = unchanged.</summary>
+        public int? BodyFontWeight { get; set; }
+        public int? HeadingFontWeight { get; set; }
     }
 
     /// <summary>فعال‌کردن یک تم، بقیه‌ی تم‌ها را غیرفعال می‌کند (فقط یک تم فعال).</summary>

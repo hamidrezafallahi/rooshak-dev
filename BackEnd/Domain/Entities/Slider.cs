@@ -1,4 +1,4 @@
-﻿using OnlineShop.Domain.Common;
+using OnlineShop.Domain.Common;
 
 namespace OnlineShop.Domain.Entities
 {
@@ -8,6 +8,8 @@ namespace OnlineShop.Domain.Entities
     public class Slide : BaseEntity
     {
         public const int MaxLinkTextLength = 100;
+        public const int MinTitleOpacity = 0;
+        public const int MaxTitleOpacity = 100;
 
         private Slide() { }
 
@@ -30,6 +32,11 @@ namespace OnlineShop.Domain.Entities
         public string MobileBannerUrl { get; private set; } = string.Empty;
         public string MobileVideoUrl { get; private set; } = string.Empty;
         public bool IsHero { get; private set; }
+        /// <summary>
+        /// شفافیت عنوان و توضیح روی بنر (۰ تا ۱۰۰). صفر یعنی دیده نشوند، ولی متن در HTML صفحه
+        /// می‌ماند تا H1 و توضیح برای موتور جستجو و صفحه‌خوان از دست نروند.
+        /// </summary>
+        public int TitleOpacity { get; private set; } = MaxTitleOpacity;
 
 
         // ===== Factory =====
@@ -40,7 +47,8 @@ namespace OnlineShop.Domain.Entities
             string? bannerTitle,
             string? bannerDescription,
             string? secondUrlTextFa = null,
-            string? secondUrlTextEn = null
+            string? secondUrlTextEn = null,
+            int? titleOpacity = null
         )
         {
             if (string.IsNullOrWhiteSpace(firstUrl))
@@ -52,6 +60,7 @@ namespace OnlineShop.Domain.Entities
                 BannerDescription = bannerDescription?.Trim() ?? string.Empty,
             };
             slide.SetSecondLink(secondUrl, secondUrlTextFa, secondUrlTextEn);
+            slide.SetTitleOpacity(titleOpacity);
             slide.MarkCreated(currentUserId);
             return slide;
         }
@@ -68,7 +77,8 @@ namespace OnlineShop.Domain.Entities
             string? bannerDescription,
             string? videoUrl = null,
             string? secondUrlTextFa = null,
-            string? secondUrlTextEn = null
+            string? secondUrlTextEn = null,
+            int? titleOpacity = null
         )
         {
             if (!string.IsNullOrWhiteSpace(bannerUrl)) BannerUrl = bannerUrl;
@@ -81,6 +91,7 @@ namespace OnlineShop.Domain.Entities
                 secondUrlTextEn ?? SecondUrlTextEn);
 
             if (!string.IsNullOrWhiteSpace(videoUrl)) VideoUrl = videoUrl;
+            SetTitleOpacity(titleOpacity);
 
             MarkUpdated(currentUserId);
         }
@@ -89,6 +100,15 @@ namespace OnlineShop.Domain.Entities
         /// آدرس دوم اختیاری است؛ اگر داده شود متن فارسی و انگلیسی آن الزامی است.
         /// بدون آدرس، متن‌ها هم پاک می‌شوند.
         /// </summary>
+        /// <summary>null یعنی «بدون تغییر».</summary>
+        private void SetTitleOpacity(int? opacity)
+        {
+            if (opacity is null) return;
+            if (opacity < MinTitleOpacity || opacity > MaxTitleOpacity)
+                throw new DomainException($"شفافیت عنوان باید بین {MinTitleOpacity} تا {MaxTitleOpacity} باشد");
+            TitleOpacity = opacity.Value;
+        }
+
         private void SetSecondLink(string? url, string? textFa, string? textEn)
         {
             var cleanUrl = url?.Trim() ?? string.Empty;
