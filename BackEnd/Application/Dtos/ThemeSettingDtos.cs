@@ -23,5 +23,10 @@ namespace Application.Dtos
 
         public string FontFamily { get; set; } = string.Empty;
         public string HeadingFontFamily { get; set; } = string.Empty;
+
+        public string BodyTextSize { get; set; } = "medium";
+        public int? BodyTextSizePx { get; set; }
+        public string HeadingTextSize { get; set; } = "medium";
+        public int? HeadingTextSizePx { get; set; }
     }
 }

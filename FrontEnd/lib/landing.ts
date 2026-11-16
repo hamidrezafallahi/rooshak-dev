@@ -22,10 +22,24 @@ export type LandingSlide = {
   mobileVideoUrl?: string;
   firstUrl: string;
   secondUrl?: string;
+  /** Text of the optional second link, per locale (both are required when secondUrl is set). */
+  secondUrlTextFa?: string;
+  secondUrlTextEn?: string;
   bannerTitle?: string;
   bannerDescription?: string;
   isHero?: boolean;
   isActive?: boolean;
+};
+
+/** A slide of the mid-page home slider (HomeSlides table; separate from the hero banner). */
+export type HomeSlide = {
+  id: number;
+  imageUrl: string;
+  mobileImageUrl?: string;
+  linkUrl?: string;
+  titleFa?: string;
+  titleEn?: string;
+  displayOrder?: number;
 };
 
 export async function getSlides<T = LandingSlide>(): Promise<T[]> {
@@ -35,7 +49,8 @@ export async function getSlides<T = LandingSlide>(): Promise<T[]> {
   );
   try {
     const res = await fetch(url, {
-      next: { revalidate: 60, tags: ['Landing/slide'] },
+      // `landing` is the tag the admin panel revalidates after a save.
+      next: { revalidate: 60, tags: ['Landing/slide', 'landing'] },
     });
 
     if (!res.ok) {
@@ -57,20 +72,36 @@ export async function getSlides<T = LandingSlide>(): Promise<T[]> {
 }
 
 /**
- * Splits active slides into the full-bleed hero (the slide flagged `isHero`, else
- * the first slide that has a video, else the first slide) and the remaining
- * slides that feed the editorial banner section below the hero.
+ * The full-bleed hero: the active slide flagged `isHero`, else the first one with a
+ * video, else the first one. The other hero slides are not shown anywhere: the
+ * slider further down the page has its own table and API (see getHomeSlides).
  */
-export function splitHeroSlide(slides: LandingSlide[]): {
-  hero: LandingSlide | null;
-  rest: LandingSlide[];
-} {
-  if (!slides.length) return { hero: null, rest: [] };
-  const hero =
+export function pickHeroSlide(slides: LandingSlide[]): LandingSlide | null {
+  if (!slides.length) return null;
+  return (
     slides.find((s) => s.isHero) ??
     slides.find((s) => Boolean(s.videoUrl)) ??
-    slides[0];
-  return { hero, rest: slides.filter((s) => s !== hero) };
+    slides[0]
+  );
+}
+
+/** Active slides of the mid-page home slider, in display order (HomeSlides/public). */
+export async function getHomeSlides(): Promise<HomeSlide[]> {
+  const url = requireAbsoluteUrl(`${serverApiBaseUrl}/HomeSlides/public`, 'getHomeSlides URL');
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60, tags: ['homeSlides'] },
+    });
+    if (!res.ok) {
+      logger.error('getHomeSlides HTTP error', { scope: 'landing', source: 'server', url, status: res.status });
+      return [];
+    }
+    const data = await res.json();
+    return ((data?.data ?? []) as HomeSlide[]).filter((s) => Boolean(s?.imageUrl));
+  } catch (err) {
+    logger.error('getHomeSlides failed', { scope: 'landing', source: 'server', url }, err);
+    return [];
+  }
 }
 
 /**

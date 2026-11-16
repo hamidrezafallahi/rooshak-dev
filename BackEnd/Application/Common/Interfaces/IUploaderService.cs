@@ -13,6 +13,12 @@ namespace Application.Common.Interfaces
         /// <summary>Stores an mp4/webm video as-is (no transcoding). Returns relative path or null on failure.</summary>
         Task<string?> UploadVideo(UploadDTO request);
 
+        /// <summary>
+        /// Stores a web font (woff2/woff/ttf/otf, max 5 MB) as-is after checking its signature.
+        /// Returns relative path like uploads/fonts/3/guid.woff2.
+        /// </summary>
+        Task<string?> UploadFont(UploadDTO request);
+
         Task DeleteFile(DeleteDTO request);
 
         /// <summary>

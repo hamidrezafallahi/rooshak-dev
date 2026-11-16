@@ -17,7 +17,23 @@ export type FontOption = {
   /** English (original) name. */
   en: string;
   category: FontCategory;
-  cssVar: string;
+  /** Bundled fonts: the next/font CSS variable. */
+  cssVar?: string;
+  /** Uploaded fonts: the @font-face family name (see customFontFaceCss). */
+  family?: string;
+  /** Uploaded fonts: root-absolute URL of the font file. */
+  src?: string;
+};
+
+/** Mirrors CustomFontDto (BackEnd): a font the admin uploaded in «تم سایت». */
+export type CustomFontDto = {
+  id: number;
+  key: string;
+  nameFa: string;
+  nameEn: string;
+  category: string;
+  fileUrl: string;
+  isActive?: boolean;
 };
 
 /** Rooshak's current face for body text and headings (IRANSans). */
@@ -55,26 +71,85 @@ export const FONT_OPTIONS: FontOption[] = [
 
 const BY_KEY = new Map(FONT_OPTIONS.map((f) => [f.key, f]));
 
-export function findFont(key?: string | null): FontOption | undefined {
-  return key ? BY_KEY.get(key) : undefined;
+/** Keys of uploaded fonts: custom-{id} (CustomFont.KeyFor in the backend). */
+export const CUSTOM_FONT_KEY = /^custom-[1-9]\d{0,8}$/;
+/** Only files the backend stored under uploads/fonts/{id}/ ever reach a @font-face rule. */
+const FONT_FILE = /^\/?uploads\/fonts\/\d+\/[A-Za-z0-9_-]+\.(woff2|woff|ttf|otf)$/;
+const FONT_FORMAT: Record<string, string> = {
+  woff2: 'woff2',
+  woff: 'woff',
+  ttf: 'truetype',
+  otf: 'opentype',
+};
+
+/** True for a bundled font key or a well-formed uploaded-font key. */
+export function isFontKey(key?: string | null): boolean {
+  return Boolean(key && (BY_KEY.has(key) || CUSTOM_FONT_KEY.test(key)));
 }
 
 /**
- * The full `font-family` stack for a key: the chosen font, then the site's
- * default fonts for any glyph it lacks. Unknown keys give the default stack.
+ * Turns API rows into picker options. Rows with an unexpected key, category or file
+ * path are dropped, so nothing the API returns can inject CSS.
  */
-export function fontStack(key?: string | null): string {
-  return stackFor(findFont(key) ?? BY_KEY.get(DEFAULT_FONT_KEY)!);
+export function toCustomFontOptions(rows: CustomFontDto[] | null | undefined): FontOption[] {
+  if (!Array.isArray(rows)) return [];
+  return rows.flatMap((row) => {
+    const id = Number(row?.id);
+    const key = `custom-${id}`;
+    const file = typeof row?.fileUrl === 'string' ? row.fileUrl.trim() : '';
+    const category = FONT_CATEGORIES.includes(row?.category as FontCategory)
+      ? (row.category as FontCategory)
+      : 'general';
+    if (!Number.isInteger(id) || id <= 0 || row.key !== key || !FONT_FILE.test(file)) return [];
+    const en = (row.nameEn || row.nameFa || key).trim();
+    return [{
+      key,
+      fa: (row.nameFa || en).trim(),
+      en,
+      category,
+      family: `site-custom-${id}`,
+      src: file.startsWith('/') ? file : `/${file}`,
+    }];
+  });
 }
 
-/** `font-family` stack for headings (--font-display); unknown keys give IRANSans. */
-export function headingFontStack(key?: string | null): string {
-  return stackFor(findFont(key) ?? BY_KEY.get(DEFAULT_HEADING_FONT_KEY)!);
+/** `@font-face` rules for uploaded fonts (only validated options get here). */
+export function customFontFaceCss(fonts: FontOption[]): string {
+  return fonts
+    .filter((f) => f.family && f.src && FONT_FILE.test(f.src))
+    .map((f) => {
+      const ext = f.src!.split('.').pop()!.toLowerCase();
+      return `@font-face{font-family:"${f.family}";src:url("${f.src}") format("${FONT_FORMAT[ext]}");font-display:swap}`;
+    })
+    .join('');
+}
+
+export function findFont(key?: string | null, custom: FontOption[] = []): FontOption | undefined {
+  if (!key) return undefined;
+  return BY_KEY.get(key) ?? custom.find((f) => f.key === key);
 }
 
 /** The chosen font, then IRANSans for any glyph it lacks. */
 function stackFor(font: FontOption): string {
-  const chain = [font.key === 'iransans' ? "var(--IRANSans-font, 'IRANSans')" : `var(${font.cssVar})`];
+  const first = font.family
+    ? `"${font.family}"`
+    : font.key === 'iransans'
+      ? "var(--IRANSans-font, 'IRANSans')"
+      : `var(${font.cssVar})`;
+  const chain = [first];
   if (font.key !== 'iransans') chain.push("var(--IRANSans-font, 'IRANSans')");
   return [...chain, 'Tahoma', 'sans-serif'].join(', ');
+}
+
+/**
+ * The full `font-family` stack for a key: the chosen font, then the site's
+ * default font for any glyph it lacks. Unknown keys give the default stack.
+ */
+export function fontStack(key?: string | null, custom: FontOption[] = []): string {
+  return stackFor(findFont(key, custom) ?? BY_KEY.get(DEFAULT_FONT_KEY)!);
+}
+
+/** `font-family` stack for headings (--font-display); unknown keys give IRANSans. */
+export function headingFontStack(key?: string | null, custom: FontOption[] = []): string {
+  return stackFor(findFont(key, custom) ?? BY_KEY.get(DEFAULT_HEADING_FONT_KEY)!);
 }

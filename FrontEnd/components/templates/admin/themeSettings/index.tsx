@@ -19,7 +19,7 @@ import {
   deleteTheme,
   refreshStorefrontTheme,
 } from './api';
-import { findFont, fontStack, headingFontStack } from '@lib/fontCatalog';
+import { customFontFaceCss, findFont, type FontOption, fontStack, headingFontStack } from '@lib/fontCatalog';
 import {
   Glint,
   Glyph,
@@ -32,7 +32,14 @@ import {
 } from './parts';
 import StorefrontPreview, { StorefrontThumb } from './storefrontPreview';
 
-export default function ThemeGallery({ themes }: { themes: ThemeRecord[] | null }) {
+export default function ThemeGallery({
+  themes,
+  customFonts = [],
+}: {
+  themes: ThemeRecord[] | null;
+  /** Uploaded fonts, so a theme using one shows its real name and face. */
+  customFonts?: FontOption[];
+}) {
   const t = useTranslations('admin.themeSettings');
   const tf = useTranslations('admin.themeSettings.fields');
   const locale = useLocale();
@@ -75,8 +82,11 @@ export default function ThemeGallery({ themes }: { themes: ThemeRecord[] | null 
     setBusyId(null);
   };
 
+  const fontFaces = customFontFaceCss(customFonts);
+
   return (
     <div className="admin-page">
+      {fontFaces ? <style dangerouslySetInnerHTML={{ __html: fontFaces }} /> : null}
       <header className="admin-page-header">
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 font-medium text-[var(--highlight-color)] text-xs">
@@ -200,7 +210,7 @@ export default function ThemeGallery({ themes }: { themes: ThemeRecord[] | null 
                     <div className="min-w-0">
                       <h3
                         className="font-semibold text-[var(--admin-text)] truncate"
-                        style={{ fontFamily: headingFontStack(theme.headingFontFamily) }}
+                        style={{ fontFamily: headingFontStack(theme.headingFontFamily, customFonts) }}
                       >
                         {theme.name}
                       </h3>
@@ -209,9 +219,9 @@ export default function ThemeGallery({ themes }: { themes: ThemeRecord[] | null 
                         className="text-[var(--admin-text-muted)] text-xs truncate"
                         style={{ fontFamily: fontStack(theme.fontFamily) }}
                       >
-                        {t('fontTitle')}: {findFont(theme.fontFamily)?.[locale === 'fa' ? 'fa' : 'en']}
+                        {t('fontTitle')}: {findFont(theme.fontFamily, customFonts)?.[locale === 'fa' ? 'fa' : 'en']}
                         {' · '}
-                        {t('fontTargets.heading')}: {findFont(theme.headingFontFamily)?.[locale === 'fa' ? 'fa' : 'en']}
+                        {t('fontTargets.heading')}: {findFont(theme.headingFontFamily, customFonts)?.[locale === 'fa' ? 'fa' : 'en']}
                       </p>
                     </div>
                     <SwatchStack colors={[theme.primaryColor, theme.highlightColor, theme.surfaceColor, theme.textColor]} />

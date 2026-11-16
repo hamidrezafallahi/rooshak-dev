@@ -125,7 +125,8 @@
       "cart": "Cart",
       "orders": "Orders",
       "faq": "FAQ",
-      "cooperation": "Work with us"
+      "cooperation": "Work with us",
+      "about": "About us"
     }
   },
   "seo": {
@@ -225,7 +226,8 @@
     "eyebrow": "The art of crystal",
     "videoPause": "Pause background video",
     "videoPlay": "Play background video",
-    "scroll": "Scroll to discover"
+    "scroll": "Scroll to discover",
+    "heroLinkAria": "See the banner details"
   },
   "usp": {
     "sectionTitle": "Why buy crystal from Rooshak?",
@@ -520,7 +522,31 @@
         "footer": "© Rooshak",
         "footerLink1": "FAQ",
         "footerLink2": "Contact"
-      }
+      },
+      "textSizeTitle": "Text size",
+      "textSizeHint": "Pick the size of body text and of headings separately; “Custom” takes an exact pixel size. The preview updates right away.",
+      "textSizes": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "custom": "Custom (px)"
+      },
+      "textSizePxBody": "Base text size",
+      "textSizePxHeading": "Main heading (H1) size",
+      "textSizePxRange": "Between {min} and {max} px; the site is currently {base} px and every other size follows in proportion.",
+      "customFontBadge": "Uploaded",
+      "addFontTitle": "Add a font",
+      "addFontHint": "Choose a font file (woff2, woff, ttf or otf, up to 5 MB) and its name. It joins this category and can be used for text and headings.",
+      "addFontFile": "Font file",
+      "addFontNameFa": "Persian name",
+      "addFontNameEn": "English name",
+      "addFontSubmit": "Upload font",
+      "addFontUploading": "Uploading…",
+      "addFontCancel": "Cancel",
+      "addFontDone": "Font added; you can select it now.",
+      "addFontFailed": "The font could not be uploaded",
+      "addFontNeedFile": "Choose a font file",
+      "addFontNeedName": "Enter the font name"
     },
     "dashboard": "Dashboard",
     "dashboardTitle": "Admin panel",
@@ -1095,5 +1121,9 @@
       "submitFailed": "Could not send the request. Please try again.",
       "connectionError": "Could not reach the server. Please try again."
     }
+  },
+  "aboutPage": {
+    "title": "About Rooshak",
+    "description": "Get to know the Rooshak store and how we work."
   }
 }

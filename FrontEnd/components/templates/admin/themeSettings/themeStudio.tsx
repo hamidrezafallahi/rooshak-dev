@@ -16,14 +16,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
+  customFontFaceCss,
   DEFAULT_FONT_KEY,
   DEFAULT_HEADING_FONT_KEY,
   findFont,
   FONT_CATEGORIES,
   FONT_OPTIONS,
+  type FontCategory,
+  type FontOption,
   fontStack,
   headingFontStack,
+  isFontKey,
 } from '@lib/fontCatalog';
+import {
+  BODY_BASE_PX,
+  BODY_PX_RANGE,
+  bodyTextScale,
+  HEADING_BASE_PX,
+  HEADING_PX_RANGE,
+  headingTextScale,
+  TEXT_SIZE_KEYS,
+  type TextSizeKey,
+} from '@lib/typography';
 import { saveEntity } from '@lib/saveEntity';
 import {
   showErrorToast,
@@ -33,6 +47,7 @@ import {
 import {
   refreshStorefrontTheme,
   THEME_ENDPOINT,
+  uploadCustomFont,
 } from './api';
 import {
   Glint,
@@ -45,8 +60,10 @@ import {
   CONTRAST_CHECKS,
   contrastRatio,
   HEX,
+  DEFAULT_TYPOGRAPHY,
   Palette,
   PRESETS,
+  Typography,
 } from './palette';
 import {
   LiveBadge,
@@ -64,6 +81,10 @@ type StudioProps = {
   initialFont?: string | null;
   /** Heading font key; defaults to the site's current heading face. */
   initialHeadingFont?: string | null;
+  /** Body / heading text sizes (lib/typography.ts). */
+  initialTypography?: Typography;
+  /** Fonts the admin uploaded (CustomFonts table), already validated. */
+  customFonts?: FontOption[];
 };
 
 type FontTarget = 'body' | 'heading';
@@ -166,18 +187,114 @@ function ColorRow({
   );
 }
 
+/** Upload box at the end of each font category: file + Persian/English name. */
+function AddFontCard({ category, onAdded }: { category: FontCategory; onAdded: () => void }) {
+  const t = useTranslations('admin.themeSettings');
+  const [open, setOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [nameFa, setNameFa] = useState('');
+  const [nameEn, setNameEn] = useState('');
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const submit = async () => {
+    if (busy) return;
+    if (!file) {
+      showErrorToast(t('addFontNeedFile'), '', 4000);
+      return;
+    }
+    if (!nameFa.trim() && !nameEn.trim()) {
+      showErrorToast(t('addFontNeedName'), '', 4000);
+      return;
+    }
+    setBusy(true);
+    const res = await uploadCustomFont({ file, nameFa: nameFa.trim(), nameEn: nameEn.trim(), category });
+    setBusy(false);
+    if (res.isSuccess) {
+      showSuccessToast(t('addFontDone'), '', 4000);
+      setOpen(false);
+      setFile(null);
+      setNameFa('');
+      setNameEn('');
+      if (fileRef.current) fileRef.current.value = '';
+      onAdded();
+    } else {
+      showErrorToast(res.error || t('addFontFailed'), '', 6000);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex justify-center items-center gap-2 px-3.5 py-3 border border-[var(--admin-border)] hover:border-[var(--admin-text)] border-dashed w-full h-full min-h-[84px] text-[13px] text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] transition-colors"
+      >
+        <span aria-hidden className="text-lg leading-none">+</span>
+        {t('addFontTitle')}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2.5 px-3.5 py-3 border border-[var(--admin-text)] w-full">
+      <p className="m-0 text-[13px] text-[var(--admin-text-muted)] leading-6">{t('addFontHint')}</p>
+      <label className="flex flex-col gap-1 text-[13px]">
+        {t('addFontFile')}
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          className="text-[13px]"
+        />
+      </label>
+      <input
+        value={nameFa}
+        onChange={(e) => setNameFa(e.target.value)}
+        placeholder={t('addFontNameFa')}
+        aria-label={t('addFontNameFa')}
+        maxLength={60}
+        className="luca-input"
+      />
+      <input
+        value={nameEn}
+        onChange={(e) => setNameEn(e.target.value)}
+        placeholder={t('addFontNameEn')}
+        aria-label={t('addFontNameEn')}
+        maxLength={60}
+        dir="ltr"
+        className="luca-input"
+      />
+      <div className="flex gap-2">
+        <button type="button" className="flex-1 admin-btn admin-btn-primary" onClick={submit} disabled={busy}>
+          {busy ? t('addFontUploading') : t('addFontSubmit')}
+        </button>
+        <button type="button" className="admin-btn" onClick={() => setOpen(false)} disabled={busy}>
+          {t('addFontCancel')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function FontPicker({
   value,
   onChange,
   target,
+  customFonts,
+  onFontAdded,
 }: {
   value: string;
   onChange: (key: string) => void;
   target: FontTarget;
+  customFonts: FontOption[];
+  onFontAdded: () => void;
 }) {
   const t = useTranslations('admin.themeSettings');
   const locale = useLocale();
   const heading = target === 'heading';
+  const allFonts = [...FONT_OPTIONS, ...customFonts];
 
   return (
     <div className="flex flex-col gap-6" role="radiogroup" aria-label={t(`fontTargets.${target}`)}>
@@ -187,7 +304,7 @@ function FontPicker({
             {t(`fontCategories.${category}`)}
           </p>
           <ul className="gap-2 grid grid-cols-1 sm:grid-cols-2">
-            {FONT_OPTIONS.filter((font) => font.category === category).map((font) => {
+            {allFonts.filter((font) => font.category === category).map((font) => {
               const selected = font.key === value;
               return (
                 <li key={font.key}>
@@ -211,13 +328,20 @@ function FontPicker({
                           </span>
                         )}
                       </span>
-                      {selected && (
-                        <span className="admin-badge admin-badge-success shrink-0">{t('fontCurrent')}</span>
-                      )}
+                      <span className="flex gap-1.5 shrink-0">
+                        {font.family && <span className="admin-badge">{t('customFontBadge')}</span>}
+                        {selected && (
+                          <span className="admin-badge admin-badge-success">{t('fontCurrent')}</span>
+                        )}
+                      </span>
                     </span>
                     <span
                       className={`text-[var(--admin-text)] leading-relaxed ${heading ? 'text-[22px]' : 'text-[17px]'}`}
-                      style={{ fontFamily: heading ? headingFontStack(font.key) : fontStack(font.key) }}
+                      style={{
+                        fontFamily: heading
+                          ? headingFontStack(font.key, customFonts)
+                          : fontStack(font.key, customFonts),
+                      }}
                     >
                       {t(heading ? 'fontHeadingSample' : 'fontSample')}
                     </span>
@@ -225,9 +349,83 @@ function FontPicker({
                 </li>
               );
             })}
+            <li>
+              <AddFontCard category={category} onAdded={onFontAdded} />
+            </li>
           </ul>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** Three presets or an exact pixel size, for body text or for headings. */
+function TextSizePicker({
+  target,
+  size,
+  px,
+  onChange,
+}: {
+  target: FontTarget;
+  size: TextSizeKey;
+  px: number | null;
+  onChange: (size: TextSizeKey, px: number | null) => void;
+}) {
+  const t = useTranslations('admin.themeSettings');
+  const range = target === 'heading' ? HEADING_PX_RANGE : BODY_PX_RANGE;
+  const base = target === 'heading' ? HEADING_BASE_PX : BODY_BASE_PX;
+  const inputId = `text-size-px-${target}`;
+  const invalid = size === 'custom' && (px === null || px < range.min || px > range.max);
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <p className="m-0 font-medium text-[13px] text-[var(--admin-text-muted)]">{t(`fontTargets.${target}`)}</p>
+      <div className="flex flex-wrap" role="radiogroup" aria-label={t(`fontTargets.${target}`)}>
+        {TEXT_SIZE_KEYS.map((key) => (
+          <button
+            key={key}
+            type="button"
+            role="radio"
+            aria-checked={size === key}
+            onClick={() => onChange(key, key === 'custom' ? (px ?? base) : null)}
+            className={`flex-1 sm:flex-none px-4 h-10 border text-[13px] transition-colors -ms-px first:ms-0 ${
+              size === key
+                ? 'relative z-10 border-[var(--admin-text)] bg-[var(--admin-text)] text-[var(--admin-surface-elevated)]'
+                : 'border-[var(--admin-border)] text-[var(--admin-text)] hover:border-[var(--admin-text)]'
+            }`}
+          >
+            {t(`textSizes.${key}`)}
+          </button>
+        ))}
+      </div>
+      {size === 'custom' && (
+        <div className="flex items-center gap-2">
+          <label htmlFor={inputId} className="text-[13px]">
+            {t(target === 'heading' ? 'textSizePxHeading' : 'textSizePxBody')}
+          </label>
+          <input
+            id={inputId}
+            type="number"
+            inputMode="numeric"
+            min={range.min}
+            max={range.max}
+            value={px ?? ''}
+            onChange={(e) => {
+              const n = Number.parseInt(e.target.value, 10);
+              onChange('custom', Number.isFinite(n) ? n : null);
+            }}
+            aria-invalid={invalid}
+            dir="ltr"
+            className={`w-24 luca-input ${invalid ? '!border-[var(--error-color)]' : ''}`}
+          />
+          <span className="text-[13px] text-[var(--admin-text-muted)]">px</span>
+        </div>
+      )}
+      {size === 'custom' && (
+        <p className={`m-0 text-[13px] ${invalid ? 'text-[var(--error-color)]' : 'text-[var(--admin-text-muted)]'}`}>
+          {t('textSizePxRange', { min: range.min, max: range.max, base })}
+        </p>
+      )}
     </div>
   );
 }
@@ -239,6 +437,8 @@ export default function ThemeStudio({
   initialPalette,
   initialFont,
   initialHeadingFont,
+  initialTypography = DEFAULT_TYPOGRAPHY,
+  customFonts = [],
 }: StudioProps) {
   const t = useTranslations('admin.themeSettings');
   const locale = useLocale();
@@ -247,10 +447,14 @@ export default function ThemeStudio({
 
   const [name, setName] = useState(initialName);
   const [palette, setPalette] = useState<Palette>(initialPalette);
-  const startFont = findFont(initialFont)?.key ?? DEFAULT_FONT_KEY;
+  // Uploaded fonts keep their key even if the list could not be loaded, so saving
+  // never silently swaps a custom font for the default one.
+  const startFont = initialFont && isFontKey(initialFont) ? initialFont : DEFAULT_FONT_KEY;
   const [font, setFont] = useState<string>(startFont);
-  const startHeadingFont = findFont(initialHeadingFont)?.key ?? DEFAULT_HEADING_FONT_KEY;
+  const startHeadingFont =
+    initialHeadingFont && isFontKey(initialHeadingFont) ? initialHeadingFont : DEFAULT_HEADING_FONT_KEY;
   const [headingFont, setHeadingFont] = useState<string>(startHeadingFont);
+  const [typography, setTypography] = useState<Typography>(initialTypography);
   const [fontTarget, setFontTarget] = useState<FontTarget>('body');
   const [focusKey, setFocusKey] = useState<ColorKey | null>(null);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -261,11 +465,19 @@ export default function ThemeStudio({
   const nameRef = useRef<HTMLInputElement>(null);
   const leavingRef = useRef(false);
 
+  const sameTypography =
+    typography.bodyTextSize === initialTypography.bodyTextSize &&
+    typography.bodyTextSizePx === initialTypography.bodyTextSizePx &&
+    typography.headingTextSize === initialTypography.headingTextSize &&
+    typography.headingTextSizePx === initialTypography.headingTextSizePx;
   const dirty =
     name !== initialName ||
     !samePalette(palette, initialPalette) ||
     font !== startFont ||
-    headingFont !== startHeadingFont;
+    headingFont !== startHeadingFont ||
+    !sameTypography;
+  const fontFaces = useMemo(() => customFontFaceCss(customFonts), [customFonts]);
+  const fontName = (key: string) => findFont(key, customFonts)?.[locale === 'fa' ? 'fa' : 'en'];
   const number = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }), [locale]);
 
   const checks = CONTRAST_CHECKS.map((check) => {
@@ -304,6 +516,7 @@ export default function ThemeStudio({
     setPalette(initialPalette);
     setFont(startFont);
     setHeadingFont(startHeadingFont);
+    setTypography(initialTypography);
     setNameError(false);
   };
 
@@ -320,7 +533,17 @@ export default function ThemeStudio({
     const res = await saveEntity({
       endPoint: THEME_ENDPOINT,
       method: id ? 'PUT' : 'POST',
-      body: { ...(id ? { id } : {}), name: name.trim(), ...palette, fontFamily: font, headingFontFamily: headingFont },
+      body: {
+        ...(id ? { id } : {}),
+        name: name.trim(),
+        ...palette,
+        fontFamily: font,
+        headingFontFamily: headingFont,
+        bodyTextSize: typography.bodyTextSize,
+        bodyTextSizePx: typography.bodyTextSize === 'custom' ? typography.bodyTextSizePx : null,
+        headingTextSize: typography.headingTextSize,
+        headingTextSizePx: typography.headingTextSize === 'custom' ? typography.headingTextSizePx : null,
+      },
     });
     if (res?.isSuccess) {
       showSuccessToast(t(isActive ? 'savedLive' : 'saved'), '', 4000);
@@ -336,6 +559,8 @@ export default function ThemeStudio({
 
   return (
     <form ref={formRef} onSubmit={save} className="admin-page" noValidate>
+      {/* Uploaded fonts for the previews below (validated paths under /uploads/fonts only). */}
+      {fontFaces ? <style dangerouslySetInnerHTML={{ __html: fontFaces }} /> : null}
       <header className="top-0 z-20 sticky flex justify-between items-center gap-2 sm:gap-3 p-2.5 sm:p-4 md:px-5 admin-panel">
         <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0">
           <Link
@@ -520,16 +745,49 @@ export default function ThemeStudio({
                 >
                   {t(`fontTargets.${target}`)}
                   <span className="ms-1.5 opacity-75">
-                    ({findFont(target === 'body' ? font : headingFont)?.[locale === 'fa' ? 'fa' : 'en']})
+                    ({fontName(target === 'body' ? font : headingFont)})
                   </span>
                 </button>
               ))}
             </div>
             {fontTarget === 'body' ? (
-              <FontPicker target="body" value={font} onChange={setFont} />
+              <FontPicker
+                target="body"
+                value={font}
+                onChange={setFont}
+                customFonts={customFonts}
+                onFontAdded={() => router.refresh()}
+              />
             ) : (
-              <FontPicker target="heading" value={headingFont} onChange={setHeadingFont} />
+              <FontPicker
+                target="heading"
+                value={headingFont}
+                onChange={setHeadingFont}
+                customFonts={customFonts}
+                onFontAdded={() => router.refresh()}
+              />
             )}
+          </section>
+
+          <section className="p-4 sm:p-5 admin-panel">
+            <h2 className="font-semibold text-[var(--admin-text)] text-sm">{t('textSizeTitle')}</h2>
+            <p className="mt-1 mb-4 text-[var(--admin-text-muted)] text-xs leading-5">{t('textSizeHint')}</p>
+            <div className="flex flex-col gap-6">
+              <TextSizePicker
+                target="body"
+                size={typography.bodyTextSize}
+                px={typography.bodyTextSizePx}
+                onChange={(size, px) => setTypography((prev) => ({ ...prev, bodyTextSize: size, bodyTextSizePx: px }))}
+              />
+              <TextSizePicker
+                target="heading"
+                size={typography.headingTextSize}
+                px={typography.headingTextSizePx}
+                onChange={(size, px) =>
+                  setTypography((prev) => ({ ...prev, headingTextSize: size, headingTextSizePx: px }))
+                }
+              />
+            </div>
           </section>
 
           <section className="p-4 sm:p-5 admin-panel">
@@ -627,8 +885,12 @@ export default function ThemeStudio({
                 <div
                   className="bg-[var(--admin-surface-muted)] lg:max-h-[calc(100dvh-16rem)] overflow-y-auto"
                   style={{
-                    ['--font-body' as string]: fontStack(font),
-                    ['--font-display' as string]: headingFontStack(headingFont),
+                    ['--font-body' as string]: fontStack(font, customFonts),
+                    ['--font-display' as string]: headingFontStack(headingFont, customFonts),
+                    ['--text-scale' as string]: String(bodyTextScale(typography.bodyTextSize, typography.bodyTextSizePx)),
+                    ['--heading-scale' as string]: String(
+                      headingTextScale(typography.headingTextSize, typography.headingTextSizePx),
+                    ),
                     fontFamily: 'var(--font-body)',
                   }}
                 >

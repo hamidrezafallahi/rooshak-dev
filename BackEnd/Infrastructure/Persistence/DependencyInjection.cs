@@ -91,6 +91,9 @@ namespace OnlineShop.Infrastructure
             services.AddScoped<IFaqRepository, FaqRepository>();
             services.AddScoped<IThemeSettingRepository, ThemeSettingRepository>();
             services.AddScoped<IAnnouncementBarRepository, AnnouncementBarRepository>();
+            services.AddScoped<IHomeSlideRepository, HomeSlideRepository>();
+            services.AddScoped<IAboutSectionRepository, AboutSectionRepository>();
+            services.AddScoped<ICustomFontRepository, CustomFontRepository>();
             services.AddScoped<IContactRequestRepository, ContactRequestRepository>();
             services.AddScoped<IBlogContentQualityService, BlogContentQualityService>();
             services.AddHttpClient("SeoOpsProbe", client =>

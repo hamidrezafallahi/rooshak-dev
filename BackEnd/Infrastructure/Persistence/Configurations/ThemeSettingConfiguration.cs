@@ -37,6 +37,17 @@ namespace OnlineShop.Infrastructure.Persistence.Configurations
                    .HasMaxLength(ThemeFonts.MaxLength)
                    .HasDefaultValue(ThemeFonts.DefaultHeading);
 
+            // ردیف‌های موجود اندازه‌ی «متوسط» می‌گیرند، یعنی سایت همان شکل فعلی را دارد.
+            builder.Property(x => x.BodyTextSize)
+                   .IsRequired()
+                   .HasMaxLength(ThemeTextSizes.MaxLength)
+                   .HasDefaultValue(ThemeTextSizes.Medium);
+
+            builder.Property(x => x.HeadingTextSize)
+                   .IsRequired()
+                   .HasMaxLength(ThemeTextSizes.MaxLength)
+                   .HasDefaultValue(ThemeTextSizes.Medium);
+
             builder.ToTable("ThemeSettings");
 
             // تم پیش‌فرض (همان پالت مونوکروم فعلی سایت) تا سایت از روز اول رنگ‌هایش را از دیتابیس بگیرد.
@@ -59,6 +70,8 @@ namespace OnlineShop.Infrastructure.Persistence.Configurations
                 TextMutedColor = "#6b6b6b",
                 FontFamily = ThemeFonts.Default,
                 HeadingFontFamily = ThemeFonts.DefaultHeading,
+                BodyTextSize = ThemeTextSizes.Medium,
+                HeadingTextSize = ThemeTextSizes.Medium,
                 IsActive = true,
                 IsDeleted = false,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),

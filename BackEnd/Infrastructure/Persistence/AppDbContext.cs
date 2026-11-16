@@ -46,6 +46,9 @@ namespace OnlineShop.Infrastructure.Persistence
         public DbSet<ContactRequest> ContactRequests => Set<ContactRequest>();
         public DbSet<ThemeSetting> ThemeSettings => Set<ThemeSetting>();
         public DbSet<AnnouncementBar> AnnouncementBars => Set<AnnouncementBar>();
+        public DbSet<HomeSlide> HomeSlides => Set<HomeSlide>();
+        public DbSet<AboutSection> AboutSections => Set<AboutSection>();
+        public DbSet<CustomFont> CustomFonts => Set<CustomFont>();
 
 
 

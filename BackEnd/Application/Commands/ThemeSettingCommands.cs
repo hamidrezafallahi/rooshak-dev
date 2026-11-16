@@ -23,6 +23,11 @@ namespace Application.Commands
         public string? FontFamily { get; set; }
         /// <summary>کلید فونت تیترها؛ خالی یعنی بدون تغییر.</summary>
         public string? HeadingFontFamily { get; set; }
+        /// <summary>small / medium / large / custom؛ خالی یعنی بدون تغییر.</summary>
+        public string? BodyTextSize { get; set; }
+        public int? BodyTextSizePx { get; set; }
+        public string? HeadingTextSize { get; set; }
+        public int? HeadingTextSizePx { get; set; }
     }
 
     public class UpdateThemeSettingCommand : IRequest<ServiceResult<IdDto>>
@@ -46,6 +51,11 @@ namespace Application.Commands
         public string? FontFamily { get; set; }
         /// <summary>کلید فونت تیترها؛ خالی یعنی بدون تغییر.</summary>
         public string? HeadingFontFamily { get; set; }
+        /// <summary>small / medium / large / custom؛ خالی یعنی بدون تغییر.</summary>
+        public string? BodyTextSize { get; set; }
+        public int? BodyTextSizePx { get; set; }
+        public string? HeadingTextSize { get; set; }
+        public int? HeadingTextSizePx { get; set; }
     }
 
     /// <summary>فعال‌کردن یک تم، بقیه‌ی تم‌ها را غیرفعال می‌کند (فقط یک تم فعال).</summary>

@@ -1,23 +1,18 @@
 "use client";
 import React from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import {
-  shallowEqual,
-  useDispatch,
-} from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { LangIcon } from '@components/atoms/iconComponents';
 import { setLocale } from '@slice/config';
 import { TLang } from '@slice/config/type';
-import { useAppSelector } from '@store/index';
 
 export default function LangSwitcher() {
-  const { locale } = useAppSelector((state) => {
-    const locale = state.withPersist.config.locale;
-    return { locale };
-  }, shallowEqual);
+  // The URL is the source of truth: a locale persisted in the store (e.g. 'en' left
+  // over from an earlier visit) must not decide where the switch goes.
+  const locale = useLocale() as TLang;
   const router = useRouter();
   const t = useTranslations()
   const dispatch = useDispatch();

@@ -92,7 +92,10 @@ namespace OnlineShop.Infrastructure.Configurations
                 CreateFaqsEntity(),
                 CreateContactRequestsEntity(),
                 CreateThemeSettingsEntity(),
-                CreateAnnouncementBarsEntity()
+                CreateAnnouncementBarsEntity(),
+                CreateHomeSlidesEntity(),
+                CreateAboutSectionsEntity(),
+                CreateCustomFontsEntity()
             //CreateCartsEntity(),
             //CreateOrdersEntity(),
 
@@ -1730,8 +1733,8 @@ namespace OnlineShop.Infrastructure.Configurations
             {
                 Id = 20,
                 EntityName = "landing",
-                PersianDisplayName = "اسلاید صفحه اصلی",
-                EnglishDisplayName = "landing slide",
+                PersianDisplayName = "بنر هیرو صفحه اصلی",
+                EnglishDisplayName = "home hero banner",
                 EndPoint = "landing",
                 EntityIconBase64 = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6"">
                   <path stroke-linecap=""round"" stroke-linejoin=""round"" d=""m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"" />
@@ -1741,13 +1744,12 @@ namespace OnlineShop.Infrastructure.Configurations
                 ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
                 {
                     new JsonDefinition {Header="شناسه",Accessor="id",Type ="number",Sortable =false,Filterable =false,Options =null},
-                    new JsonDefinition {Header="عکس",Accessor="banner",Type ="image",Sortable =false,Filterable =false,Options =null},
+                    new JsonDefinition {Header="عکس",Accessor="bannerUrl",Type ="image",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="عنوان بنر",Accessor="bannerTitle",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="توضیح بنر",Accessor="bannerDescription",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس اول",Accessor="firstUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="آدرس دوم",Accessor="secondUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
-                    new JsonDefinition {Header="ویدیو دسکتاپ",Accessor="videoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
-                    new JsonDefinition {Header="ویدیو موبایل",Accessor="mobileVideoUrl",Type ="text",Sortable =false,Filterable =false,Options =null},
+                    new JsonDefinition {Header="متن لینک دوم",Accessor="secondUrlTextFa",Type ="text",Sortable =false,Filterable =false,Options =null},
                     new JsonDefinition {Header="نمایش بنر",Accessor="isHero",Type ="bool",Sortable =false,Filterable =false,Options =null},
 
                 }),
@@ -1768,28 +1770,20 @@ namespace OnlineShop.Infrastructure.Configurations
                     new FormFieldDefinition
                     {
                         Name ="bannerTitle",
-                        Caption ="عنوان بنر",
+                        Caption ="عنوان بنر (اختیاری)",
                         Type = "text",
                         PlaceHolder ="عنوان بنر",
-                        Help = "در بنر چه عنوانی نمایش داده شود ؟ ؟",
-                        Rules = new List<ValidationRule>
-                        {
-                            new ValidationRule { Rule = "required", Condition = "true", Message = "عنوان بنر الزامی است" }
-
-                        }
+                        Help = "اگر خالی بماند، عنوانی روی بنر نمایش داده نمی‌شود.",
+                        Rules = new List<ValidationRule>()
                     },
                     new FormFieldDefinition
                     {
                         Name ="bannerDescription",
-                        Caption ="توضیح بنر",
+                        Caption ="توضیح بنر (اختیاری)",
                         Type = "text",
                         PlaceHolder ="توضیحات بنر",
-                        Help = "در بنر چه توضیحاتی نمایش داده شود ؟",
-                        Rules = new List<ValidationRule>
-                        {
-                            new ValidationRule { Rule = "required", Condition = "true", Message = "توضیحات بنر الزامی است" }
-
-                        }
+                        Help = "اگر خالی بماند، توضیحی روی بنر نمایش داده نمی‌شود.",
+                        Rules = new List<ValidationRule>()
                     },
                     new FormFieldDefinition
                     {
@@ -1797,7 +1791,7 @@ namespace OnlineShop.Infrastructure.Configurations
                         Caption ="آدرس اول",
                         Type = "text",
                         PlaceHolder ="آدرس اول",
-                        Help = "با کلیک بر روی عکس به چه آدرسی برود ؟",
+                        Help = "با کلیک بر روی عکس یا ویدیوی بنر به چه آدرسی برود؟",
                         Rules = new List<ValidationRule>
                         {
                             new ValidationRule { Rule = "required", Condition = "true", Message = "آدرس   الزامی است" }
@@ -1807,10 +1801,28 @@ namespace OnlineShop.Infrastructure.Configurations
                     new FormFieldDefinition
                     {
                         Name ="secondUrl",
-                        Caption ="آدرس دوم",
+                        Caption ="آدرس دوم (اختیاری)",
                         Type = "text",
                         PlaceHolder ="آدرس صفحه دوم",
-                        Help = "با کلیک بر روی دکمه دوم به چه آدرسی برود ؟ (اختیاری)",
+                        Help = "اگر پر شود، یک لینک متنی روی بنر نمایش داده می‌شود؛ متن فارسی و انگلیسی آن را پایین‌تر وارد کنید.",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="secondUrlTextFa",
+                        Caption ="متن لینک دوم (فارسی)",
+                        Type = "text",
+                        PlaceHolder ="مثلاً: مشاهده تخفیف‌ها",
+                        Help = "با وجود آدرس دوم الزامی است؛ در نسخه‌ی فارسی سایت نمایش داده می‌شود.",
+                        Rules = new List<ValidationRule>()
+                    },
+                    new FormFieldDefinition
+                    {
+                        Name ="secondUrlTextEn",
+                        Caption ="متن لینک دوم (انگلیسی)",
+                        Type = "text",
+                        PlaceHolder ="e.g. See the offers",
+                        Help = "با وجود آدرس دوم الزامی است؛ در نسخه‌ی انگلیسی سایت نمایش داده می‌شود.",
                         Rules = new List<ValidationRule>()
                     },
                     new FormFieldDefinition
@@ -2684,6 +2696,122 @@ namespace OnlineShop.Infrastructure.Configurations
             };
         }
 
+
+            private const string SlidesIcon = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"" /></svg>";
+        private const string AboutIcon = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"" /></svg>";
+        private const string FontIcon = @"<svg xmlns=""http://www.w3.org/2000/svg"" fill=""none"" viewBox=""0 0 24 24"" stroke-width=""1.5"" stroke=""currentColor"" class=""size-6""><path stroke-linecap=""round"" stroke-linejoin=""round"" d=""M3 19.5 8.25 4.5h1.5L15 19.5M5.1 14.25h7.8M15.75 19.5l2.625-7.5h.75L21.75 19.5m-5.25-2.25h4.5"" /></svg>";
+
+        /// <summary>اسلایدر میانی صفحه‌ی اصلی؛ موجودیت و API جدا از بنر هیرو (landing).</summary>
+        private static object CreateHomeSlidesEntity() => new
+        {
+            Id = 34,
+            EntityName = "homeSlides",
+            PersianDisplayName = "اسلایدر صفحه اصلی",
+            EnglishDisplayName = "Home slider",
+            EndPoint = "homeSlides",
+            EntityIconBase64 = SlidesIcon,
+            ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit", "delete", "new" }),
+            ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+            {
+                new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number" },
+                new JsonDefinition { Header = "عکس", Accessor = "imageUrl", Type = "image" },
+                new JsonDefinition { Header = "عنوان", Accessor = "titleFa", Type = "text" },
+                new JsonDefinition { Header = "لینک", Accessor = "linkUrl", Type = "text" },
+                new JsonDefinition { Header = "ترتیب", Accessor = "displayOrder", Type = "number" },
+            }),
+            FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+            {
+                new FormFieldDefinition
+                {
+                    Name = "imageUrl",
+                    Caption = "عکس اسلاید",
+                    Type = "file",
+                    PlaceHolder = "انتخاب عکس",
+                    Help = "عکس افقی، ترجیحاً ۱۶:۷؛ فقط در اسلایدر میانی صفحه‌ی اصلی نمایش داده می‌شود (نه در بنر هیرو).",
+                    Rules = new List<ValidationRule>
+                    {
+                        new ValidationRule { Rule = "required", Condition = "true", Message = "انتخاب عکس الزامی است" }
+                    }
+                },
+                new FormFieldDefinition { Name = "mobileImageUrl", Caption = "عکس موبایل (اختیاری)", Type = "file", PlaceHolder = "انتخاب عکس موبایل", Help = "اگر خالی باشد همان عکس اصلی استفاده می‌شود." },
+                new FormFieldDefinition { Name = "removeMobileImage", Caption = "حذف عکس موبایل فعلی", Type = "checkbox", Help = "در ویرایش: برای حذف عکس موبایل ثبت‌شده فعال کنید." },
+                new FormFieldDefinition { Name = "linkUrl", Caption = "آدرس لینک (اختیاری)", Type = "text", PlaceHolder = "مثلاً products", Help = "با کلیک روی اسلاید به این صفحه می‌رود؛ خالی = بدون لینک." },
+                new FormFieldDefinition { Name = "titleFa", Caption = "عنوان فارسی (اختیاری)", Type = "text", Help = "متن جایگزین عکس برای موتورهای جستجو و صفحه‌خوان." },
+                new FormFieldDefinition { Name = "titleEn", Caption = "عنوان انگلیسی (اختیاری)", Type = "text" },
+                new FormFieldDefinition { Name = "displayOrder", Caption = "ترتیب نمایش", Type = "number", PlaceHolder = "0", Help = "عدد کوچک‌تر زودتر نمایش داده می‌شود." },
+            }),
+            IsActive = true,
+            CreatedAt = new DateTime(2026, 1, 1),
+            CreatedBy = 1,
+            IsDeleted = false
+        };
+
+        /// <summary>متن‌های دوزبانه‌ی صفحه‌ی درباره ما / داستان ما؛ بخش‌ها ثابت‌اند و فقط ویرایش می‌شوند.</summary>
+        private static object CreateAboutSectionsEntity() => new
+        {
+            Id = 35,
+            EntityName = "aboutSections",
+            PersianDisplayName = "درباره ما",
+            EnglishDisplayName = "About us",
+            EndPoint = "aboutSections",
+            EntityIconBase64 = AboutIcon,
+            ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit" }),
+            ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+            {
+                new JsonDefinition { Header = "بخش", Accessor = "sectionKey", Type = "text" },
+                new JsonDefinition { Header = "برچسب", Accessor = "eyebrowFa", Type = "text" },
+                new JsonDefinition { Header = "تیتر", Accessor = "titleFa", Type = "text" },
+                new JsonDefinition { Header = "متن", Accessor = "bodyFa", Type = "text" },
+                new JsonDefinition { Header = "ترتیب", Accessor = "displayOrder", Type = "number" },
+            }),
+            FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+            {
+                new FormFieldDefinition { Name = "eyebrowFa", Caption = "برچسب بالای تیتر (فارسی)", Type = "text", Help = "خالی = نمایش داده نمی‌شود." },
+                new FormFieldDefinition { Name = "eyebrowEn", Caption = "برچسب بالای تیتر (انگلیسی)", Type = "text" },
+                new FormFieldDefinition { Name = "titleFa", Caption = "تیتر (فارسی)", Type = "text", Help = "در بخش‌های «fact» عدد یا مقدار بزرگ؛ در «quote» نام گوینده." },
+                new FormFieldDefinition { Name = "titleEn", Caption = "تیتر (انگلیسی)", Type = "text" },
+                new FormFieldDefinition { Name = "bodyFa", Caption = "متن (فارسی)", Type = "textarea", Help = "در بخش «quote» متن نقل‌قول؛ در «fact» توضیح زیر عدد." },
+                new FormFieldDefinition { Name = "bodyEn", Caption = "متن (انگلیسی)", Type = "textarea" },
+                new FormFieldDefinition { Name = "linkTextFa", Caption = "متن لینک (فارسی)", Type = "text", Help = "اختیاری؛ فقط بخش‌هایی که لینک دارند." },
+                new FormFieldDefinition { Name = "linkTextEn", Caption = "متن لینک (انگلیسی)", Type = "text" },
+                new FormFieldDefinition { Name = "linkUrl", Caption = "آدرس لینک", Type = "text", PlaceHolder = "مثلاً cooperation" },
+                new FormFieldDefinition { Name = "displayOrder", Caption = "ترتیب", Type = "number" },
+            }),
+            IsActive = true,
+            CreatedAt = new DateTime(2026, 1, 1),
+            CreatedBy = 1,
+            IsDeleted = false
+        };
+
+        /// <summary>فونت‌های آپلودی؛ افزودن از «تم سایت»، مدیریت (ویرایش نام، غیرفعال، حذف) از همین لیست.</summary>
+        private static object CreateCustomFontsEntity() => new
+        {
+            Id = 36,
+            EntityName = "customFonts",
+            PersianDisplayName = "فونت‌های آپلودی",
+            EnglishDisplayName = "Custom fonts",
+            EndPoint = "customFonts",
+            EntityIconBase64 = FontIcon,
+            ActionsJson = JsonSerializer.Serialize(new List<string> { "active", "edit", "delete" }),
+            ColumnsJson = JsonSerializer.Serialize(new List<JsonDefinition>
+            {
+                new JsonDefinition { Header = "شناسه", Accessor = "id", Type = "number" },
+                new JsonDefinition { Header = "نام فارسی", Accessor = "nameFa", Type = "text" },
+                new JsonDefinition { Header = "نام انگلیسی", Accessor = "nameEn", Type = "text" },
+                new JsonDefinition { Header = "دسته", Accessor = "category", Type = "text" },
+                new JsonDefinition { Header = "کلید", Accessor = "key", Type = "text" },
+            }),
+            FormFieldsJson = JsonSerializer.Serialize(new List<FormFieldDefinition>
+            {
+                new FormFieldDefinition { Name = "nameFa", Caption = "نام فارسی", Type = "text" },
+                new FormFieldDefinition { Name = "nameEn", Caption = "نام انگلیسی", Type = "text" },
+                new FormFieldDefinition { Name = "category", Caption = "دسته (general / formal / fancy)", Type = "text", Help = "general = عمومی، formal = رسمی، fancy = فانتزی" },
+            }),
+            IsActive = true,
+            CreatedAt = new DateTime(2026, 1, 1),
+            CreatedBy = 1,
+            IsDeleted = false
+        };
 
     }
 }

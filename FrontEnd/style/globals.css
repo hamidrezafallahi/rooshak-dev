@@ -4,6 +4,18 @@
 
 /* ================== Default Theme — Maison Crystal (Swarovski-inspired mono) ================== */
 :root {
+  /* Text sizes chosen in admin → تم سایت (lib/theme.ts overrides these). Every fixed
+     font-size is multiplied by --text-scale at build time (postcss/font-scale.cjs). */
+  --text-scale: 1;
+  --heading-scale: 1;
+}
+
+/* Headings (and everything inside them) follow the heading size instead of the body size. */
+:where(h1, h2, h3, h4, h5, h6) {
+  --text-scale: var(--heading-scale, 1);
+}
+
+:root {
   --primary-color: #000000;   /* مشکی لوکس — دکمه‌ها و تیترها */
   --secondary-color: #f2f2f2; /* خاکستری بلور */
   --highlight-color: #a38a52; /* طلای مات */
@@ -126,6 +138,7 @@ html[data-theme="dark"] [data-surface="admin"] {
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    font-size: 1rem;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);

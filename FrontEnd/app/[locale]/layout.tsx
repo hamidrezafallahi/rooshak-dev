@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
 import CustomLayout from '@layout/index';
+import { getCustomFonts } from '@lib/customFonts';
 import { fontVariables } from '@lib/fonts';
 import { getActiveTheme, themeToCss } from '@lib/theme';
 import type { TLang } from '@slice/config/type';
@@ -22,7 +23,8 @@ export async function generateStaticParams() {
 export default async function BaseLayout({ children, params }: IProps) {
   const { locale } = await params;
   const messages = await getMessages({ locale });
-  const themeCss = themeToCss(await getActiveTheme());
+  const [theme, customFonts] = await Promise.all([getActiveTheme(), getCustomFonts()]);
+  const themeCss = themeToCss(theme, customFonts);
 
   // Theme is applied client-side / via cookie bootstrap — avoid cookies() here
   // so storefront segments can stay SSG/ISR instead of always dynamic.

@@ -13,11 +13,15 @@ namespace Application.Commands
         /// <summary>Optional mobile poster / video (fall back to the desktop ones when absent).</summary>
         public IFormFile? MobileBannerUrl { get; set; }
         public IFormFile? MobileVideoUrl { get; set; }
-        public string BannerTitle { get; set; }
-        public string BannerDescription { get; set; }
+        /// <summary>Optional; hidden on the hero when empty.</summary>
+        public string? BannerTitle { get; set; }
+        /// <summary>Optional; hidden on the hero when empty.</summary>
+        public string? BannerDescription { get; set; }
         public string FirstUrl { get; set; }
-        /// <summary>Optional second CTA / link.</summary>
+        /// <summary>Optional second link; needs SecondUrlTextFa and SecondUrlTextEn.</summary>
         public string? SecondUrl { get; set; }
+        public string? SecondUrlTextFa { get; set; }
+        public string? SecondUrlTextEn { get; set; }
     }
 
     public class UpdateSlideCommand : IRequest<ServiceResult<IdDto>>
@@ -34,6 +38,8 @@ namespace Application.Commands
         public string? BannerDescription { get; set; }
         public string? FirstUrl { get; set; }
         public string? SecondUrl { get; set; }
+        public string? SecondUrlTextFa { get; set; }
+        public string? SecondUrlTextEn { get; set; }
     }
 
     public class DeleteSlideCommand : IRequest<ServiceResult<IdDto>>

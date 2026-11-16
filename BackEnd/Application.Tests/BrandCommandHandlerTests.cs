@@ -92,6 +92,7 @@ public class BrandCommandHandlerTests
         public Task<string?> UploadAsJpeg(UploadDTO request) => UploadAsWebp(request);
         public Task<string?> UploadAsJpg(UploadDTO request) => UploadAsWebp(request);
         public Task<string?> UploadVideo(UploadDTO request) => UploadAsWebp(request);
+        public Task<string?> UploadFont(UploadDTO request) => Task.FromResult<string?>(null);
         public Task DeleteFile(DeleteDTO request) => Task.CompletedTask;
         public Task DeleteStoredFile(string? storedPath, string fallbackDirectory) => Task.CompletedTask;
     }

@@ -44,7 +44,9 @@ public class SlideCommandHandler(
                 request.FirstUrl,
                 request.SecondUrl,
                 request.BannerTitle,
-                request.BannerDescription
+                request.BannerDescription,
+                request.SecondUrlTextFa,
+                request.SecondUrlTextEn
             );
 
             await _slideRepository.AddAsync(slide);
@@ -159,15 +161,24 @@ public class SlideCommandHandler(
 
         slide.SetMobileMedia(userId.Value, newMobileBanner, newMobileVideo);
 
-        slide.Update(
-         userId.Value,
-         bannerUrl,
-         request.FirstUrl,
-         request.SecondUrl,
-         request.BannerTitle,
-         request.BannerDescription,
-         videoPath
-        );
+        try
+        {
+            slide.Update(
+             userId.Value,
+             bannerUrl,
+             request.FirstUrl,
+             request.SecondUrl,
+             request.BannerTitle,
+             request.BannerDescription,
+             videoPath,
+             request.SecondUrlTextFa,
+             request.SecondUrlTextEn
+            );
+        }
+        catch (DomainException ex)
+        {
+            return ServiceResult<IdDto>.Failed(ex.Message);
+        }
         await _slideRepository.SaveChangesAsync(cancellationToken);
 
         // Only now: a failed upload or save must leave the slide with everything it had.

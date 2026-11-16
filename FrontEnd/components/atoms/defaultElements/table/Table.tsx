@@ -160,38 +160,39 @@ export function TableCell({ children, ...props }: IRow) {
     row,
   });
 
+  // `max-width` on a <td> is ignored by the table layout, so a long value used to
+  // widen its column until the whole table scrolled sideways on desktop. The limit
+  // lives on an inner block instead; the full text stays available in `title`.
+  const colSpan = (props as { colSpan?: number }).colSpan;
+  const title = typeof children === 'string' || typeof children === 'number'
+    ? String(children)
+    : undefined;
+
   switch (itemType as TElement) {
     case 'image':
     case 'bool':
     case 'action':
-      return <td>{content}</td>;
+      return <td colSpan={colSpan}>{content}</td>;
     case 'date':
       return (
-        <td
-          className="max-w-48 overflow-hidden text-[var(--admin-text)] text-ellipsis whitespace-nowrap"
-          {...props}
-        >
+        <td colSpan={colSpan} className="text-[var(--admin-text)] whitespace-nowrap">
           {content}
         </td>
       );
     case 'rate':
       return (
-        <td
-          title={children as string}
-          className="w-20 max-w-96 overflow-hidden text-[var(--admin-text)] text-ellipsis whitespace-nowrap"
-          {...props}
-        >
-          {content}
+        <td colSpan={colSpan} title={title} className="text-[var(--admin-text)]">
+          <div className="max-w-24 truncate">{content}</div>
         </td>
       );
     default:
       return (
-        <td
-          title={typeof children === 'string' ? children : undefined}
-          className="max-w-56 overflow-hidden text-[var(--admin-text)] text-ellipsis whitespace-nowrap"
-          {...props}
-        >
-          {content}
+        <td colSpan={colSpan} title={title} className="text-[var(--admin-text)]">
+          {typeof content === 'string' || typeof content === 'number' ? (
+            <div className="admin-cell-text">{content}</div>
+          ) : (
+            content
+          )}
         </td>
       );
   }
