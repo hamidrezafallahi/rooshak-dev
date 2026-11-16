@@ -32,9 +32,13 @@ import {
   BODY_BASE_PX,
   BODY_PX_RANGE,
   bodyTextScale,
+  bodyWeightShift,
+  FONT_WEIGHTS,
+  type FontWeight,
   HEADING_BASE_PX,
   HEADING_PX_RANGE,
   headingTextScale,
+  headingWeightShift,
   TEXT_SIZE_KEYS,
   type TextSizeKey,
 } from '@lib/typography';
@@ -430,6 +434,47 @@ function TextSizePicker({
   );
 }
 
+/** Font weight (100..900) for body text or for headings; every other weight moves with it. */
+function FontWeightPicker({
+  target,
+  value,
+  onChange,
+}: {
+  target: FontTarget;
+  value: FontWeight;
+  onChange: (weight: FontWeight) => void;
+}) {
+  const t = useTranslations('admin.themeSettings');
+  const label = `${t(`fontTargets.${target}`)} — ${t('fontWeightTitle')}`;
+  return (
+    <div className="flex flex-col gap-2.5">
+      <p className="m-0 font-medium text-[13px] text-[var(--admin-text-muted)]">{label}</p>
+      <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={label}>
+        {FONT_WEIGHTS.map((weight) => (
+          <button
+            key={weight}
+            type="button"
+            role="radio"
+            aria-checked={value === weight}
+            onClick={() => onChange(weight)}
+            className={`flex flex-col items-center justify-center px-3 min-w-[4.5rem] h-14 border text-[13px] transition-colors ${
+              value === weight
+                ? 'border-[var(--admin-text)] bg-[var(--admin-text)] text-[var(--admin-surface-elevated)]'
+                : 'border-[var(--admin-border)] text-[var(--admin-text)] hover:border-[var(--admin-text)]'
+            }`}
+          >
+            {/* The sample keeps its real weight: [font-weight:var(--w)] is not rewritten by the theme. */}
+            <span className="text-[17px] leading-none [font-weight:var(--w)]" style={{ ['--w' as string]: weight }}>
+              {t('fontWeightSample')}
+            </span>
+            <span className="mt-1 text-[11px] opacity-75">{t(`fontWeights.${weight}`)}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ThemeStudio({
   id,
   isActive = false,
@@ -469,7 +514,9 @@ export default function ThemeStudio({
     typography.bodyTextSize === initialTypography.bodyTextSize &&
     typography.bodyTextSizePx === initialTypography.bodyTextSizePx &&
     typography.headingTextSize === initialTypography.headingTextSize &&
-    typography.headingTextSizePx === initialTypography.headingTextSizePx;
+    typography.headingTextSizePx === initialTypography.headingTextSizePx &&
+    typography.bodyFontWeight === initialTypography.bodyFontWeight &&
+    typography.headingFontWeight === initialTypography.headingFontWeight;
   const dirty =
     name !== initialName ||
     !samePalette(palette, initialPalette) ||
@@ -543,6 +590,8 @@ export default function ThemeStudio({
         bodyTextSizePx: typography.bodyTextSize === 'custom' ? typography.bodyTextSizePx : null,
         headingTextSize: typography.headingTextSize,
         headingTextSizePx: typography.headingTextSize === 'custom' ? typography.headingTextSizePx : null,
+        bodyFontWeight: typography.bodyFontWeight,
+        headingFontWeight: typography.headingFontWeight,
       },
     });
     if (res?.isSuccess) {
@@ -787,6 +836,16 @@ export default function ThemeStudio({
                   setTypography((prev) => ({ ...prev, headingTextSize: size, headingTextSizePx: px }))
                 }
               />
+              <FontWeightPicker
+                target="body"
+                value={typography.bodyFontWeight}
+                onChange={(w) => setTypography((prev) => ({ ...prev, bodyFontWeight: w }))}
+              />
+              <FontWeightPicker
+                target="heading"
+                value={typography.headingFontWeight}
+                onChange={(w) => setTypography((prev) => ({ ...prev, headingFontWeight: w }))}
+              />
             </div>
           </section>
 
@@ -891,6 +950,8 @@ export default function ThemeStudio({
                     ['--heading-scale' as string]: String(
                       headingTextScale(typography.headingTextSize, typography.headingTextSizePx),
                     ),
+                    ['--weight-shift' as string]: String(bodyWeightShift(typography.bodyFontWeight)),
+                    ['--heading-weight-shift' as string]: String(headingWeightShift(typography.headingFontWeight)),
                     fontFamily: 'var(--font-body)',
                   }}
                 >

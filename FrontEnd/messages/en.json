@@ -524,7 +524,7 @@
         "footerLink2": "Contact"
       },
       "textSizeTitle": "Text size",
-      "textSizeHint": "Pick the size of body text and of headings separately; “Custom” takes an exact pixel size. The preview updates right away.",
+      "textSizeHint": "Pick the size and weight of body text and headings separately; «Custom» takes an exact pixel size. Every other size and weight moves by the same step. The preview updates right away.",
       "textSizes": {
         "small": "Small",
         "medium": "Medium",
@@ -546,7 +546,20 @@
       "addFontDone": "Font added; you can select it now.",
       "addFontFailed": "The font could not be uploaded",
       "addFontNeedFile": "Choose a font file",
-      "addFontNeedName": "Enter the font name"
+      "addFontNeedName": "Enter the font name",
+      "fontWeightTitle": "Weight",
+      "fontWeightSample": "Aa",
+      "fontWeights": {
+        "100": "Thin",
+        "200": "Extra light",
+        "300": "Light",
+        "400": "Regular",
+        "500": "Medium",
+        "600": "Semibold",
+        "700": "Bold",
+        "800": "Extra bold",
+        "900": "Black"
+      }
     },
     "dashboard": "Dashboard",
     "dashboardTitle": "Admin panel",

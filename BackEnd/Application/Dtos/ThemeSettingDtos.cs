@@ -28,5 +28,7 @@ namespace Application.Dtos
         public int? BodyTextSizePx { get; set; }
         public string HeadingTextSize { get; set; } = "medium";
         public int? HeadingTextSizePx { get; set; }
+        public int BodyFontWeight { get; set; } = 400;
+        public int HeadingFontWeight { get; set; } = 400;
     }
 }

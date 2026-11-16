@@ -26,7 +26,7 @@ namespace Application.Handler.CommandHandler
             {
                 var customKeys = await ActiveCustomFontKeys(cancellationToken);
                 var theme = ThemeSetting.Create(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily,
-                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx),
+                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx, request.BodyFontWeight, request.HeadingFontWeight),
                     customKeys.Contains);
 
                 // تم تازه فعال نمی‌شود تا سایت ناخواسته عوض نشود؛ ادمین با «فعال‌سازی» آن را انتخاب می‌کند.
@@ -56,7 +56,7 @@ namespace Application.Handler.CommandHandler
             {
                 var customKeys = await ActiveCustomFontKeys(cancellationToken);
                 theme.Update(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily,
-                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx),
+                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx, request.BodyFontWeight, request.HeadingFontWeight),
                     customKeys.Contains);
             }
             catch (DomainException ex)

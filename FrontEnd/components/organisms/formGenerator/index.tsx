@@ -92,6 +92,11 @@ export default function FormGenerator({
       rules.valueAsNumber = true;
     }
     field.Rules?.forEach((r) => {
+      // Range rules (e.g. hero title opacity 0..100); the API checks them again.
+      if ((r.Rule === "min" || r.Rule === "max") && r.Condition !== undefined && r.Condition !== null) {
+        const limit = Number(r.Condition);
+        if (Number.isFinite(limit)) rules[r.Rule] = { value: limit, message: r.Message };
+      }
       if (r.Rule === "required" && r.Condition) {
         // Stored rule texts may be English; the form always speaks the page's language.
         rules.required =

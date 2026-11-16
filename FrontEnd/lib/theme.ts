@@ -8,7 +8,7 @@ import {
   fontStack,
   headingFontStack,
 } from './fontCatalog';
-import { bodyTextScale, headingTextScale } from './typography';
+import { bodyTextScale, bodyWeightShift, headingTextScale, headingWeightShift } from './typography';
 import { logger } from './logger';
 
 /** Mirrors ThemeSettingDto (BackEnd). Every colour is a #RRGGBB string. */
@@ -37,6 +37,9 @@ export type SiteTheme = {
   bodyTextSizePx?: number | null;
   headingTextSize?: string | null;
   headingTextSizePx?: number | null;
+  /** 100..900; the site's design weight when missing. */
+  bodyFontWeight?: number | null;
+  headingFontWeight?: number | null;
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -104,6 +107,10 @@ export function themeToCss(theme: SiteTheme | null, customFonts: FontOption[] = 
   const headingScale = headingTextScale(theme.headingTextSize, theme.headingTextSizePx);
   if (textScale !== 1) colors.push(`--text-scale:${textScale}`);
   if (headingScale !== 1) colors.push(`--heading-scale:${headingScale}`);
+  const weightShift = bodyWeightShift(theme.bodyFontWeight);
+  const headingShift = headingWeightShift(theme.headingFontWeight);
+  if (weightShift !== 0) colors.push(`--weight-shift:${weightShift}`);
+  if (headingShift !== 0) colors.push(`--heading-weight-shift:${headingShift}`);
 
   const body = colors.join(';');
   // Only the uploaded fonts this theme uses are declared, so no other file is fetched.

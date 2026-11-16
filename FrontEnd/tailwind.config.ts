@@ -28,6 +28,8 @@ export default {
 			},
 			fontFamily: {
 				iranSansLight: ['IRANSans-Light', 'sans-serif'],
+				// Heading font chosen in admin → تم سایت; text with it follows the heading size and weight.
+				display: ['var(--font-display)'],
 			},
 			colors: {
 				primary: 'var(--primary-color)',

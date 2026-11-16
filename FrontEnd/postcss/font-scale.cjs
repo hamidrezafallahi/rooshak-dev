@@ -9,9 +9,22 @@
  *
  * Left alone: values that already use a variable, relative units (em, %) that
  * inherit the scale anyway, and keywords (inherit, larger ...).
+ *
+ * Font weights work the same way: `font-weight: 500` becomes
+ * `calc(500 + var(--weight-shift, 0))`, where --weight-shift is the admin's chosen
+ * weight minus the design weight (lib/typography.ts). Every weight moves by the same
+ * step, so bold stays bolder than regular. @font-face descriptors are never touched.
  */
 const ABSOLUTE = /(\d|\))\s*(px|rem|vw|vh|vmin|vmax|svh|dvh|pt)\b/i;
 const RELATIVE = /(^|[^r])em\b|%/i;
+const WEIGHT_KEYWORDS = { normal: '400', bold: '700' };
+
+const insideFontFace = (decl) => {
+  for (let node = decl.parent; node; node = node.parent) {
+    if (node.type === 'atrule' && node.name.toLowerCase() === 'font-face') return true;
+  }
+  return false;
+};
 
 module.exports = () => ({
   postcssPlugin: 'font-scale',
@@ -22,6 +35,15 @@ module.exports = () => ({
       if (!ABSOLUTE.test(value) || RELATIVE.test(value)) return;
       const important = decl.important;
       decl.value = `calc(${value} * var(--text-scale, 1))`;
+      decl.important = important;
+    },
+    'font-weight': (decl) => {
+      if (insideFontFace(decl)) return;
+      const raw = decl.value.trim().toLowerCase();
+      const value = WEIGHT_KEYWORDS[raw] ?? raw;
+      if (!/^\d{3}$/.test(value)) return;
+      const important = decl.important;
+      decl.value = `calc(${value} + var(--weight-shift, 0))`;
       decl.important = important;
     },
   },

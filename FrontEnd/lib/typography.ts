@@ -53,3 +53,22 @@ export const bodyTextScale = (size?: string | null, px?: number | null) =>
 /** Multiplier for headings (1 = the site as designed). */
 export const headingTextScale = (size?: string | null, px?: number | null) =>
   scaleOf(size, px, HEADING_PRESETS, HEADING_BASE_PX, HEADING_PX_RANGE);
+
+/** Font weights the admin can pick (CSS 100..900). Mirrors ThemeFontWeights (BackEnd). */
+export const FONT_WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+export type FontWeight = (typeof FONT_WEIGHTS)[number];
+
+/** The weights the site is designed with; choosing them changes nothing. */
+export const BODY_WEIGHT_BASE: FontWeight = 400;
+export const HEADING_WEIGHT_BASE: FontWeight = 400;
+
+export const toFontWeight = (value: unknown, fallback: FontWeight): FontWeight =>
+  FONT_WEIGHTS.includes(value as FontWeight) ? (value as FontWeight) : fallback;
+
+/** How far every body weight moves (postcss/font-scale.cjs adds it to each font-weight). */
+export const bodyWeightShift = (weight?: number | null) =>
+  toFontWeight(weight, BODY_WEIGHT_BASE) - BODY_WEIGHT_BASE;
+
+/** Same for headings. */
+export const headingWeightShift = (weight?: number | null) =>
+  toFontWeight(weight, HEADING_WEIGHT_BASE) - HEADING_WEIGHT_BASE;

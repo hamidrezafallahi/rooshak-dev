@@ -1,4 +1,4 @@
-﻿using OnlineShop.Domain.Common;
+using OnlineShop.Domain.Common;
 using Application.Commands;
 using Application.Common;
 using Application.Common.Interfaces;
@@ -46,7 +46,8 @@ public class SlideCommandHandler(
                 request.BannerTitle,
                 request.BannerDescription,
                 request.SecondUrlTextFa,
-                request.SecondUrlTextEn
+                request.SecondUrlTextEn,
+                request.TitleOpacity
             );
 
             await _slideRepository.AddAsync(slide);
@@ -172,7 +173,8 @@ public class SlideCommandHandler(
              request.BannerDescription,
              videoPath,
              request.SecondUrlTextFa,
-             request.SecondUrlTextEn
+             request.SecondUrlTextEn,
+             request.TitleOpacity
             );
         }
         catch (DomainException ex)

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OnlineShop.Domain.Entities;
 
@@ -30,6 +30,8 @@ namespace OnlineShop.Infrastructure.Configurations
                    .IsRequired()
                    .HasMaxLength(Slide.MaxLinkTextLength)
                    .HasDefaultValue(string.Empty);
+            builder.Property(b => b.TitleOpacity)
+                   .HasDefaultValue(Slide.MaxTitleOpacity);
             builder.Property(b => b.VideoUrl)
                    .HasMaxLength(300);
             builder.Property(ua => ua.IsHero)

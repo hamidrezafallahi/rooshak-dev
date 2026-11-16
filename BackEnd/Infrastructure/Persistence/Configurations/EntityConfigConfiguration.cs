@@ -1827,6 +1827,19 @@ namespace OnlineShop.Infrastructure.Configurations
                     },
                     new FormFieldDefinition
                     {
+                        Name ="titleOpacity",
+                        Caption ="شفافیت عنوان و توضیح (۰ تا ۱۰۰)",
+                        Type = "number",
+                        PlaceHolder ="100",
+                        Help = "۱۰۰ = کاملاً دیده می‌شود، ۰ = دیده نمی‌شود. متن در کد صفحه می‌ماند، پس تیتر H1 و توضیح برای گوگل و صفحه‌خوان حفظ می‌شوند. خالی = ۱۰۰.",
+                        Rules = new List<ValidationRule>
+                        {
+                            new ValidationRule { Rule = "min", Condition = "0", Message = "شفافیت نمی‌تواند کمتر از ۰ باشد" },
+                            new ValidationRule { Rule = "max", Condition = "100", Message = "شفافیت نمی‌تواند بیشتر از ۱۰۰ باشد" }
+                        }
+                    },
+                    new FormFieldDefinition
+                    {
                         Name ="videoUrl",
                         Caption ="ویدیوی دسکتاپ (اختیاری)",
                         Type = "video",
