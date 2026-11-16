@@ -30,6 +30,34 @@ export const activateTheme = (id: number) =>
 export const deleteTheme = (id: number) =>
   send(`${THEME_ENDPOINT}/${id}`, { method: 'DELETE' });
 
+export const CUSTOM_FONTS_ENDPOINT = 'customFonts';
+
+/**
+ * Uploads a font file (woff2/woff/ttf/otf) with its names and style category.
+ * The backend checks the file signature and stores it under uploads/fonts/{id}.
+ */
+export async function uploadCustomFont(input: {
+  file: File;
+  nameFa: string;
+  nameEn: string;
+  category: string;
+}): Promise<Result> {
+  const form = new FormData();
+  form.append('fontFile', input.file);
+  form.append('nameFa', input.nameFa);
+  form.append('nameEn', input.nameEn);
+  form.append('category', input.category);
+  const result = await send(CUSTOM_FONTS_ENDPOINT, { method: 'POST', body: form });
+  if (result.isSuccess) {
+    try {
+      await revalidateEntity(CUSTOM_FONTS_ENDPOINT);
+    } catch {
+      /* the storefront font list refreshes on its own within the hour */
+    }
+  }
+  return result;
+}
+
 /**
  * Busts the `themeSettings` fetch cache so the storefront picks up the new colours
  * now instead of after its 60s revalidate. Best effort: a failed hop must never

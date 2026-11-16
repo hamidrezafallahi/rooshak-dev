@@ -1,7 +1,14 @@
 import 'server-only';
 
 import { serverApiBaseUrl } from './api';
-import { findFont, fontStack, headingFontStack } from './fontCatalog';
+import {
+  customFontFaceCss,
+  findFont,
+  type FontOption,
+  fontStack,
+  headingFontStack,
+} from './fontCatalog';
+import { bodyTextScale, headingTextScale } from './typography';
 import { logger } from './logger';
 
 /** Mirrors ThemeSettingDto (BackEnd). Every colour is a #RRGGBB string. */
@@ -25,6 +32,11 @@ export type SiteTheme = {
   fontFamily?: string | null;
   /** Heading font key (--font-display); unknown keys are ignored. */
   headingFontFamily?: string | null;
+  /** small / medium / large / custom (lib/typography.ts). */
+  bodyTextSize?: string | null;
+  bodyTextSizePx?: number | null;
+  headingTextSize?: string | null;
+  headingTextSizePx?: number | null;
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -53,7 +65,7 @@ export async function getActiveTheme(): Promise<SiteTheme | null> {
  * re-validated as hex and the font key against lib/fontCatalog.ts, so nothing
  * else can ever reach the <style> tag.
  */
-export function themeToCss(theme: SiteTheme | null): string {
+export function themeToCss(theme: SiteTheme | null, customFonts: FontOption[] = []): string {
   if (!theme) return '';
 
   const pairs: [string, string][] = [
@@ -78,13 +90,26 @@ export function themeToCss(theme: SiteTheme | null): string {
     .filter(([, value]) => HEX.test(value ?? ''))
     .map(([name, value]) => `${name}:${value}`);
 
-  // Only whitelisted keys become a font stack, so the value can't inject CSS.
-  if (findFont(theme.fontFamily)) colors.push(`--font-body:${fontStack(theme.fontFamily)}`);
-  if (findFont(theme.headingFontFamily)) {
-    colors.push(`--font-display:${headingFontStack(theme.headingFontFamily)}`);
+  // Only whitelisted keys (bundled, or uploaded fonts the API listed and
+  // toCustomFontOptions validated) become a font stack, so nothing can inject CSS.
+  const bodyFont = findFont(theme.fontFamily, customFonts);
+  const headingFont = findFont(theme.headingFontFamily, customFonts);
+  if (bodyFont) colors.push(`--font-body:${fontStack(theme.fontFamily, customFonts)}`);
+  if (headingFont) {
+    colors.push(`--font-display:${headingFontStack(theme.headingFontFamily, customFonts)}`);
   }
 
-  const body = colors.join(';');
+  // Numbers only: computed from whitelisted keys and clamped pixel values.
+  const textScale = bodyTextScale(theme.bodyTextSize, theme.bodyTextSizePx);
+  const headingScale = headingTextScale(theme.headingTextSize, theme.headingTextSizePx);
+  if (textScale !== 1) colors.push(`--text-scale:${textScale}`);
+  if (headingScale !== 1) colors.push(`--heading-scale:${headingScale}`);
 
-  return body ? `:root:root{${body}}` : '';
+  const body = colors.join(';');
+  // Only the uploaded fonts this theme uses are declared, so no other file is fetched.
+  const faces = customFontFaceCss(
+    [bodyFont, headingFont].filter((f): f is FontOption => Boolean(f?.family)),
+  );
+
+  return (faces + (body ? `:root:root{${body}}` : '')) || '';
 }

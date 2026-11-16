@@ -2,22 +2,34 @@
 
 namespace OnlineShop.Domain.Entities
 {
+    /// <summary>
+    /// بنر هیروی صفحه‌ی اصلی (جدول Slides). اسلایدر پایین‌تر صفحه موجودیت جدای <see cref="HomeSlide"/> است.
+    /// </summary>
     public class Slide : BaseEntity
     {
+        public const int MaxLinkTextLength = 100;
+
         private Slide() { }
 
-        // ===== محتوای فارسی =====
+        // ===== محتوا =====
         public string BannerUrl { get; private set; } = string.Empty;
+        /// <summary>اختیاری؛ خالی یعنی روی هیرو نمایش داده نشود.</summary>
         public string BannerTitle { get; private set; } = string.Empty;
+        /// <summary>اختیاری؛ خالی یعنی روی هیرو نمایش داده نشود.</summary>
         public string BannerDescription { get; private set; } = string.Empty;
+        /// <summary>مقصد کلیک روی خود عکس / ویدیوی بنر.</summary>
         public string FirstUrl { get; private set; } = string.Empty;
+        /// <summary>لینک دوم اختیاری؛ به شکل متن روی هیرو نمایش داده می‌شود.</summary>
         public string SecondUrl { get; private set; } = string.Empty;
+        /// <summary>متن لینک دوم (فارسی/انگلیسی)؛ وقتی آدرس دوم داده شود هر دو الزامی‌اند.</summary>
+        public string SecondUrlTextFa { get; private set; } = string.Empty;
+        public string SecondUrlTextEn { get; private set; } = string.Empty;
         /// <summary>Optional hero video (mp4/webm). BannerUrl doubles as its poster / fallback image.</summary>
         public string VideoUrl { get; private set; } = string.Empty;
         /// <summary>نسخه‌ی موبایل: پوستر (عکس) و ویدیوی جدا برای صفحه‌های کوچک. خالی = از نسخه‌ی دسکتاپ استفاده می‌شود.</summary>
         public string MobileBannerUrl { get; private set; } = string.Empty;
         public string MobileVideoUrl { get; private set; } = string.Empty;
-        public bool IsHero { get; private set; } 
+        public bool IsHero { get; private set; }
 
 
         // ===== Factory =====
@@ -25,25 +37,28 @@ namespace OnlineShop.Domain.Entities
             int currentUserId,
             string firstUrl,
             string? secondUrl,
-            string bannerTitle,
-            string bannerDescription
+            string? bannerTitle,
+            string? bannerDescription,
+            string? secondUrlTextFa = null,
+            string? secondUrlTextEn = null
         )
         {
             if (string.IsNullOrWhiteSpace(firstUrl))
                 throw new DomainException("آدرس صفحه مربوط به بنر دیده نشد");
             var slide = new Slide
             {
-                FirstUrl = firstUrl ?? string.Empty,
-                SecondUrl = secondUrl ?? string.Empty,
-                BannerTitle = bannerTitle ?? string.Empty,
-                BannerDescription = bannerDescription ?? string.Empty,
+                FirstUrl = firstUrl.Trim(),
+                BannerTitle = bannerTitle?.Trim() ?? string.Empty,
+                BannerDescription = bannerDescription?.Trim() ?? string.Empty,
             };
+            slide.SetSecondLink(secondUrl, secondUrlTextFa, secondUrlTextEn);
             slide.MarkCreated(currentUserId);
             return slide;
         }
 
 
         // ===== Behavior =====
+        /// <summary>null یعنی «بدون تغییر»؛ رشته‌ی خالی عنوان، توضیح یا لینک دوم را پاک می‌کند.</summary>
         public void Update(
             int currentUserId,
             string? bannerUrl,
@@ -51,20 +66,50 @@ namespace OnlineShop.Domain.Entities
             string? secondUrl,
             string? bannerTitle,
             string? bannerDescription,
-            string? videoUrl = null
+            string? videoUrl = null,
+            string? secondUrlTextFa = null,
+            string? secondUrlTextEn = null
         )
         {
             if (!string.IsNullOrWhiteSpace(bannerUrl)) BannerUrl = bannerUrl;
-            if (!string.IsNullOrWhiteSpace(firstUrl)) FirstUrl = firstUrl;
-            // Empty string is allowed to clear an optional second URL
-            if (secondUrl is not null) SecondUrl = secondUrl;
-            if (!string.IsNullOrWhiteSpace(bannerTitle)) BannerTitle = bannerTitle;
-            if (!string.IsNullOrWhiteSpace(bannerDescription)) BannerDescription = bannerDescription;
+            if (!string.IsNullOrWhiteSpace(firstUrl)) FirstUrl = firstUrl.Trim();
+            if (bannerTitle is not null) BannerTitle = bannerTitle.Trim();
+            if (bannerDescription is not null) BannerDescription = bannerDescription.Trim();
+            SetSecondLink(
+                secondUrl ?? SecondUrl,
+                secondUrlTextFa ?? SecondUrlTextFa,
+                secondUrlTextEn ?? SecondUrlTextEn);
 
             if (!string.IsNullOrWhiteSpace(videoUrl)) VideoUrl = videoUrl;
 
-
             MarkUpdated(currentUserId);
+        }
+
+        /// <summary>
+        /// آدرس دوم اختیاری است؛ اگر داده شود متن فارسی و انگلیسی آن الزامی است.
+        /// بدون آدرس، متن‌ها هم پاک می‌شوند.
+        /// </summary>
+        private void SetSecondLink(string? url, string? textFa, string? textEn)
+        {
+            var cleanUrl = url?.Trim() ?? string.Empty;
+            if (cleanUrl.Length == 0)
+            {
+                SecondUrl = string.Empty;
+                SecondUrlTextFa = string.Empty;
+                SecondUrlTextEn = string.Empty;
+                return;
+            }
+
+            var fa = textFa?.Trim() ?? string.Empty;
+            var en = textEn?.Trim() ?? string.Empty;
+            if (fa.Length == 0 || en.Length == 0)
+                throw new DomainException("برای آدرس دوم، متن فارسی و انگلیسی لینک الزامی است");
+            if (fa.Length > MaxLinkTextLength || en.Length > MaxLinkTextLength)
+                throw new DomainException($"متن لینک دوم حداکثر {MaxLinkTextLength} کاراکتر است");
+
+            SecondUrl = cleanUrl;
+            SecondUrlTextFa = fa;
+            SecondUrlTextEn = en;
         }
 
         public void SetMobileMedia(int currentUserId, string? mobileBannerUrl, string? mobileVideoUrl)

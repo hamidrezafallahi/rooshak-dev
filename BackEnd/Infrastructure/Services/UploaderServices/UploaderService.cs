@@ -113,6 +113,56 @@ namespace Services.Services.Uploader
 
         }
 
+        /// <summary>Font files are served as-is from /uploads; keep them small for page speed.</summary>
+        private const long MaxFontBytes = 5L * 1024 * 1024;
+
+        public async Task<string?> UploadFont(UploadDTO request)
+        {
+            if (request?.File is null)
+                return null;
+
+            EnsureNotEmpty(request.File.FileName, request.File.Length);
+            if (request.File.Length > MaxFontBytes)
+                throw new FileUploadException($"حجم فونت «{request.File.FileName}» بیشتر از سقف مجاز ۵ مگابایت است.");
+
+            var relativeDirectory = UploadPaths.Normalize(request.Path);
+            if (string.IsNullOrWhiteSpace(relativeDirectory))
+                throw new FileUploadException("مسیر ذخیرهٔ فایل مشخص نشده است.");
+
+            var ext = Path.GetExtension(request.File.FileName).TrimStart('.').ToLowerInvariant();
+            var header = new byte[4];
+            await using (var probe = request.File.OpenReadStream())
+            {
+                var read = await probe.ReadAsync(header.AsMemory(0, 4));
+                if (read < 4 || !FontSignatureMatches(ext, header))
+                    throw new FileUploadException(
+                        $"فایل «{request.File.FileName}» فونت معتبر نیست؛ فقط woff2، woff، ttf و otf پذیرفته می‌شود.");
+            }
+
+            var rootPath = ResolveDirectory(relativeDirectory);
+            Directory.CreateDirectory(rootPath);
+
+            var fileName = $"{Guid.NewGuid():N}.{ext}";
+            await using (var input = request.File.OpenReadStream())
+            await using (var output = new FileStream(Path.Combine(rootPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await input.CopyToAsync(output);
+            }
+
+            return $"{relativeDirectory}/{fileName}";
+        }
+
+        /// <summary>The extension must agree with the file's magic bytes, so nothing else is served as a font.</summary>
+        private static bool FontSignatureMatches(string ext, byte[] h) => ext switch
+        {
+            "woff2" => h[0] == (byte)'w' && h[1] == (byte)'O' && h[2] == (byte)'F' && h[3] == (byte)'2',
+            "woff" => h[0] == (byte)'w' && h[1] == (byte)'O' && h[2] == (byte)'F' && h[3] == (byte)'F',
+            "otf" => h[0] == (byte)'O' && h[1] == (byte)'T' && h[2] == (byte)'T' && h[3] == (byte)'O',
+            "ttf" => (h[0] == 0x00 && h[1] == 0x01 && h[2] == 0x00 && h[3] == 0x00)
+                     || (h[0] == (byte)'t' && h[1] == (byte)'r' && h[2] == (byte)'u' && h[3] == (byte)'e'),
+            _ => false,
+        };
+
 
         public Task DeleteFile(DeleteDTO request)
         {

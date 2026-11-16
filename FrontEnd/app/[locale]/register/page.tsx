@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import Register from '@components/templates/register';
-import { getSlides, splitHeroSlide } from '@lib/landing';
+import { getSlides, pickHeroSlide } from '@lib/landing';
 import { toMediaUrl } from '@utils/toMediaUrl';
 import { buildPageMetadata } from '@lib/seo';
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function RegisterPage({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'homePage' });
-  const { hero } = splitHeroSlide(await getSlides());
+  const hero = pickHeroSlide(await getSlides());
 
   return (
     <Register

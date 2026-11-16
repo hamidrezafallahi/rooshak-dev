@@ -2,9 +2,12 @@ import React from 'react';
 
 import { getTranslations } from 'next-intl/server';
 
+import { getAdminCustomFonts } from '@components/templates/admin/themeSettings/customFontsApi';
 import {
   DEFAULT_PALETTE,
+  DEFAULT_TYPOGRAPHY,
   pickPalette,
+  pickTypography,
   toThemeRecord,
 } from '@components/templates/admin/themeSettings/palette';
 import ThemeStudio from '@components/templates/admin/themeSettings/themeStudio';
@@ -24,6 +27,7 @@ export default async function NewThemePage({
       ? toThemeRecord(await getById('themeSettings', from))
       : null;
   const t = await getTranslations('admin.themeSettings');
+  const customFonts = await getAdminCustomFonts();
 
   return (
     <ThemeStudio
@@ -31,6 +35,8 @@ export default async function NewThemePage({
       initialPalette={source ? pickPalette(source) : DEFAULT_PALETTE}
       initialFont={source?.fontFamily}
       initialHeadingFont={source?.headingFontFamily}
+      initialTypography={source ? pickTypography(source) : DEFAULT_TYPOGRAPHY}
+      customFonts={customFonts}
     />
   );
 }

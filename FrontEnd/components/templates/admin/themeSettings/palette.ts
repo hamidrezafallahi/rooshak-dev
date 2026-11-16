@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 
-import { DEFAULT_FONT_KEY, DEFAULT_HEADING_FONT_KEY, findFont } from '@lib/fontCatalog';
+import { DEFAULT_FONT_KEY, DEFAULT_HEADING_FONT_KEY, isFontKey } from '@lib/fontCatalog';
+import { TEXT_SIZE_KEYS, type TextSizeKey } from '@lib/typography';
 
 /**
  * Palette model of the theme studio. Mirrors ThemeSettingDto (BackEnd) and
@@ -24,7 +25,36 @@ export const COLOR_KEYS = [
 
 export type ColorKey = (typeof COLOR_KEYS)[number];
 export type Palette = Record<ColorKey, string>;
-export type ThemeRecord = Palette & { id: number; name: string; isActive: boolean; fontFamily: string; headingFontFamily: string };
+/** Text sizes of a theme (see lib/typography.ts); px only matters for «custom». */
+export type Typography = {
+  bodyTextSize: TextSizeKey;
+  bodyTextSizePx: number | null;
+  headingTextSize: TextSizeKey;
+  headingTextSizePx: number | null;
+};
+
+export const DEFAULT_TYPOGRAPHY: Typography = {
+  bodyTextSize: 'medium',
+  bodyTextSizePx: null,
+  headingTextSize: 'medium',
+  headingTextSizePx: null,
+};
+
+export type ThemeRecord = Palette & Typography & { id: number; name: string; isActive: boolean; fontFamily: string; headingFontFamily: string };
+
+const sizeKey = (value: unknown): TextSizeKey =>
+  TEXT_SIZE_KEYS.includes(value as TextSizeKey) ? (value as TextSizeKey) : 'medium';
+const sizePx = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : null;
+
+export function pickTypography(source: Typography): Typography {
+  return {
+    bodyTextSize: source.bodyTextSize,
+    bodyTextSizePx: source.bodyTextSizePx,
+    headingTextSize: source.headingTextSize,
+    headingTextSizePx: source.headingTextSizePx,
+  };
+}
 
 export const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -156,11 +186,15 @@ export function toThemeRecord(row: Record<string, unknown> | null | undefined): 
     name: typeof row.name === 'string' ? row.name : '',
     isActive: Boolean(row.isActive),
     fontFamily:
-      typeof row.fontFamily === 'string' && findFont(row.fontFamily) ? row.fontFamily : DEFAULT_FONT_KEY,
+      typeof row.fontFamily === 'string' && isFontKey(row.fontFamily) ? row.fontFamily : DEFAULT_FONT_KEY,
     headingFontFamily:
-      typeof row.headingFontFamily === 'string' && findFont(row.headingFontFamily)
+      typeof row.headingFontFamily === 'string' && isFontKey(row.headingFontFamily)
         ? row.headingFontFamily
         : DEFAULT_HEADING_FONT_KEY,
+    bodyTextSize: sizeKey(row.bodyTextSize),
+    bodyTextSizePx: sizePx(row.bodyTextSizePx),
+    headingTextSize: sizeKey(row.headingTextSize),
+    headingTextSizePx: sizePx(row.headingTextSizePx),
   };
 }
 

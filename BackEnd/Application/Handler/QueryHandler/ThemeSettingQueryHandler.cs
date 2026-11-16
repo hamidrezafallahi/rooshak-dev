@@ -91,6 +91,10 @@ namespace Application.Handler.QueryHandler
             TextMutedColor = t.TextMutedColor,
             FontFamily = t.FontFamily,
             HeadingFontFamily = t.HeadingFontFamily,
+            BodyTextSize = t.BodyTextSize,
+            BodyTextSizePx = t.BodyTextSizePx,
+            HeadingTextSize = t.HeadingTextSize,
+            HeadingTextSizePx = t.HeadingTextSizePx,
         };
     }
 }

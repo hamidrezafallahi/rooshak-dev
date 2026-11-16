@@ -26,7 +26,7 @@ import LandingHero from '@components/organisms/landingHero';
 import Footer from '@layout/footer';
 import Header from '@layout/header';
 import { getCategories } from '@lib/category';
-import { getSlides, splitHeroSlide } from '@lib/landing';
+import { getHomeSlides, getSlides, pickHeroSlide } from '@lib/landing';
 import { siteBaseUrl } from '@lib/api';
 import {
   absoluteUrl,
@@ -60,7 +60,9 @@ export default async function Home({ params }: Props) {
   const tBrand = await getTranslations({ locale, namespace: 'brand' });
   const tSeo = await getTranslations({ locale, namespace: 'seo' });
 
-  const { hero, rest } = splitHeroSlide(await getSlides());
+  // Hero banner (Slides) and the banner tiles (HomeSlides) are separate tables and APIs.
+  const [heroSlides, homeSlides] = await Promise.all([getSlides(), getHomeSlides()]);
+  const hero = pickHeroSlide(heroSlides);
   const categories = await getCategories({
     queries: { IsShowInLanding: true },
   });
@@ -116,7 +118,7 @@ export default async function Home({ params }: Props) {
       <Header overlay />
       <main className="flex flex-col min-h-screen">
         <LandingHero slide={hero} />
-        <LandingSlider slides={rest} />
+        <LandingSlider slides={homeSlides} />
         <LandingBrands />
         <TheMostProducts />
         <LandingCategory

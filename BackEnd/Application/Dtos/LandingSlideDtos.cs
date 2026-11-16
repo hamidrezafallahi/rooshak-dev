@@ -14,6 +14,8 @@ namespace Application.Dtos
         public string BannerUrl { get;  set; } = string.Empty;
         public string FirstUrl { get;  set; } = string.Empty;
         public string SecondUrl { get; set; } = string.Empty;
+        public string SecondUrlTextFa { get; set; } = string.Empty;
+        public string SecondUrlTextEn { get; set; } = string.Empty;
         public string VideoUrl { get; set; } = string.Empty;
         public string MobileBannerUrl { get; set; } = string.Empty;
         public string MobileVideoUrl { get; set; } = string.Empty;

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   useRouter,
   useSearchParams,
@@ -58,13 +58,14 @@ export function LoginForm({
 
   const t = useTranslations();
 
-  const { ShoppingCart, locale } = useAppSelector(
+  const { ShoppingCart } = useAppSelector(
     (state) => ({
       ShoppingCart: state.withPersist.ShoppingCart,
-      locale: state.withPersist.config.locale,
     }),
     shallowEqual,
   );
+  // Redirect in the language of the current URL, not one persisted from an earlier visit.
+  const locale = useLocale();
 
   const route = useRouter();
 

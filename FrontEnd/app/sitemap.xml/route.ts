@@ -196,6 +196,7 @@ export async function GET() {
     { path: 'tags', priority: 0.7, changeFrequency: 'weekly', lastmod: newestLastmod(tags) },
     { path: 'exhibition', priority: 0.8, changeFrequency: 'weekly' },
     { path: 'discounts', priority: 0.8, changeFrequency: 'daily', lastmod: newestLastmod(discounts) },
+    { path: 'about', priority: 0.5, changeFrequency: 'monthly' },
     { path: 'faq', priority: 0.6, changeFrequency: 'weekly' },
     { path: 'cooperation', priority: 0.5, changeFrequency: 'monthly' },
   ];

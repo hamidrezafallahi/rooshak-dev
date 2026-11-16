@@ -10,7 +10,7 @@ using OnlineShop.Domain.Interfaces;
 
 namespace Application.Handler.CommandHandler
 {
-    public class ThemeSettingCommandHandler(IThemeSettingRepository _repo, IHttpContextAccessor _accessor) :
+    public class ThemeSettingCommandHandler(IThemeSettingRepository _repo, ICustomFontRepository _fonts, IHttpContextAccessor _accessor) :
         IRequestHandler<CreateThemeSettingCommand, ServiceResult<IdDto>>,
         IRequestHandler<UpdateThemeSettingCommand, ServiceResult<IdDto>>,
         IRequestHandler<ActiveThemeSettingCommand, ServiceResult<IdDto>>,
@@ -24,7 +24,10 @@ namespace Application.Handler.CommandHandler
 
             try
             {
-                var theme = ThemeSetting.Create(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily);
+                var customKeys = await ActiveCustomFontKeys(cancellationToken);
+                var theme = ThemeSetting.Create(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily,
+                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx),
+                    customKeys.Contains);
 
                 // تم تازه فعال نمی‌شود تا سایت ناخواسته عوض نشود؛ ادمین با «فعال‌سازی» آن را انتخاب می‌کند.
                 theme.SetActive(false, userId.Value);
@@ -51,7 +54,10 @@ namespace Application.Handler.CommandHandler
 
             try
             {
-                theme.Update(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily);
+                var customKeys = await ActiveCustomFontKeys(cancellationToken);
+                theme.Update(request.Name, ToPalette(request), userId.Value, request.FontFamily, request.HeadingFontFamily,
+                    new ThemeTypography(request.BodyTextSize, request.BodyTextSizePx, request.HeadingTextSize, request.HeadingTextSizePx),
+                    customKeys.Contains);
             }
             catch (DomainException ex)
             {
@@ -110,6 +116,13 @@ namespace Application.Handler.CommandHandler
             theme.Delete(userId.Value);
             await _repo.SaveChangesAsync(cancellationToken);
             return ServiceResult<IdDto>.Ok(new IdDto { Id = theme.Id });
+        }
+
+        /// <summary>کلیدهای فونت‌های آپلودی فعال (custom-{id})؛ فقط همین‌ها در تم پذیرفته می‌شوند.</summary>
+        private async Task<HashSet<string>> ActiveCustomFontKeys(CancellationToken ct)
+        {
+            var ids = await _fonts.Query(f => f.IsActive && f.FileUrl != "").Select(f => f.Id).ToListAsync(ct);
+            return ids.Select(CustomFont.KeyFor).ToHashSet(StringComparer.Ordinal);
         }
 
         private static ThemePalette ToPalette(CreateThemeSettingCommand c) => new(

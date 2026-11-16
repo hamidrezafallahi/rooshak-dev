@@ -14,8 +14,12 @@ type Props = {
   slide?: LandingSlide | null;
 };
 
-const internalHref = (locale: string, url?: string) => {
-  const clean = url?.trim().replace(/^\/+/, '');
+/** Internal paths get the locale prefix; full http(s) URLs are used as they are. */
+const toHref = (locale: string, url?: string) => {
+  const raw = url?.trim();
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const clean = raw.replace(/^\/+/, '');
   return clean ? `/${locale}/${clean}` : null;
 };
 
@@ -34,8 +38,21 @@ export default async function LandingHero({ slide }: Props) {
     video: slide?.mobileVideoUrl ? toMediaUrl(slide.mobileVideoUrl) : undefined,
   };
 
-  const primaryHref = internalHref(locale, slide?.firstUrl) ?? `/${locale}/products`;
-  const secondaryHref = internalHref(locale, slide?.secondUrl) ?? `/${locale}/discounts`;
+  // Title and description are optional in the admin: empty means not shown at all.
+  const title = slide?.bannerTitle?.trim() ?? '';
+  const description = slide?.bannerDescription?.trim() ?? '';
+
+  // The banner itself (image or video) links to the first URL.
+  const bannerHref = toHref(locale, slide?.firstUrl) ?? (hasSlide ? null : `/${locale}/products`);
+  // The optional second URL shows as a text link, in the visitor's language.
+  const secondHref = toHref(locale, slide?.secondUrl);
+  const secondText = (
+    locale === 'en'
+      ? slide?.secondUrlTextEn || slide?.secondUrlTextFa
+      : slide?.secondUrlTextFa || slide?.secondUrlTextEn
+  )?.trim();
+  const showSecond = Boolean(secondHref && secondText);
+  const hasText = Boolean(title || description || showSecond);
 
   return (
     <section
@@ -45,39 +62,50 @@ export default async function LandingHero({ slide }: Props) {
       <HeroMedia
         desktop={desktop}
         mobile={mobile}
-        alt={t('heroImageAlt')}
+        alt={title || t('heroImageAlt')}
         playLabel={t('videoPlay')}
         pauseLabel={t('videoPause')}
       />
 
-      <div className="relative z-10 flex flex-col justify-end items-start gap-5 mx-auto px-4 sm:px-8 lg:px-16 pt-[calc(var(--store-header-h)+2rem)] pb-16 md:pb-24 max-w-[1600px] h-full">
-        <p className="font-medium text-xs sm:text-sm uppercase ltr:tracking-[0.2em]">
-          {slide?.bannerTitle?.trim() || t('eyebrow')}
-        </p>
-        <h1
-          id="home-hero-title"
-          className="max-w-3xl font-normal text-3xl sm:text-5xl lg:text-6xl leading-tight"
-        >
+      {bannerHref ? (
+        // Covers the whole banner; the play/pause button and the second link sit above it.
+        <Link
+          href={bannerHref}
+          aria-label={title || t('heroLinkAria')}
+          className="z-[5] absolute inset-0"
+        />
+      ) : null}
+
+      {/* The page keeps one H1 for search engines even when the banner has no title. */}
+      {!title ? (
+        <h1 id="home-hero-title" className="sr-only">
           {t('title')}
         </h1>
-        <p className="max-w-xl text-white/90 text-base sm:text-lg leading-relaxed">
-          {slide?.bannerDescription?.trim() || t('subtitle')}
-        </p>
-        <div className="flex sm:flex-row flex-col gap-3 mt-2 w-full sm:w-auto">
-          <Link
-            href={primaryHref}
-            className="inline-flex justify-center items-center bg-white hover:bg-transparent px-8 py-3.5 border border-white font-medium text-black hover:text-white text-sm transition-colors"
-          >
-            {t('ctaProducts')}
-          </Link>
-          <Link
-            href={secondaryHref}
-            className="inline-flex justify-center items-center hover:bg-white px-8 py-3.5 border border-white font-medium text-white hover:text-black text-sm transition-colors"
-          >
-            {t('ctaDiscounts')}
-          </Link>
+      ) : null}
+
+      {hasText ? (
+        <div className="z-10 relative flex flex-col justify-end items-start gap-5 mx-auto px-4 sm:px-8 lg:px-16 pt-[calc(var(--store-header-h)+2rem)] pb-16 md:pb-24 max-w-[1600px] h-full pointer-events-none">
+          {title ? (
+            <h1
+              id="home-hero-title"
+              className="max-w-3xl font-normal text-3xl sm:text-5xl lg:text-6xl leading-tight"
+            >
+              {title}
+            </h1>
+          ) : null}
+          {description ? (
+            <p className="max-w-xl text-white/90 text-base sm:text-lg leading-relaxed">{description}</p>
+          ) : null}
+          {showSecond ? (
+            <Link
+              href={secondHref!}
+              className="pb-0.5 border-white border-b font-medium text-sm sm:text-base pointer-events-auto"
+            >
+              {secondText}
+            </Link>
+          ) : null}
         </div>
-      </div>
+      ) : null}
     </section>
   );
 }

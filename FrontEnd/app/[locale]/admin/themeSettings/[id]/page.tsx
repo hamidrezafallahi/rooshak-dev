@@ -4,9 +4,11 @@ import { notFound } from 'next/navigation';
 
 import {
   pickPalette,
+  pickTypography,
   toThemeRecord,
 } from '@components/templates/admin/themeSettings/palette';
 import ThemeStudio from '@components/templates/admin/themeSettings/themeStudio';
+import { getAdminCustomFonts } from '@components/templates/admin/themeSettings/customFontsApi';
 import { getById } from '@lib/getAll';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +21,8 @@ export default async function EditThemePage({
   const { id } = await params;
   if (!/^\d+$/.test(id)) notFound();
 
-  const theme = toThemeRecord(await getById('themeSettings', id));
+  const [row, customFonts] = await Promise.all([getById('themeSettings', id), getAdminCustomFonts()]);
+  const theme = toThemeRecord(row);
   if (!theme) notFound();
 
   return (
@@ -30,6 +33,8 @@ export default async function EditThemePage({
       initialPalette={pickPalette(theme)}
       initialFont={theme.fontFamily}
       initialHeadingFont={theme.headingFontFamily}
+      initialTypography={pickTypography(theme)}
+      customFonts={customFonts}
     />
   );
 }
