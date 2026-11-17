@@ -43,6 +43,16 @@ public class ProductImagesController : BaseController
         return Ok(result);
     }
 
+    /// <summary>All images of one product for the admin gallery, main image first.</summary>
+    [HttpGet("product/{productId}")]
+    [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
+    public async Task<ActionResult<List<GetProductImageDto>>> GetByProduct(int productId)
+    {
+        var result = await _mediator.Send(new GetProductImagesByProductIdQuery { ProductId = productId });
+        if (result.IsUnauthorized) return Unauthorized(result);
+        return Ok(result);
+    }
+
     [HttpPost]
     [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
     [Consumes("multipart/form-data")]
@@ -55,15 +65,28 @@ public class ProductImagesController : BaseController
 
     }
 
-    //[HttpPut]
-    //public async Task<ActionResult<IdDto>> Update([FromForm] UpdateProductImageCommand command)
-    //{
-    //    var result = await _mediator.Send(command);
-    //    if (result.IsUnauthorized)
-    //        return Unauthorized(result);
-    //    return Ok(result);
+    /// <summary>Swaps the file of a single image; the rest of the gallery is untouched.</summary>
+    [HttpPut("{id}/file")]
+    [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<IdDto>> ReplaceFile(int id, [FromForm] ReplaceProductImageFileCommand command)
+    {
+        command.Id = id;
+        var result = await _mediator.Send(command);
+        if (result.IsUnauthorized)
+            return Unauthorized(result);
+        return Ok(result);
+    }
 
-    //}
+    [HttpPut("{id}/main")]
+    [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
+    public async Task<ActionResult<IdDto>> SetMain(int id)
+    {
+        var result = await _mediator.Send(new SetMainProductImageCommand { Id = id });
+        if (result.IsUnauthorized)
+            return Unauthorized(result);
+        return Ok(result);
+    }
     [HttpPut("active")]
     [Authorize(Roles = "SuperAdmin,Admin,ContentEditor")]
 

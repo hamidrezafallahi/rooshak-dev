@@ -17,4 +17,8 @@ public class GetProductImagesByIdQuery : IRequest<ServiceResult<GetProductImageD
 
 }
 
-
+/// <summary>The whole gallery of one product (active and inactive), main image first.</summary>
+public class GetProductImagesByProductIdQuery : IRequest<ServiceResult<List<GetProductImageDto>>>
+{
+    public int ProductId { get; set; }
+}

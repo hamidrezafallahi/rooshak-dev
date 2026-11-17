@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Claims;
 using Application.Commands;
@@ -342,7 +342,7 @@ public class UploadFailureTests
     }
 
     [Fact]
-    public async Task New_product_images_replace_the_old_ones_after_the_save()
+    public async Task New_product_images_are_added_next_to_the_old_ones()
     {
         var products = new Table<Product>();
         var images = new Table<ProductImage>();
@@ -356,7 +356,105 @@ public class UploadFailureTests
             default);
 
         Assert.True(result.IsSuccess);
+        Assert.False(images.Rows[0].IsDeleted);
+        Assert.True(images.Rows[0].IsMain);
+        Assert.Empty(working.Deleted);
+        var added = Assert.Single(product.Images);
+        Assert.False(added.IsMain);
+    }
+
+    [Fact]
+    public async Task A_new_main_image_takes_the_role_from_the_old_one()
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        var product = Product.Create("Loupe", "Text", 1, 1, new ProductDimensions(1, 1, 1, 1), 1);
+        products.Rows.Add(product);
+        images.Rows.Add(ProductImage.Create(product.Id, Stored, true, 1));
+        var working = new FakeUploader { Path = "uploads/test/new.webp" };
+
+        await ProductImages(images, products, working).Handle(
+            new AddProductImageCommand { ProductId = product.Id, Images = [File, File], IsMainImages = [false, true] },
+            default);
+
+        Assert.False(images.Rows[0].IsMain);
+        Assert.Equal([false, true], product.Images.Select(i => i.IsMain).ToArray());
+    }
+
+    [Fact]
+    public async Task Replacing_one_image_file_keeps_the_rest_and_drops_only_its_old_file()
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        var product = Product.Create("Loupe", "Text", 1, 1, new ProductDimensions(1, 1, 1, 1), 1);
+        products.Rows.Add(product);
+        images.Rows.Add(ProductImage.Create(product.Id, Stored, true, 1));
+        images.Rows.Add(ProductImage.Create(product.Id, "uploads/test/other.webp", false, 1));
+        images.Save();
+        var working = new FakeUploader { Path = "uploads/test/new.webp" };
+
+        var result = await ProductImages(images, products, working).Handle(
+            new ReplaceProductImageFileCommand { Id = images.Rows[0].Id, Image = File },
+            default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("uploads/test/new.webp", images.Rows[0].ImageUrl);
+        Assert.True(images.Rows[0].IsMain);
+        Assert.Equal("uploads/test/other.webp", images.Rows[1].ImageUrl);
+        Assert.Equal(Stored, Assert.Single(working.Deleted));
+    }
+
+    [Theory]
+    [InlineData(Failure.ReturnsNull)]
+    [InlineData(Failure.Throws)]
+    public async Task Failed_file_swap_keeps_the_image(Failure failure)
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        images.Rows.Add(ProductImage.Create(1, Stored, true, 1));
+        images.Save();
+        var failing = new FakeUploader(failure);
+
+        Assert.True(await FailsAsync(() => ProductImages(images, products, failing).Handle(
+            new ReplaceProductImageFileCommand { Id = images.Rows[0].Id, Image = File }, default)));
+
+        Assert.Equal(Stored, images.Rows[0].ImageUrl);
+        Assert.Empty(failing.Deleted);
+    }
+
+    [Fact]
+    public async Task Setting_main_image_clears_the_previous_main()
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        images.Rows.Add(ProductImage.Create(1, Stored, true, 1));
+        images.Rows.Add(ProductImage.Create(1, "uploads/test/other.webp", false, 1));
+        images.Save();
+
+        var result = await ProductImages(images, products, new FakeUploader()).Handle(
+            new SetMainProductImageCommand { Id = images.Rows[1].Id }, default);
+
+        Assert.True(result.IsSuccess);
+        Assert.False(images.Rows[0].IsMain);
+        Assert.True(images.Rows[1].IsMain);
+    }
+
+    [Fact]
+    public async Task Deleting_the_main_image_promotes_another_one()
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        images.Rows.Add(ProductImage.Create(1, Stored, true, 1));
+        images.Rows.Add(ProductImage.Create(1, "uploads/test/other.webp", false, 1));
+        images.Save();
+        var working = new FakeUploader();
+
+        var result = await ProductImages(images, products, working).Handle(
+            new DeleteProductImageCommand { Id = images.Rows[0].Id }, default);
+
+        Assert.True(result.IsSuccess);
         Assert.True(images.Rows[0].IsDeleted);
+        Assert.True(images.Rows[1].IsMain);
         Assert.Equal(Stored, Assert.Single(working.Deleted));
     }
 

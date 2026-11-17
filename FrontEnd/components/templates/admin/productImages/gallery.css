@@ -1,0 +1,293 @@
+/* Product image gallery (admin). Follows the admin tokens: flat surfaces, hairline borders, no radius. */
+
+.pig-picker {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .pig-picker { grid-template-columns: auto minmax(260px, 420px) 1fr; }
+}
+
+.pig-picker-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.pig-picker-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  justify-content: flex-end;
+  font-size: 0.8125rem;
+  color: var(--admin-text-muted);
+}
+
+.pig-picker-meta strong { color: var(--admin-text); font-weight: 600; }
+
+@media (max-width: 767px) {
+  .pig-picker-meta { justify-content: flex-start; }
+}
+
+.pig-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.pig-empty-icon { color: var(--admin-text-muted); }
+
+/* ---- grid ---- */
+.pig-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  outline: 2px dashed transparent;
+  outline-offset: 6px;
+  transition: outline-color 0.15s;
+}
+
+@media (min-width: 640px) { .pig-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .pig-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; } }
+@media (min-width: 1440px) { .pig-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+.pig-grid-drop { outline-color: var(--primary-color); }
+
+.pig-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  background: var(--admin-surface-elevated);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pig-tile:hover { border-color: color-mix(in srgb, var(--admin-text) 35%, var(--admin-border)); }
+
+/* The main image is the product's face: it gets the large slot. */
+.pig-tile-main {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-color: var(--admin-text);
+}
+
+.pig-tile-drop {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.pig-frame {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  background:
+    repeating-conic-gradient(var(--admin-surface-muted) 0% 25%, transparent 0% 50%) 50% / 18px 18px;
+}
+
+.pig-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6%;
+}
+
+.pig-tile-hidden .pig-frame img { opacity: 0.38; filter: grayscale(1); }
+
+.pig-badges {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  display: flex;
+  gap: 0.375rem;
+}
+
+.pig-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 24px;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--admin-surface-muted);
+  color: var(--admin-text-muted);
+  border: 1px solid var(--admin-border);
+}
+
+.pig-badge-main {
+  background: var(--admin-text);
+  color: var(--admin-surface-elevated);
+  border-color: var(--admin-text);
+}
+
+.pig-veil {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--admin-text);
+  background: color-mix(in srgb, var(--admin-surface-elevated) 72%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+/* ---- action bar ---- */
+.pig-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.pig-bar-tools { display: flex; align-items: center; margin-inline-start: auto; }
+
+.pig-main-note {
+  padding-inline: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--admin-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pig-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--admin-text-muted);
+  background: transparent;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pig-tool:hover:not(:disabled) { background: var(--admin-hover); color: var(--admin-text); }
+.pig-tool:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
+.pig-tool:disabled { opacity: 0.35; cursor: not-allowed; }
+.pig-tool-danger:hover:not(:disabled) { background: var(--admin-danger-soft); color: var(--error-color); }
+.pig-tool-active { color: var(--primary-color); }
+
+.pig-confirm {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--admin-text);
+}
+
+.pig-text-btn {
+  height: 32px;
+  padding: 0 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  background: var(--admin-surface-elevated);
+}
+
+.pig-text-btn:hover { background: var(--admin-hover); }
+
+.pig-text-btn-danger {
+  border-color: var(--error-color);
+  background: var(--error-color);
+  color: #fff;
+}
+
+.pig-text-btn-danger:hover { background: var(--error-color); filter: brightness(1.1); }
+
+/* ---- pending uploads ---- */
+.pig-tile-pending { border-style: dashed; }
+.pig-tile-failed { border-color: var(--error-color); }
+.pig-fail-text { color: var(--error-color); }
+
+.pig-file-name {
+  padding-inline: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+/* ---- add tile ---- */
+.pig-add {
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 180px;
+  padding: 1.25rem 1rem;
+  border: 2px dashed var(--admin-border);
+  background: color-mix(in srgb, var(--primary-color) 3%, transparent);
+  color: var(--admin-text);
+  text-align: center;
+  cursor: pointer;
+}
+
+.pig-add:hover,
+.pig-grid-drop .pig-add {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
+.pig-add:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+.pig-add-wide { grid-column: 1 / -1; min-height: 280px; }
+
+.pig-add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface-elevated);
+  color: var(--primary-color);
+}
+
+.pig-add-title { font-size: 0.9375rem; font-weight: 600; }
+.pig-add-hint { max-width: 32ch; font-size: 0.75rem; line-height: 1.6; color: var(--admin-text-muted); }
+
+/* ---- loading ---- */
+.pig-skeleton {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(90deg, var(--admin-surface-muted) 0%, var(--admin-hover) 50%, var(--admin-surface-muted) 100%);
+  background-size: 200% 100%;
+  animation: pig-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes pig-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pig-skeleton { animation: none; }
+}
