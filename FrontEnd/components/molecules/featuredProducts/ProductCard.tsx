@@ -1,13 +1,13 @@
 import Link from 'next/link';
 
+
 import { CardSliderDots, CardSliderImages, CardSliderProvider } from './CardImageSlider';
 import { IProductCardProps } from './type';
 
 /**
- * Tall charcoal product card: the product photo sits in its own area at the top,
- * shown whole at its natural proportions (never cropped or stretched), with the
- * title + price pill, description, two badges and a white pill button below it.
- * Card size: the h-[380px] w-[240px] classes below.
+ * Tall full-bleed product card: photo behind everything, dark/frosted gradient
+ * toward the bottom, title + price pill, short description, two badges and a
+ * white pill button. Card size: the h-[380px] w-[240px] classes below.
  *
  * Server component; only the photo slider + its dots are client-side
  * (CardImageSlider). Slides start at the main image and change every 2s.
@@ -20,7 +20,7 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
     <CardSliderProvider count={images.length}>
     <article
       className={[
-        'group relative isolate flex flex-col overflow-hidden rounded-[26px] bg-[#232326]',
+        'group relative isolate overflow-hidden rounded-[26px] bg-[#2a2a2e]',
         'h-[380px] w-[240px] shrink-0 snap-center',
         'shadow-[0_22px_45px_-14px_rgba(15,15,20,0.45),0_8px_16px_-8px_rgba(15,15,20,0.18)]',
         'transition-[transform,box-shadow] duration-300 ease-out',
@@ -29,24 +29,33 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
         'motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-within:translate-y-0',
       ].join(' ')}
     >
-      {/* Photo area: fills the space above the text; images are object-contain */}
-      <div className="relative flex-1 min-h-0">
-        <CardSliderImages
-          images={images}
-          alt={product.imageAlt || product.name}
-          priority={priority}
-        />
-      </div>
+      {/* Full-bleed photographs (cross-fading slider, main image first) */}
+      <CardSliderImages
+        images={images}
+        alt={product.imageAlt || product.name}
+        priority={priority}
+        className="-z-20 transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+      />
 
-      {/* Content stack below the photo; fixed line counts keep all cards aligned */}
-      <div className="flex flex-col shrink-0 px-3 pt-2.5 pb-3 text-white">
+      {/* Dark readability gradient */}
+      <div
+        aria-hidden
+        className="-z-10 absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.12) 46%, rgba(0,0,0,0.5) 72%, rgba(0,0,0,0.68) 100%)',
+        }}
+      />
+
+      {/* Content stack pinned to the bottom; fixed line counts keep all cards aligned */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col px-3 pb-3 text-white">
         {/* Slide indicator: one dot per image */}
         <CardSliderDots />
 
         <div className="flex justify-between items-center gap-2 px-1">
           <h3 className="min-w-0 font-semibold text-[15px] leading-6 truncate">{product.name}</h3>
           {product.priceLabel && (
-            <span className="bg-white/10 px-2 py-[3px] rounded-full font-medium text-[10px] leading-4 whitespace-nowrap shrink-0">
+            <span className="bg-black/55 backdrop-blur-sm px-2 py-[3px] rounded-full font-medium text-[10px] leading-4 whitespace-nowrap shrink-0">
               {product.priceLabel}
             </span>
           )}
@@ -60,7 +69,7 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
           {badges.map((badge) => (
             <li
               key={badge}
-              className="bg-white/10 px-2.5 py-[3px] rounded-full font-medium text-[10px] leading-4 whitespace-nowrap truncate"
+              className="bg-white/15 backdrop-blur-md px-2.5 py-[3px] rounded-full font-medium text-[10px] leading-4 whitespace-nowrap truncate"
             >
               {badge}
             </li>
@@ -75,7 +84,7 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
             'mt-3 flex h-10 w-full items-center justify-center rounded-full bg-white',
             'text-[13px] font-semibold text-[#111114]',
             'transition-colors duration-300 hover:bg-[#ececef] group-hover:bg-[#f7f7f8]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#232326]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40',
             "after:absolute after:inset-0 after:content-['']",
           ].join(' ')}
         >
