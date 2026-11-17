@@ -364,7 +364,15 @@
       "saveFailed": "Save failed",
       "loadFailed": "Could not load the images",
       "notImage": "“{name}” is not an image",
-      "tooLarge": "“{name}” is larger than 10 MB"
+      "tooLarge": "“{name}” is larger than 10 MB",
+      "download": "Download original quality",
+      "downloadCompressed": "Download (only the compressed copy exists for this image)",
+      "recentTitle": "Latest images",
+      "recentEmpty": "No images uploaded yet.",
+      "recentEnd": "End of the list",
+      "recentPages": "Image list pages",
+      "prevPage": "Previous page",
+      "nextPage": "Next page"
     },
     "themeSettings": {
       "eyebrow": "Storefront look",

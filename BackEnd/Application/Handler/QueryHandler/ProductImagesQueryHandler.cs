@@ -26,7 +26,8 @@ public class ProductImagesQueryHandler(
                 IsActive = p.IsActive,
                 ProductId = p.ProductId,
                 ProductName = p.Product.Name,
-                ProductImageUrl = p.ImageUrl
+                ProductImageUrl = p.ImageUrl,
+                OriginalImageUrl = p.OriginalUrl
             })
             .ToListAsync(cancellationToken);
 
@@ -69,8 +70,10 @@ public class ProductImagesQueryHandler(
 
 
         int totalCount = await query.CountAsync(cancellationToken);
+        // Newest first, so the admin "recent images" list shows the latest uploads on top.
         var pagedproductImages = await query
-    .Skip((pageNumber - 1) * pageSize).Take(pageSize)
+            .OrderByDescending(i => i.Id)
+            .Skip((pageNumber - 1) * pageSize).Take(pageSize)
             .ToListAsync(cancellationToken);
         var productImagesDto = pagedproductImages.Select(p => new GetProductImageDto
         {
@@ -80,6 +83,7 @@ public class ProductImagesQueryHandler(
             ProductName = p.Product.Name,
             IsActive = p.IsActive,
             ProductImageUrl = p.ImageUrl,
+            OriginalImageUrl = p.OriginalUrl,
         }).ToList();
 
         dynamic? config = null;

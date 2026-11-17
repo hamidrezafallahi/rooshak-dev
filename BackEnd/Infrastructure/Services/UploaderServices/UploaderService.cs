@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Services.Services.Uploader.DTO;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
@@ -15,6 +16,18 @@ namespace Services.Services.Uploader
         private static readonly HashSet<string> SupportedTypes = new(StringComparer.OrdinalIgnoreCase)
         {
             "jpg", "jpeg", "png", "webp"
+        };
+
+        /// <summary>
+        /// Originals are served byte-for-byte, so only jpg/png/webp may be recognised; the default configuration
+        /// would also accept TIFF, GIF, BMP and others by their bytes.
+        /// </summary>
+        private static readonly DecoderOptions ImageDecoderOptions = new()
+        {
+            Configuration = new Configuration(
+                new JpegConfigurationModule(),
+                new PngConfigurationModule(),
+                new WebpConfigurationModule())
         };
 
         private static readonly HashSet<string> VideoTypes = new(StringComparer.OrdinalIgnoreCase)
@@ -51,6 +64,58 @@ namespace Services.Services.Uploader
                     Quality = 70,
                     FileFormat = WebpFileFormatType.Lossy,
                 }));
+
+        public async Task<string?> UploadOriginalImage(UploadDTO request)
+        {
+            if (request?.File is null)
+                return null;
+
+            EnsureNotEmpty(request.File.FileName, request.File.Length);
+
+            var relativeDirectory = UploadPaths.Normalize(request.Path);
+            if (string.IsNullOrWhiteSpace(relativeDirectory))
+                throw new FileUploadException("مسیر ذخیرهٔ فایل مشخص نشده است.");
+
+            // The extension comes from the decoded format, never from the client's file name.
+            string ext;
+            await using (var probe = request.File.OpenReadStream())
+            {
+                IImageFormat format;
+                try
+                {
+                    format = await Image.DetectFormatAsync(ImageDecoderOptions, probe);
+                }
+                catch (Exception ex) when (ex is ImageFormatException or NotSupportedException)
+                {
+                    throw new FileUploadException(
+                        $"فایل «{request.File.FileName}» تصویر معتبری نیست یا خراب است؛ یک فایل jpg، png یا webp سالم انتخاب کنید.",
+                        ex);
+                }
+                ext = format.FileExtensions.FirstOrDefault() ?? "img";
+            }
+
+            var rootPath = ResolveDirectory(relativeDirectory);
+            Directory.CreateDirectory(rootPath);
+
+            var safeBaseName = SafeBaseName(request.File.FileName);
+            var fileName = $"{Guid.NewGuid():N}_{safeBaseName}_original.{ext}";
+            await using (var input = request.File.OpenReadStream())
+            await using (var output = new FileStream(Path.Combine(rootPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await input.CopyToAsync(output);
+            }
+
+            return $"{relativeDirectory}/{fileName}";
+        }
+
+        /// <summary>Keeps only letters, digits, '-' and '_' so the name is safe in a URL and on disk.</summary>
+        private static string SafeBaseName(string fileName)
+        {
+            var raw = Path.GetFileNameWithoutExtension(fileName) ?? string.Empty;
+            var cleaned = new string(raw.Select(c => char.IsLetterOrDigit(c) || c is '-' or '_' ? c : '-').ToArray()).Trim('-');
+            if (cleaned.Length > 60) cleaned = cleaned[..60];
+            return string.IsNullOrWhiteSpace(cleaned) ? "image" : cleaned;
+        }
 
         public async Task<string?> UploadVideo(UploadDTO request)
 

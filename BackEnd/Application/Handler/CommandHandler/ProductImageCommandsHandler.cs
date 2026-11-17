@@ -36,7 +36,7 @@ public class AddProductImageCommandHandler(
             return ServiceResult<IdDto>.Ok(new IdDto { Id = product.Id });
 
         // Store every file before touching the gallery: a failed upload leaves the product as it was.
-        var uploaded = new List<(string Url, bool IsMain)>();
+        var uploaded = new List<(string Url, string OriginalUrl, bool IsMain)>();
         for (int i = 0; i < request.Images.Count; i++)
         {
             var file = request.Images[i];
@@ -50,7 +50,15 @@ public class AddProductImageCommandHandler(
             if (!UploadPaths.IsStoredPath(imageUrl))
                 return ServiceResult<IdDto>.Failed($"آپلود تصویر «{file.FileName}» ناموفق بود");
 
-            uploaded.Add((imageUrl!, isMain));
+            var originalUrl = await _uploaderService.UploadOriginalImage(new UploadDTO
+            {
+                File = file,
+                Path = UploadPaths.Products(product.Id)
+            });
+            if (!UploadPaths.IsStoredPath(originalUrl))
+                return ServiceResult<IdDto>.Failed($"ذخیرهٔ فایل اصلی «{file.FileName}» ناموفق بود");
+
+            uploaded.Add((imageUrl!, originalUrl!, isMain));
         }
 
         var existing = _repository.Query(pi => pi.ProductId == product.Id).ToList();
@@ -72,7 +80,8 @@ public class AddProductImageCommandHandler(
                     productId: product.Id,
                     imageUrl: uploaded[i].Url,
                     isMain: i == mainIndex,
-                    currentUserId: userId.Value),
+                    currentUserId: userId.Value,
+                    originalUrl: uploaded[i].OriginalUrl),
                 userId.Value);
         }
 
@@ -101,12 +110,23 @@ public class AddProductImageCommandHandler(
         if (!UploadPaths.IsStoredPath(imageUrl))
             return ServiceResult<IdDto>.Failed($"آپلود تصویر «{request.Image.FileName}» ناموفق بود");
 
+        var originalUrl = await _uploaderService.UploadOriginalImage(new UploadDTO
+        {
+            File = request.Image,
+            Path = UploadPaths.Products(image.ProductId)
+        });
+        if (!UploadPaths.IsStoredPath(originalUrl))
+            return ServiceResult<IdDto>.Failed($"ذخیرهٔ فایل اصلی «{request.Image.FileName}» ناموفق بود");
+
         var previousUrl = image.ImageUrl;
-        image.UpdateUrl(imageUrl!, userId.Value);
+        var previousOriginal = image.OriginalUrl;
+        image.UpdateUrl(imageUrl!, userId.Value, originalUrl);
         await _repository.SaveChangesAsync(cancellationToken);
 
-        // The old file goes only after the new path is saved.
+        // The old files go only after the new paths are saved.
         await _uploaderService.DeleteStoredFile(previousUrl, UploadPaths.Products(image.ProductId));
+        if (!string.IsNullOrWhiteSpace(previousOriginal))
+            await _uploaderService.DeleteStoredFile(previousOriginal, UploadPaths.Products(image.ProductId));
 
         return ServiceResult<IdDto>.Ok(new IdDto { Id = image.Id });
     }
@@ -182,6 +202,8 @@ public class AddProductImageCommandHandler(
         await _uploaderService.DeleteStoredFile(
             image.ImageUrl,
             UploadPaths.Products(image.ProductId));
+        if (!string.IsNullOrWhiteSpace(image.OriginalUrl))
+            await _uploaderService.DeleteStoredFile(image.OriginalUrl, UploadPaths.Products(image.ProductId));
 
         return ServiceResult<IdDto>.Ok(new IdDto { Id = image.Id });
     }

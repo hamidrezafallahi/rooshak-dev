@@ -14,6 +14,8 @@ export interface GalleryImage {
   productId: number;
   productName?: string | null;
   productImageUrl: string;
+  /** Full-quality upload; null for images stored before originals were kept. */
+  originalImageUrl?: string | null;
   isMain: boolean;
   isActive: boolean;
 }
@@ -33,6 +35,29 @@ async function send<T = unknown>(path: string, init: RequestInit = {}): Promise<
 /** The whole gallery of one product, main image first. */
 export const getProductGallery = (productId: number) =>
   send<GalleryImage[]>(`/product/${productId}`);
+
+export interface ImagePage {
+  records: GalleryImage[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+/** Every product image (active and hidden), newest upload first. */
+export const getRecentImages = (page: number, pageSize: number) =>
+  send<ImagePage>(`?page=${page}&pageSize=${pageSize}&OnlyActives=false`);
+
+/** The best file to hand out: the untouched original when it exists, else the stored copy. */
+export function downloadInfo(img: GalleryImage, productName?: string | null) {
+  const path = img.originalImageUrl || img.productImageUrl;
+  const ext = (path.split('?')[0].match(/\.([a-z0-9]+)$/i)?.[1] ?? 'webp').toLowerCase();
+  const base = (productName || img.productName || 'product')
+    .trim()
+    .replace(/[\/:*?"<>|\s]+/g, '-')
+    .slice(0, 60);
+  return { path, fileName: `${base}-${img.id}.${ext}`, isOriginal: Boolean(img.originalImageUrl) };
+}
 
 /** Adds one image next to the existing ones; the backend makes it main only when the product has none. */
 export function addProductImage(productId: number, file: File) {

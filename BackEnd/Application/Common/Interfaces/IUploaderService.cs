@@ -10,6 +10,12 @@ namespace Application.Common.Interfaces
         Task<string?> UploadAsJpeg(UploadDTO request);
         Task<string?> UploadAsJpg(UploadDTO request);
 
+        /// <summary>
+        /// Stores a jpg/png/webp image byte-for-byte (no re-encoding) after checking it decodes as one.
+        /// Returns relative path like uploads/products/1/guid_name_original.jpg, or null on failure.
+        /// </summary>
+        Task<string?> UploadOriginalImage(UploadDTO request);
+
         /// <summary>Stores an mp4/webm video as-is (no transcoding). Returns relative path or null on failure.</summary>
         Task<string?> UploadVideo(UploadDTO request);
 

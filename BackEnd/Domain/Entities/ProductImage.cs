@@ -11,10 +11,13 @@ namespace OnlineShop.Domain.Entities
         public Product Product { get; private set; } = default!;
 
         public string ImageUrl { get; private set; } = string.Empty;
+
+        /// <summary>The uploaded file exactly as it arrived (no re-encoding), for full-quality download. Null for images stored before this existed.</summary>
+        public string? OriginalUrl { get; private set; }
         public bool IsMain { get; private set; }
 
         // ===== Factory Method =====
-        public static ProductImage Create(int productId, string imageUrl, bool isMain, int currentUserId)
+        public static ProductImage Create(int productId, string imageUrl, bool isMain, int currentUserId, string? originalUrl = null)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
                 throw new DomainException("تصویر نمی‌تواند خالی باشد.");
@@ -23,6 +26,7 @@ namespace OnlineShop.Domain.Entities
             {
                 ProductId = productId,
                 ImageUrl = imageUrl,
+                OriginalUrl = originalUrl,
                 IsMain = isMain
             };
 
@@ -37,12 +41,13 @@ namespace OnlineShop.Domain.Entities
             MarkUpdated(currentUserId);
         }
 
-        public void UpdateUrl(string newUrl, int currentUserId)
+        public void UpdateUrl(string newUrl, int currentUserId, string? newOriginalUrl = null)
         {
             if (string.IsNullOrWhiteSpace(newUrl))
                 throw new DomainException("تصویر نمی‌تواند خالی باشد.");
 
             ImageUrl = newUrl;
+            OriginalUrl = newOriginalUrl;
             MarkUpdated(currentUserId);
         }
 
