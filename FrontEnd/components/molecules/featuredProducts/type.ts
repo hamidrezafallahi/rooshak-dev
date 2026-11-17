@@ -4,8 +4,11 @@ export interface IFeaturedProduct {
   name: string;
   /** Short plain-text description (clamped to 2 lines on the card). */
   description: string;
-  /** Backend media path or absolute URL; resolved through MediaImage. */
-  image: string | null;
+  /**
+   * Slider images (backend media paths or URLs), main image FIRST.
+   * One indicator dot is shown per image; they rotate every 2s.
+   */
+  images: string[];
   /** Descriptive alt text; falls back to the product name. */
   imageAlt?: string;
   /** Price already formatted for display, e.g. "۱٬۲۵۰٬۰۰۰ تومان". */
