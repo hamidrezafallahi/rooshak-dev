@@ -1009,6 +1009,8 @@
     "supplierNotFound": "تأمین‌کننده پیدا نشد"
   },
   "landing": {
+    "featuredProducts": "محصولات منتخب",
+    "viewProduct": "مشاهده محصول",
     "brandsTitle": "برندها",
     "brandsSubtitle": "برند های موجود",
     "viewAllBrands": "مشاهده همه برند ها",
