@@ -1009,6 +1009,8 @@
     "supplierNotFound": "Supplier not found"
   },
   "landing": {
+    "featuredProducts": "Featured products",
+    "viewProduct": "View Product",
     "brandsTitle": "Brands",
     "brandsSubtitle": "Available brands",
     "viewAllBrands": "View all brands",

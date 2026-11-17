@@ -20,6 +20,7 @@ import TheMostProducts
   from '@components/molecules/landing Elements/theMostProducts';
 import TrustSection from '@components/molecules/landing Elements/trustSection';
 import USPSection from '@components/molecules/landing Elements/uspSection';
+import LandingFeaturedProducts from '@components/molecules/featuredProducts';
 import JsonLd from '@components/molecules/storefront/JsonLd';
 import AdminDock from '@components/organisms/adminDock';
 import LandingHero from '@components/organisms/landingHero';
@@ -120,6 +121,7 @@ export default async function Home({ params }: Props) {
         <LandingHero slide={hero} />
         <LandingSlider slides={homeSlides} />
         <LandingBrands />
+        <LandingFeaturedProducts locale={locale} />
         <TheMostProducts />
         <LandingCategory
           categories={categories.data?.records ?? []}
