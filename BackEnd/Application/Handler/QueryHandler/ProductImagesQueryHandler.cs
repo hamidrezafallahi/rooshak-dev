@@ -11,8 +11,28 @@ public class ProductImagesQueryHandler(
         IHttpContextAccessor _accessor) : 
     IRequestHandler<GetAllProductImagesQuery, ServiceResult<ListDto<GetProductImageDto>>>,
     IRequestHandler<GetMainImageByProductIdQuery, ServiceResult<GetProductImageDto>>,
-    IRequestHandler<GetProductImagesByIdQuery, ServiceResult<GetProductImageDto>>
+    IRequestHandler<GetProductImagesByIdQuery, ServiceResult<GetProductImageDto>>,
+    IRequestHandler<GetProductImagesByProductIdQuery, ServiceResult<List<GetProductImageDto>>>
 {
+    public async Task<ServiceResult<List<GetProductImageDto>>> Handle(GetProductImagesByProductIdQuery request, CancellationToken cancellationToken)
+    {
+        var images = await _repo.Query(p => p.ProductId == request.ProductId)
+            .OrderByDescending(p => p.IsMain)
+            .ThenBy(p => p.Id)
+            .Select(p => new GetProductImageDto
+            {
+                Id = p.Id,
+                IsMain = p.IsMain,
+                IsActive = p.IsActive,
+                ProductId = p.ProductId,
+                ProductName = p.Product.Name,
+                ProductImageUrl = p.ImageUrl
+            })
+            .ToListAsync(cancellationToken);
+
+        return ServiceResult<List<GetProductImageDto>>.Ok(images);
+    }
+
     public async Task<ServiceResult<ListDto<GetProductImageDto>>> Handle( GetAllProductImagesQuery request,  CancellationToken cancellationToken)
     {
         int pageNumber = request.page ?? 1;
