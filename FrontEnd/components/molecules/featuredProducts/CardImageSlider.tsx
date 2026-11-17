@@ -49,7 +49,7 @@ export function CardSliderProvider({
   );
 }
 
-/** Stacked full-bleed images; the active one fades in over the others. */
+/** Stacked images (whole, object-contain); the active one fades in over the others. */
 export function CardSliderImages({
   images,
   alt,
@@ -95,25 +95,7 @@ export function CardSliderImages({
             fill
             priority={priority && i === 0}
             sizes="(max-width: 768px) 75vw, 240px"
-            className="object-cover"
-          />
-          {/*
-            Frosted lower half: a blurred copy of the same photo, masked to the bottom.
-            Deliberately NOT backdrop-filter — Chrome drops a backdrop-filter's
-            mask while an ancestor transform animates (the hover lift), which
-            blurred the whole card during hover.
-          */}
-          <MediaImage
-            src={src}
-            alt=""
-            aria-hidden
-            fill
-            sizes="(max-width: 768px) 75vw, 240px"
-            className="object-cover scale-110 blur-xl"
-            style={{
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 42%, #000 68%)',
-              maskImage: 'linear-gradient(to bottom, transparent 42%, #000 68%)',
-            }}
+            className="object-contain"
           />
         </div>
       ))}
