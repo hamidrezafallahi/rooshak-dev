@@ -1,7 +1,10 @@
 import { getTranslations } from 'next-intl/server';
 
+import { serverApiBaseUrl } from '@lib/api';
 import { getLandingProductsByTabs } from '@lib/landing';
-import { ILandingProduct } from '@models/product';
+import { safeFetchJson } from '@lib/safeFetch';
+import { SimpleResponse } from '@models/base';
+import { IDetailedProduct, ILandingProduct } from '@models/product';
 
 import FeaturedProducts from './FeaturedProducts';
 import { IFeaturedProduct } from './type';
@@ -22,14 +25,43 @@ function formatMoney(value: number, locale: string) {
   return new Intl.NumberFormat(locale === 'fa' ? 'fa-IR' : 'en-US').format(value);
 }
 
-function toFeatured(p: ILandingProduct, locale: string, currency: string): IFeaturedProduct {
+/**
+ * Slider images for one product: main image first, then the rest of the gallery
+ * (from the product detail endpoint), without duplicates. Falls back to the
+ * main image alone if the detail request fails.
+ */
+async function getGallery(p: ILandingProduct): Promise<string[]> {
+  const result = await safeFetchJson<SimpleResponse<IDetailedProduct> | IDetailedProduct>(
+    `${serverApiBaseUrl}/Products/${encodeURIComponent(String(p.slug || p.id))}`,
+    { next: { revalidate: 60 } },
+    0,
+  );
+  let detail: IDetailedProduct | null = null;
+  if (result.ok && result.data && typeof result.data === 'object') {
+    detail =
+      'data' in result.data
+        ? (result.data as SimpleResponse<IDetailedProduct>).data ?? null
+        : (result.data as IDetailedProduct);
+  }
+  const all = [p.mainImage, ...(detail?.imageUrls ?? [])].filter(
+    (src): src is string => Boolean(src && src.trim()),
+  );
+  return [...new Set(all)];
+}
+
+function toFeatured(
+  p: ILandingProduct,
+  images: string[],
+  locale: string,
+  currency: string,
+): IFeaturedProduct {
   const final = p.finalPrice && p.finalPrice > 0 ? p.finalPrice : p.price;
   const category = locale === 'fa' ? p.persianCategoryName : p.englishCategoryName;
   return {
     id: p.id,
     name: p.name,
     description: toPlainText(p.description),
-    image: p.mainImage,
+    images,
     imageAlt: [p.name, category].filter(Boolean).join(' - '),
     priceLabel: final && final > 0 ? `${formatMoney(final, locale)} ${currency}` : null,
     badges: [category, p.brand].filter((b): b is string => Boolean(b && b.trim())),
@@ -54,11 +86,13 @@ export default async function LandingFeaturedProducts({ locale }: { locale: stri
     if (p?.mainImage && !picked.some((x) => x.id === p.id)) picked.push(p);
   }
 
+  const galleries = await Promise.all(picked.map(getGallery));
+
   return (
     <FeaturedProducts
       heading={t('featuredProducts')}
       ctaLabel={t('viewProduct')}
-      products={picked.map((p) => toFeatured(p, locale, tCommon('currency')))}
+      products={picked.map((p, i) => toFeatured(p, galleries[i], locale, tCommon('currency')))}
     />
   );
 }

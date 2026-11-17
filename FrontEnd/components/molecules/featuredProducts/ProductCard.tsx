@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-import MediaImage from '@components/atoms/MediaImage';
 
+import { CardSliderDots, CardSliderImages, CardSliderProvider } from './CardImageSlider';
 import { IProductCardProps } from './type';
 
 /**
@@ -9,42 +9,34 @@ import { IProductCardProps } from './type';
  * toward the bottom, title + price pill, short description, two badges and a
  * white pill button. Card size: the h-[380px] w-[240px] classes below.
  *
- * Pure server component (no hooks/state) → no hydration concerns.
+ * Server component; only the photo slider + its dots are client-side
+ * (CardImageSlider). Slides start at the main image and change every 2s.
  */
 export default function ProductCard({ product, ctaLabel, priority }: IProductCardProps) {
   const badges = (product.badges ?? []).filter(Boolean).slice(0, 2);
+  const images = product.images.length ? product.images : [''];
 
   return (
+    <CardSliderProvider count={images.length}>
     <article
       className={[
         'group relative isolate overflow-hidden rounded-[26px] bg-[#2a2a2e]',
         'h-[380px] w-[240px] shrink-0 snap-center',
         'shadow-[0_22px_45px_-14px_rgba(15,15,20,0.45),0_8px_16px_-8px_rgba(15,15,20,0.18)]',
-        'transition-[transform,box-shadow] duration-300 ease-out will-change-transform',
+        'transition-[transform,box-shadow] duration-300 ease-out',
         'hover:-translate-y-[5px] hover:shadow-[0_32px_60px_-14px_rgba(15,15,20,0.55),0_10px_20px_-8px_rgba(15,15,20,0.22)]',
         'focus-within:-translate-y-[5px]',
         'motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-within:translate-y-0',
       ].join(' ')}
     >
-      {/* Full-bleed photograph */}
-      <MediaImage
-        src={product.image}
+      {/* Full-bleed photographs (cross-fading slider, main image first) */}
+      <CardSliderImages
+        images={images}
         alt={product.imageAlt || product.name}
-        fill
         priority={priority}
-        sizes="(max-width: 768px) 75vw, 240px"
-        className="-z-20 object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        className="-z-20 transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
       />
 
-      {/* Frosted lower half: blurs the photo itself so the bottom takes on its tint */}
-      <div
-        aria-hidden
-        className="-z-10 absolute inset-0 backdrop-blur-xl"
-        style={{
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 42%, #000 68%)',
-          maskImage: 'linear-gradient(to bottom, transparent 42%, #000 68%)',
-        }}
-      />
       {/* Dark readability gradient */}
       <div
         aria-hidden
@@ -57,12 +49,8 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
 
       {/* Content stack pinned to the bottom; fixed line counts keep all cards aligned */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col px-3 pb-3 text-white">
-        {/* Decorative pager dots */}
-        <div aria-hidden className="flex justify-center items-center gap-[3px] mb-2">
-          <span className="bg-white rounded-full w-[4px] h-[4px]" />
-          <span className="bg-white/50 rounded-full w-[4px] h-[4px]" />
-          <span className="bg-white/50 rounded-full w-[4px] h-[4px]" />
-        </div>
+        {/* Slide indicator: one dot per image */}
+        <CardSliderDots />
 
         <div className="flex justify-between items-center gap-2 px-1">
           <h3 className="min-w-0 font-semibold text-[15px] leading-6 truncate">{product.name}</h3>
@@ -104,5 +92,6 @@ export default function ProductCard({ product, ctaLabel, priority }: IProductCar
         </Link>
       </div>
     </article>
+    </CardSliderProvider>
   );
 }
