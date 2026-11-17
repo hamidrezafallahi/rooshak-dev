@@ -16,6 +16,9 @@ namespace OnlineShop.Infrastructure.Persistence.Configurations
                    .IsRequired()
                    .HasMaxLength(500);
 
+            builder.Property(pi => pi.OriginalUrl)
+                   .HasMaxLength(500);
+
             builder.Property(pi => pi.IsMain)
                    .IsRequired();
 

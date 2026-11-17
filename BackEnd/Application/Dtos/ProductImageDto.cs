@@ -13,6 +13,9 @@ public class GetProductImageDto
     public string ProductName { get; set; }
 
     public string ProductImageUrl { get; set; }
+
+    /// <summary>Full-quality original file; null when only the compressed copy exists.</summary>
+    public string? OriginalImageUrl { get; set; }
     public bool IsMain { get; set; }
     public bool IsActive { get; set; }
 

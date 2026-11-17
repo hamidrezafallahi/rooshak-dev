@@ -404,6 +404,28 @@ public class UploadFailureTests
         Assert.Equal(Stored, Assert.Single(working.Deleted));
     }
 
+    [Fact]
+    public async Task New_images_keep_their_original_file_and_replacing_drops_the_old_original()
+    {
+        var products = new Table<Product>();
+        var images = new Table<ProductImage>();
+        var product = Product.Create("Loupe", "Text", 1, 1, new ProductDimensions(1, 1, 1, 1), 1);
+        products.Rows.Add(product);
+        var working = new FakeUploader { Path = "uploads/test/new.webp" };
+
+        await ProductImages(images, products, working).Handle(
+            new AddProductImageCommand { ProductId = product.Id, Images = [File] }, default);
+        Assert.Equal("uploads/test/new.webp", Assert.Single(product.Images).OriginalUrl);
+
+        images.Rows.Add(ProductImage.Create(product.Id, Stored, true, 1, "uploads/test/old_original.jpg"));
+        images.Save();
+        await ProductImages(images, products, working).Handle(
+            new ReplaceProductImageFileCommand { Id = images.Rows[0].Id, Image = File }, default);
+
+        Assert.Equal("uploads/test/new.webp", images.Rows[0].OriginalUrl);
+        Assert.Equal([Stored, "uploads/test/old_original.jpg"], working.Deleted);
+    }
+
     [Theory]
     [InlineData(Failure.ReturnsNull)]
     [InlineData(Failure.Throws)]
@@ -636,6 +658,7 @@ public class UploadFailureTests
         public Task<string?> UploadAsJpg(UploadDTO request) => Upload();
         public Task<string?> UploadVideo(UploadDTO request) => Upload();
         public Task<string?> UploadFont(UploadDTO request) => Task.FromResult<string?>(null);
+        public Task<string?> UploadOriginalImage(UploadDTO request) => Upload();
         public Task DeleteFile(DeleteDTO request) => Task.CompletedTask;
 
         public Task DeleteStoredFile(string? storedPath, string fallbackDirectory)

@@ -23,6 +23,7 @@ import {
 import {
   addProductImage,
   deleteProductImage,
+  downloadInfo,
   GalleryImage,
   getProductGallery,
   refreshStorefrontImages,
@@ -30,6 +31,7 @@ import {
   setMainProductImage,
   setProductImageActive,
 } from './api';
+import RecentImages from './RecentImages';
 import './gallery.css';
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -42,9 +44,10 @@ type Upload = {
   error?: string;
 };
 
-type IconName = 'star' | 'swap' | 'eye' | 'eyeOff' | 'trash' | 'upload' | 'retry' | 'close' | 'image';
+type IconName = 'download' | 'star' | 'swap' | 'eye' | 'eyeOff' | 'trash' | 'upload' | 'retry' | 'close' | 'image';
 
 const PATHS: Record<IconName, React.ReactNode> = {
+  download: <><path d="M12 4v11.5" /><path d="M7.5 11L12 15.5 16.5 11" /><path d="M4 15v4.5h16V15" /></>,
   star: <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />,
   swap: <><path d="M4 8h13l-3.5-3.5" /><path d="M20 16H7l3.5 3.5" /></>,
   eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="3" /></>,
@@ -121,6 +124,9 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [dropActive, setDropActive] = useState(false);
   const [tileDrop, setTileDrop] = useState<number | null>(null);
+  const [focusImageId, setFocusImageId] = useState<number | null>(null);
+  const [recentKey, setRecentKey] = useState(0);
+  const galleryTop = useRef<HTMLDivElement>(null);
 
   const addInput = useRef<HTMLInputElement>(null);
   const swapInput = useRef<HTMLInputElement>(null);
@@ -160,8 +166,24 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
   const pickProduct = (value: string | number) => {
     const id = Number(value);
     if (!Number.isFinite(id) || id <= 0) return;
+    setFocusImageId(null);
     setProductId(id);
     router.replace(`${pathname}?productId=${id}`, { scroll: false });
+  };
+
+  // A click in the recent list opens that image's product and marks the image in its gallery.
+  const pickFromList = (img: GalleryImage) => {
+    if (img.productId !== productId) pickProduct(img.productId);
+    setFocusImageId(img.id);
+    if (!window.matchMedia('(min-width: 1024px)').matches) {
+      galleryTop.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // With no product in the URL, open the product of the newest image instead of an empty page.
+  const openNewest = (img: GalleryImage) => {
+    if (productRef.current) return;
+    pickProduct(img.productId);
   };
 
   const validate = (file: File): string | null => {
@@ -176,6 +198,7 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
       const ok = await job();
       if (ok && productId) {
         await load(productId, true);
+        setRecentKey((k) => k + 1);
         refreshStorefrontImages();
       }
     } finally {
@@ -251,6 +274,7 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
           );
         }
       }
+      setRecentKey((k) => k + 1);
       refreshStorefrontImages();
     } finally {
       queueRunning.current = false;
@@ -338,6 +362,8 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
         )}
       </section>
 
+      <div className="pig-layout">
+      <div className="pig-main" ref={galleryTop}>
       {!productId && (
         <div className="admin-panel admin-empty pig-empty">
           <span className="pig-empty-icon"><Icon name="image" size={34} /></span>
@@ -384,10 +410,11 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
           {images.map((img) => {
             const isBusy = Boolean(busy[img.id]);
             const src = swapPreview[img.id] ?? toMediaUrl(img.productImageUrl);
+            const dl = downloadInfo(img, productName);
             return (
               <figure
                 key={img.id}
-                className={`pig-tile${img.isMain ? ' pig-tile-main' : ''}${!img.isActive ? ' pig-tile-hidden' : ''}${tileDrop === img.id ? ' pig-tile-drop' : ''}`}
+                className={`pig-tile${img.isMain ? ' pig-tile-main' : ''}${!img.isActive ? ' pig-tile-hidden' : ''}${tileDrop === img.id ? ' pig-tile-drop' : ''}${focusImageId === img.id ? ' pig-tile-focus' : ''}`}
                 onDragOver={(e) => {
                   if (!hasFiles(e) || isBusy) return;
                   e.preventDefault();
@@ -439,6 +466,15 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
                         <ToolButton icon="star" label={t('setMain')} onClick={() => makeMain(img)} disabled={isBusy} />
                       )}
                       <div className="pig-bar-tools">
+                        <a
+                          className="pig-tool"
+                          href={toMediaUrl(dl.path)}
+                          download={dl.fileName}
+                          title={dl.isOriginal ? t('download') : t('downloadCompressed')}
+                          aria-label={dl.isOriginal ? t('download') : t('downloadCompressed')}
+                        >
+                          <Icon name="download" />
+                        </a>
                         <ToolButton icon="swap" label={t('replace')} onClick={() => openSwap(img.id)} disabled={isBusy} />
                         <ToolButton
                           icon={img.isActive ? 'eye' : 'eyeOff'}
@@ -495,6 +531,16 @@ export default function ProductImageStudio({ initialProductId }: { initialProduc
           </button>
         </div>
       )}
+      </div>
+
+      <RecentImages
+        selectedProductId={productId}
+        activeImageId={focusImageId}
+        refreshKey={recentKey}
+        onPick={pickFromList}
+        onFirstImage={initialProductId ? undefined : openNewest}
+      />
+      </div>
 
       <input
         ref={addInput}

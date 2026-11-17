@@ -2345,6 +2345,10 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsMain")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("OriginalUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
