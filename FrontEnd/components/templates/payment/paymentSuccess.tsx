@@ -207,13 +207,13 @@ export default function PaymentSuccess({ params }: IPaymentSuccessProps) {
                     {t('downloadInvoice')}
                   </Button>
                   <Link href={`/${locale}/orders`}>
-                    <Button className="bg-primary hover:bg-primary/90 w-full text-primary-foreground">
+                    <Button className="w-full">
                       <Package config={{className:"ml-2 w-4 h-4"}} />
                       {t('viewOrders')}
                     </Button>
                   </Link>
                   <Link href={`/${locale}`}>
-                    <Button className="bg-store-muted hover:bg-store-muted w-full text-store-text">
+                    <Button variant="outline" className="w-full">
                       <Home config={{className:"ml-2 w-4 h-4"}} />
                       {t('backHome')}
                     </Button>

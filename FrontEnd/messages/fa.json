@@ -109,8 +109,8 @@
     "copyright": "© {year} {brand}. تمامی حقوق محفوظ است.",
     "columns": {
       "shop": "فروشگاه",
-      "discover": "کاوش",
-      "account": "حساب کاربری"
+      "guides": "مقالات و راهنما",
+      "service": "خدمات مشتریان"
     },
     "links": {
       "products": "محصولات",

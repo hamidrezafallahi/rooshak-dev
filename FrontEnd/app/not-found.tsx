@@ -20,13 +20,13 @@ export default function NotFound() {
           <div className="flex sm:flex-row flex-col gap-3 w-full sm:w-auto">
             <Link
               href="/fa"
-              className="inline-flex justify-center items-center bg-primary hover:bg-transparent px-8 py-3 border border-primary text-primary-foreground hover:text-store-text text-sm transition-colors"
+              className="store-btn store-btn-primary"
             >
               صفحه اصلی
             </Link>
             <Link
               href="/en"
-              className="inline-flex justify-center items-center hover:bg-primary px-8 py-3 border border-store-strong text-store-text hover:text-primary-foreground text-sm transition-colors"
+              className="store-btn"
             >
               Home
             </Link>

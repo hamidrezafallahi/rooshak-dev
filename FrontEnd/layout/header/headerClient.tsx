@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -32,39 +32,33 @@ export type HeaderAnnouncement = {
 };
 
 type HeaderProps = {
-  /** Float transparently over a full-bleed hero (home page); turns solid after scroll. */
+  /** Kept for API compatibility; the header is always solid now (see below). */
   overlay?: boolean;
   /** Admin-managed bar above the navigation; null = nothing scheduled right now. */
   announcement?: HeaderAnnouncement | null;
 };
 
-export default function HeaderClient({ overlay = false, announcement = null }: HeaderProps) {
+/**
+ * The header always has a solid surface background — it no longer floats transparently
+ * over the home-page hero video, where the cart / account / menu icons were unreadable.
+ * Mobile: the menu button sits on the physical RIGHT edge in both languages; the
+ * account + cart pair sits tight against the left edge as its visual counterweight.
+ */
+export default function HeaderClient({ announcement = null }: HeaderProps) {
   const locale = useLocale();
   const pathname = usePathname()!;
   const t = useTranslations('header');
   const tBrand = useTranslations('brand');
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    if (!overlay) return;
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [overlay]);
-
-  const floating = overlay && !scrolled;
 
   return (
     <header
       role="banner"
-      data-floating={floating}
-      className="top-0 inset-x-0 z-50 fixed bg-store-surface data-[floating=true]:bg-transparent data-[floating=true]:bg-gradient-to-b data-[floating=true]:from-black/50 data-[floating=true]:to-transparent border-b border-store-border data-[floating=true]:border-transparent text-store-text data-[floating=true]:text-white transition-colors duration-300"
+      className="top-0 inset-x-0 z-50 fixed bg-store-surface border-b border-store-border text-store-text"
     >
       {announcement ? <AnnouncementStrip bar={announcement} /> : null}
 
-      <div className="relative items-center gap-3 grid grid-cols-[1fr_auto_1fr] mx-auto px-4 sm:px-6 lg:px-10 max-w-[1600px] h-[var(--store-nav-h)]">
-        <div className="flex items-center gap-1">
+      <div className="relative items-center gap-3 grid grid-cols-[1fr_auto_1fr] mx-auto px-1 sm:px-6 lg:px-10 max-w-[1600px] h-[var(--store-nav-h)]">
+        <div className="flex max-md:ltr:justify-end items-center gap-1 max-md:ltr:order-3">
           <div className="md:hidden">
             <MobileMenu />
           </div>
@@ -80,7 +74,7 @@ export default function HeaderClient({ overlay = false, announcement = null }: H
                   key={item.href}
                   href={href}
                   aria-current={active ? 'page' : undefined}
-                  className="after:bottom-1 after:absolute relative after:inset-x-3 after:bg-current px-3 py-2 after:h-px font-medium text-sm hover:after:scale-x-100 aria-[current=page]:after:scale-x-100 after:content-[''] after:scale-x-0 after:transition-transform after:duration-300"
+                  className="after:bottom-1 after:absolute relative after:inset-x-3 after:bg-highlight px-3 py-2 after:h-px font-medium text-sm hover:after:scale-x-100 aria-[current=page]:after:scale-x-100 after:content-[''] after:scale-x-0 after:transition-transform after:duration-300"
                 >
                   {t(item.labelKey)}
                 </Link>
@@ -92,17 +86,16 @@ export default function HeaderClient({ overlay = false, announcement = null }: H
         <Link
           href={`/${locale}`}
           aria-label={tBrand('name')}
-          className="flex justify-center"
+          className="flex justify-center max-md:ltr:order-2"
         >
           <BrandLogo
             alt={tBrand('name')}
-            onDark={floating}
             priority
             className="w-32 sm:w-44"
           />
         </Link>
 
-        <div className="flex justify-end items-center gap-1">
+        <div className="flex max-md:ltr:flex-row-reverse justify-end items-center gap-0 md:gap-1 max-md:ltr:order-1">
           <div className="hidden sm:flex items-center gap-1">
             <LangSwitcher />
           </div>

@@ -109,8 +109,8 @@
     "copyright": "© {year} {brand}. All rights reserved.",
     "columns": {
       "shop": "Shop",
-      "discover": "Discover",
-      "account": "Account"
+      "guides": "Articles & guides",
+      "service": "Customer care"
     },
     "links": {
       "products": "Products",

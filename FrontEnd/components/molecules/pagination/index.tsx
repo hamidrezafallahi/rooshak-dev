@@ -143,7 +143,7 @@ const CustomPaginationInner: React.FC<PaginationProps> = ({
               key={index}
               onClick={() => handlePageChange(pageSize, p)}
               type="button"
-              className={`!px-3 !py-1 !rounded-lg !min-w-8 ${
+              className={`!px-3 !py-1 !rounded-lg !min-w-8 !h-8 ${
                 active
                   ? 'admin-btn-primary !border-primary'
                   : 'admin-btn !py-1'

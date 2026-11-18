@@ -58,7 +58,7 @@ function PromoCode() {
         />
         <button
           onClick={handleSubmitPromoCode}
-          className="bg-primary hover:bg-primary/90 px-4 py-2 border border-primary rounded-lg font-medium text-primary-foreground text-sm"
+          className="px-5 store-btn store-btn-primary"
         >
           {t("general.apply")}
         </button>

@@ -66,7 +66,7 @@ export default async function Page({ params }: Props) {
       {blocks.map((block) => (
         <section key={block.key} className="flex flex-col gap-3 mx-auto w-full max-w-3xl">
           {block.eyebrow ? <span className="text-store-subtle text-sm">{block.eyebrow}</span> : null}
-          {block.title ? <h2 className="font-normal text-2xl sm:text-3xl leading-tight">{block.title}</h2> : null}
+          {block.title ? <h2 className="font-normal text-2xl sm:text-3xl leading-tight store-heading">{block.title}</h2> : null}
           {block.body ? (
             <p className="text-store-text leading-loose whitespace-pre-line">{block.body}</p>
           ) : null}

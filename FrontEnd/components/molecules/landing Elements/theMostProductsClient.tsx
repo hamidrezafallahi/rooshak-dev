@@ -46,7 +46,7 @@ export default function TheMostProductsClient({
 
   return (
     <>
-      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-5 mb-8 md:mb-12">
+      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-5 mb-8 md:mb-12 store-section-head">
         <div>
           <h2 className="mb-5 font-normal text-2xl sm:text-3xl md:text-4xl tracking-tight">
             {t('landing.selectedProducts')}

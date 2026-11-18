@@ -61,7 +61,7 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
 
   return (
     <div
-      className="top-full z-50 absolute mt-0 end-0"
+      className="top-full z-50 absolute mt-0 end-0 max-md:left-0 max-md:right-auto"
       onMouseLeave={() => setIsOpen(false)}
     >
       <div className="bg-store-surface shadow-2xl p-4 border border-store-border w-[300px] text-store-text">
@@ -130,13 +130,13 @@ function ShoppingCartHeaderComponent({ ...props }: IProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Button className="bg-primary hover:bg-primary/90 rounded-none w-full h-10 font-medium text-primary-foreground text-sm">
+          <Button className="w-full store-btn store-btn-primary">
             <CreditCardIcon />
             {t("shoppingCart.header.checkout")}
           </Button>
           <Link
             // variant="ghost"
-            className="flex justify-center items-center hover:bg-store-muted w-full h-8 text-store-text text-xs"
+            className="justify-center w-full store-btn-text"
             href={`/${locale}/shoppingCart`}
           >
             {t("shoppingCart.header.viewCart")} →

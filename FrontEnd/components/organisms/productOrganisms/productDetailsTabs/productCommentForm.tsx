@@ -86,14 +86,14 @@ const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
           <button
             onClick={handleSubmitComment}
             disabled={isLoading}
-            className="bg-primary mt-2 px-6 py-3 border border-primary text-primary-foreground text-sm hover:bg-transparent hover:text-store-text transition-colors"
+            className="mt-2 store-btn store-btn-primary"
           >
             {isLoading ? <SpinnerIcon /> : <span>{t('product.submitComment')}</span>}
           </button>
         </>
       ) : (
         <Link
-          className="inline-block bg-primary px-6 py-3 border border-primary text-primary-foreground text-sm hover:bg-transparent hover:text-store-text transition-colors"
+          className="store-btn store-btn-primary"
           href={`/${locale}/register?redirect=${redirectUrl}`}
         >
           {t("general.loginFirst")}

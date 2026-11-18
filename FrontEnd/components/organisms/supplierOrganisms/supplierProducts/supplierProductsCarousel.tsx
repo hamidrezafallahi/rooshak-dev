@@ -161,7 +161,7 @@ dispatch(addToCart({
               onClick={() => {
                 handleAddToCart(product);
               }}
-              className="bg-primary hover:bg-primary/90 px-3 py-2 rounded-lg text-primary-foreground text-xs"
+              className="px-4 w-full store-btn store-btn-primary"
             >
               {t('common.add')}
             </button>

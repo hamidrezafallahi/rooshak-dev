@@ -54,7 +54,7 @@ export const Rate: React.FC<RateProps> = ({
         type="button"
         variant="ghost"
         size="icon"
-        className="hover:bg-transparent m-0 p-0 w-6 h-6"
+        className="hover:bg-transparent m-0 !p-0 !w-6 !h-6"
         aria-label={t('common.ratingAria', { value: rateValue, max })}
         onMouseEnter={() => setHoverValue(rateValue)}
         onMouseLeave={() => setHoverValue(null)}

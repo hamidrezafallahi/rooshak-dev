@@ -30,13 +30,13 @@ export default function SectionHeading({
       className={`flex flex-col gap-4 mb-8 md:mb-12 ${
         centered
           ? 'items-center text-center'
-          : 'sm:flex-row sm:items-end sm:justify-between'
+          : 'items-center text-center md:flex-row md:items-end md:justify-between md:text-start'
       }`}
     >
       <div className={centered ? 'max-w-2xl' : 'max-w-2xl'}>
         <Tag
           id={id}
-          className="font-normal text-2xl sm:text-3xl md:text-4xl tracking-tight"
+          className="font-normal text-2xl sm:text-3xl md:text-4xl tracking-tight store-heading"
         >
           {title}
         </Tag>
@@ -50,7 +50,7 @@ export default function SectionHeading({
       {href && linkLabel ? (
         <Link
           href={href}
-          className="self-start sm:self-auto pb-0.5 border-current border-b font-medium text-sm hover:opacity-60 whitespace-nowrap transition-opacity"
+          className="self-center md:self-auto pb-0.5 border-current border-b font-medium text-sm hover:opacity-60 whitespace-nowrap transition-opacity"
         >
           {linkLabel}
         </Link>
