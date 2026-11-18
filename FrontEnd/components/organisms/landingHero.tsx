@@ -59,7 +59,7 @@ export default async function LandingHero({ slide }: Props) {
 
   return (
     <section
-      className="relative bg-black min-h-[34rem] h-svh max-h-[58rem] overflow-hidden text-white"
+      className="relative bg-black min-h-[30rem] h-[calc(100svh-var(--store-header-h))] max-h-[54rem] overflow-hidden text-white"
       aria-labelledby="home-hero-title"
     >
       <HeroMedia
@@ -87,7 +87,7 @@ export default async function LandingHero({ slide }: Props) {
       ) : null}
 
       {hasText ? (
-        <div className="z-10 relative flex flex-col justify-end items-start gap-5 mx-auto px-4 sm:px-8 lg:px-16 pt-[calc(var(--store-header-h)+2rem)] pb-16 md:pb-24 max-w-[1600px] h-full pointer-events-none">
+        <div className="z-10 relative flex flex-col justify-end items-start gap-5 mx-auto px-4 sm:px-8 lg:px-16 pt-10 pb-16 md:pb-24 max-w-[1600px] h-full pointer-events-none">
           {title || description ? (
             <div className="flex flex-col items-start gap-5" style={opacity < 1 ? { opacity } : undefined}>
               {title ? (

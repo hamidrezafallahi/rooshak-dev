@@ -132,7 +132,7 @@ export default function FinalizeOrder({
         <button
           onClick={onClose}
           disabled={isLoading}
-          className="flex-1 px-4 py-2 border rounded-xl text-sm"
+          className="flex-1 px-4 store-btn"
         >
           {t('payment.cancel')}
         </button>
@@ -140,7 +140,7 @@ export default function FinalizeOrder({
         <button
           onClick={handleFinalizeOrder}
           disabled={isLoading}
-          className="flex-1 bg-primary disabled:opacity-60 px-4 py-2 rounded-xl text-primary-foreground text-sm"
+          className="flex-1 disabled:opacity-60 px-4 store-btn store-btn-primary"
         >
           {isLoading
             ? t('payment.connecting_gateway')

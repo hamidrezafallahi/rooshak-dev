@@ -21,7 +21,7 @@ export async function BrandProducts({ id }: { id: number }) {
   const t = await getTranslations();
   return (
     <div className="py-10">
-      <h2 className="mb-4 font-bold text-xl">{t('product.brandProducts')}</h2>
+      <h2 className="mb-4 font-bold text-xl store-heading">{t('product.brandProducts')}</h2>
       <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         {products.map((product, idx) => (
           <SimpleProductCard key={idx} product={product} />

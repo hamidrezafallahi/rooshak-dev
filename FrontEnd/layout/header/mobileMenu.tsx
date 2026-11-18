@@ -123,10 +123,10 @@ function MobileMenu() {
           <aside
             id="mobile-nav-drawer"
             aria-label={t('mainNav')}
-            className={`absolute inset-y-0 start-0 flex w-[min(88vw,420px)] flex-col overflow-hidden bg-store-surface text-store-text shadow-2xl transition-transform duration-300 ease-out ${
-              isOpen
-                ? 'translate-x-0'
-                : '-translate-x-full rtl:translate-x-full'
+            className={`absolute inset-y-0 right-0 flex w-[min(88vw,420px)] flex-col overflow-hidden bg-store-surface text-store-text shadow-2xl transition-transform duration-300 ease-out ${
+              // Always enters and leaves from the physical right edge (right-handed
+              // thumb side), whatever the language direction.
+              isOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
           >
             <div className="flex justify-between items-center px-5 border-b border-store-border h-16 shrink-0">
@@ -169,7 +169,7 @@ function MobileMenu() {
               <Link
                 href={`/${locale}/register`}
                 onClick={closeDrawer}
-                className="flex-1 bg-primary px-5 py-3 border border-primary font-medium text-primary-foreground text-sm text-center hover:bg-transparent hover:text-store-text transition-colors"
+                className="flex-1 store-btn store-btn-primary"
               >
                 {t('register')}
               </Link>

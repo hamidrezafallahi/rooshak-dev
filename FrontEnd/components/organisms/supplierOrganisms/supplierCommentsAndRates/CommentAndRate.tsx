@@ -96,14 +96,14 @@ export default function CommentAndRate({ ...props }: TCommentAndRate) {
           <Button
             onClick={handleSubmitComment}
             disabled={isLoading}
-            className="bg-primary mt-2 px-6 py-2 rounded-xl text-primary-foreground"
+            className="mt-2 store-btn store-btn-primary"
           >
             {isLoading ? <SpinnerIcon /> : <span> {t("general.save")}</span>}
           </Button>
         </>
       ) : (
         <Link
-          className="bg-primary p-2 px-3 rounded-lg text-primary-foreground"
+          className="store-btn store-btn-primary"
           href={`/${locale}/register?redirect=${redirectUrl}`}
         >
           {t("general.loginFirst")}

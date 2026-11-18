@@ -35,13 +35,13 @@ function ShoppingCart() {
         <Button
           aria-label={t("header.shopping cart")}
           variant="ghost"
-          className="relative flex justify-center items-center rounded-none w-10 h-10 hover:opacity-60 hover:bg-transparent text-inherit transition-opacity"
+          className="relative flex justify-center items-center !p-0 rounded-none !w-10 !h-10 [&_svg]:!size-5 hover:opacity-60 hover:bg-transparent text-inherit transition-opacity"
           onMouseEnter={() => setIsOpen(true)}
           onClick={() => setIsOpen(!isOpen)}
         >
           <ShoppingCartIcon config={{ size: 20 }} />
           {ShoppingCart?.products.length > 0 && (
-            <span className="top-0 end-0 absolute flex justify-center items-center bg-primary rounded-full min-w-4 h-4 px-1 text-[0.625rem] text-primary-foreground leading-none">
+            <span className="store-cart-badge">
               {ShoppingCart?.products.length}
             </span>
           )}

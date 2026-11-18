@@ -1167,3 +1167,78 @@ html {
     animation-duration: 2s;
   }
 }
+
+/* ================== UI/UX consistency layer ==================
+   Loaded last so it wins over the earlier storefront layer.
+   Colour rule (70/20/10):
+     • 70% neutral  — white / light-grey surfaces, grey lines, muted text.
+     • 20% main     — --primary-color (black): primary actions, the cart badge,
+                      outline buttons, headings and body ink.
+     • 10% second   — --highlight-color (matte gold, the main colour's warm complement):
+                      active nav underline, eyebrows, discount badges, rating stars,
+                      footer column titles, focus rings.
+   Buttons: the storefront has exactly THREE button models —
+     .store-btn-primary (filled main colour) · .store-btn (outline) · .store-btn-text (text link). */
+@layer components {
+  :root {
+    --brand-main: var(--primary-color);
+    --brand-main-contrast: var(--store-surface-solid);
+    --brand-second: var(--highlight-color);
+  }
+
+  /* ---- 1) the three buttons (one height, one padding, square corners) ---- */
+  .store-btn {
+    @apply inline-flex justify-center items-center gap-2 px-8 py-0 h-12 font-medium text-sm whitespace-nowrap transition-colors duration-200;
+    border: 1px solid var(--brand-main);
+    border-radius: 0;
+    background: transparent;
+    color: var(--store-text);
+  }
+  .store-btn:hover { background: var(--brand-main); color: var(--brand-main-contrast); }
+  .store-btn-primary {
+    background: var(--brand-main);
+    border-color: var(--brand-main);
+    color: var(--brand-main-contrast);
+  }
+  .store-btn-primary:hover { background: transparent; color: var(--store-text); }
+  .store-btn-text {
+    @apply inline-flex items-center gap-2 px-0 pb-0.5 min-h-[44px] font-medium text-sm whitespace-nowrap transition-colors duration-200;
+    background: transparent;
+    border: 0;
+    color: var(--store-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+  }
+  .store-btn-text:hover { text-decoration-color: var(--brand-second); }
+  .store-btn:focus-visible, .store-btn-text:focus-visible {
+    outline: 2px solid var(--brand-second);
+    outline-offset: 2px;
+  }
+  .store-btn:disabled, .store-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+
+  /* ---- 2) cart badge: always the main colour, same as the primary button ---- */
+  .store-cart-badge {
+    @apply absolute top-0.5 end-0 flex justify-center items-center px-1 rounded-full min-w-[18px] h-[18px] font-medium text-[11px] leading-none pointer-events-none;
+    background: var(--brand-main);
+    color: var(--brand-main-contrast);
+    box-shadow: 0 0 0 2px var(--store-surface-solid);
+  }
+
+  /* ---- 3) second colour (10%) accents ---- */
+  .store-eyebrow { color: var(--brand-second); }
+  .store-footer-title { color: var(--brand-second); }
+
+  /* ---- 4) mobile: every section / page heading is centred ---- */
+  @media (max-width: 767.98px) {
+    .store-page-header, .store-section-head {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .store-section-head > * { align-items: center; text-align: center; }
+    .store-heading { text-align: center; }
+  }
+}

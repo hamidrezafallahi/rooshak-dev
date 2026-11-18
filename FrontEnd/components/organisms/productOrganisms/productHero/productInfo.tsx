@@ -29,7 +29,7 @@ export default async function ProductInfo({ product }: { product: IDetailedProdu
       {product.brandName && (
         <p className="text-store-subtle text-xs uppercase ltr:tracking-[0.14em]">{product.brandName}</p>
       )}
-      <h1 className="font-normal text-2xl md:text-4xl leading-tight">{product.name}</h1>
+      <h1 className="font-normal text-2xl md:text-4xl leading-tight store-heading">{product.name}</h1>
 
       {product.categoryName && (
         <p className="text-store-subtle text-sm">{product.categoryName}</p>

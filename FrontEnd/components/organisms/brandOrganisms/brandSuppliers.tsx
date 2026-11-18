@@ -27,7 +27,7 @@ export async function BrandSuppliers({ id }: { id: number }) {
 
   return (
     <div className="my-10">
-      <h2 className="mb-6 font-normal text-2xl">{t('product.brandSuppliers')}</h2>
+      <h2 className="mb-6 font-normal text-2xl store-heading">{t('product.brandSuppliers')}</h2>
       <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {suppliers.map((s) => (
           <Link

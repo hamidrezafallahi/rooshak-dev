@@ -59,7 +59,7 @@ export default async function LandingSlider({ slides }: IProps) {
             {label || href ? (
               <>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-6 sm:p-10 text-white">
+                <div className="absolute inset-x-0 bottom-0 flex flex-col items-center md:items-start gap-3 p-6 sm:p-10 text-white text-center md:text-start">
                   {label ? (
                     <h2 className="font-normal text-2xl sm:text-4xl leading-tight">{label}</h2>
                   ) : null}

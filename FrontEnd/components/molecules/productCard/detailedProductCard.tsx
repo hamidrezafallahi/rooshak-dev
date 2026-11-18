@@ -50,7 +50,7 @@ export function DetailedProductCard({
         </div>
       )}
       {isLowStock && !isOutOfStock && (
-        <div className="top-3 right-3 z-10 absolute bg-amber-500 px-2 py-1 rounded-full font-medium text-white text-xs">
+        <div className="top-3 right-3 z-10 absolute bg-highlight px-2 py-1 rounded-full font-medium text-white text-xs">
           {t('lowStockShort')}
         </div>
       )}
@@ -134,7 +134,7 @@ export function DetailedProductCard({
           {/* رتبه‌بندی (اختیاری) */}
           {product.rating !== undefined && (
             <div className="flex items-center gap-1">
-              <div className="flex text-amber-400">
+              <div className="flex text-highlight">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
@@ -156,7 +156,7 @@ export function DetailedProductCard({
         <div className="flex gap-2">
           <Link
             href={`/${locale}/products/${product.slug || product.id}`}
-            className="flex-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg font-medium text-primary-foreground text-center transition-colors"
+            className="flex-1 px-4 store-btn store-btn-primary"
           >
             {t('view')}
           </Link>
@@ -167,11 +167,8 @@ export function DetailedProductCard({
               // افزودن به سبد خرید
               console.log("Add to cart:", product.id);
             }}
-            className={`flex-1 text-center py-2 px-4 rounded-lg font-medium transition-colors ${
-              isOutOfStock
-                ? "bg-store-muted text-store-subtle cursor-not-allowed"
-                : "bg-store-muted text-store-text hover:bg-store-muted"
-            }`}
+            aria-disabled={isOutOfStock || undefined}
+            className="flex-1 px-4 store-btn"
           >
             {t('addToCart')}
           </button>

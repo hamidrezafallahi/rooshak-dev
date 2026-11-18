@@ -116,8 +116,8 @@ export default async function Home({ params }: Props) {
   return (
     <>
       <JsonLd data={[organizationLd, websiteLd]} />
-      <Header overlay />
-      <main className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex flex-col pt-[var(--store-header-h)] min-h-screen">
         <LandingHero slide={hero} />
         <LandingSlider slides={homeSlides} />
         <LandingBrands />
