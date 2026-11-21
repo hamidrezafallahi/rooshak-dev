@@ -15,6 +15,18 @@ using OnlineShop.Domain.Interfaces;
         IRequestHandler<DeleteCartItemCommand, ServiceResult<IdDto>>,
         IRequestHandler<SyncCartCommand, ServiceResult<CartReadModel>>
     {
+    // آیتم‌هایی که محصول/پیشنهادشان حذف شده یا پیدا نمی‌شود، از سبد کاربر پاک می‌شوند
+    private static bool IsUnavailable(CartItem i) =>
+        i.ProductOffer == null || i.ProductOffer.IsDeleted ||
+        i.ProductOffer.Product == null || i.ProductOffer.Product.IsDeleted;
+
+    private static List<CartItem> PurgeUnavailable(Cart cart, int userId)
+    {
+        var removed = cart.Items.Where(i => !i.IsDeleted && IsUnavailable(i)).ToList();
+        foreach (var i in removed) i.Delete(userId);
+        return removed;
+    }
+
         public async Task<ServiceResult<IdDto>> Handle(UpdateCartCommand request, CancellationToken cancellationToken)
         {
             var userId = _accessor.HttpContext.GetUserId();
@@ -63,8 +75,13 @@ using OnlineShop.Domain.Interfaces;
             }
 
             var now = DateTime.UtcNow;
+            var purged = PurgeUnavailable(cart, userId.Value);
             var offer = await _offerRepo.GetByIdAsync(request.ProductOfferId);
-            if (offer == null) return ServiceResult<CartReadModel>.Failed("پیشنهاد محصول یافت نشد");
+            if (offer == null)
+            {
+                if (purged.Count > 0) await _itemRepo.SaveChangesAsync(cancellationToken);
+                return ServiceResult<CartReadModel>.Failed("پیشنهاد محصول یافت نشد");
+            }
 
             var unitPrice = offer.BasePrice;
 
@@ -100,8 +117,14 @@ using OnlineShop.Domain.Interfaces;
         if (userId == null) return ServiceResult<IdDto>.Unauthorized();
         var cart = await _repo.GetUserCartAsync(userId.Value);
         if (cart == null) return ServiceResult<IdDto>.Failed("سبد یافت نشد");
+        var purged = PurgeUnavailable(cart, userId.Value);
         var existingItem = cart.Items.FirstOrDefault(i => !i.IsDeleted && i.ProductId == request.ProductId && i.ProductOfferId == request.ProductOfferId) ?? null;
-        if (existingItem == null) return ServiceResult<IdDto>.Failed("این کالا در سبد خرید شما پیدا نشد.");
+        if (existingItem == null)
+        {
+            if (purged.Count == 0) return ServiceResult<IdDto>.Failed("این کالا در سبد خرید شما پیدا نشد.");
+            await _itemRepo.SaveChangesAsync(cancellationToken);
+            return ServiceResult<IdDto>.Ok(new IdDto { Id = cart.Id });
+        }
 
         existingItem.Update(request.ProductId,
       request.ProductOfferId,
@@ -131,15 +154,18 @@ using OnlineShop.Domain.Interfaces;
             var cart = await _repo.GetUserCartAsync(userId.Value);
             if (cart == null) return ServiceResult<CartReadModel>.Failed("سبد یافت نشد");
 
-
+            var purged = PurgeUnavailable(cart, userId.Value);
 
             var existingItem = cart.Items.FirstOrDefault(i => !i.IsDeleted && i.ProductId == request.ProductId && i.ProductOfferId == request.ProductOfferId) ?? null;
-            if (existingItem == null) return ServiceResult<CartReadModel>.Failed("این کالا در سبد خرید شما پیدا نشد.");
+            if (existingItem == null && purged.Count == 0) return ServiceResult<CartReadModel>.Failed("این کالا در سبد خرید شما پیدا نشد.");
 
-            if (existingItem.Quantity > 1)
-                existingItem.UpdateQuantity(existingItem.Quantity - 1, userId.Value);
-            else
-                existingItem.Delete(userId.Value);
+            if (existingItem != null)
+            {
+                if (existingItem.Quantity > 1)
+                    existingItem.UpdateQuantity(existingItem.Quantity - 1, userId.Value);
+                else
+                    existingItem.Delete(userId.Value);
+            }
 
             await _itemRepo.SaveChangesAsync(cancellationToken);
 
@@ -166,6 +192,10 @@ using OnlineShop.Domain.Interfaces;
             if (cartItem == null) return ServiceResult<IdDto>.Failed("آیتم سبد پیدا نشد.");
 
             cartItem.Delete(userId.Value);
+
+            // هم‌زمان آیتم‌های نامعتبر (محصول حذف‌شده) را هم پاک می‌کنیم
+            var cart = await _repo.GetUserCartAsync(userId.Value);
+            if (cart != null) PurgeUnavailable(cart, userId.Value);
             await _itemRepo.SaveChangesAsync(cancellationToken);
 
             var updatedCart = await _itemRepo.GetUserCartSummaryAsync(userId.Value);

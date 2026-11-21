@@ -100,7 +100,9 @@ namespace OnlineShop.Infrastructure.Persistence.Repositories
                 Id = cart.Id,
                 UserId = cart.UserId,
                 Items = cart.Items
-                    .Where(i => !i.IsDeleted)
+                    .Where(i => !i.IsDeleted &&
+                                i.ProductOffer != null && !i.ProductOffer.IsDeleted &&
+                                i.ProductOffer.Product != null && !i.ProductOffer.Product.IsDeleted)
                     .Select(i =>
                     {
                         var offer = i.ProductOffer;

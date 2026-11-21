@@ -28,7 +28,7 @@ public class CartRepository : Repository<Cart>, ICartRepository
         {
             Id = cart.Id,
             UserId = cart.UserId,
-            Items = cart.Items.Select(i =>
+            Items = cart.Items.Where(i => i.ProductOffer != null && !i.ProductOffer.IsDeleted && i.ProductOffer.Product != null && !i.ProductOffer.Product.IsDeleted).Select(i =>
             {
                 var offer = i.ProductOffer;
                 var product = offer.Product;
@@ -68,6 +68,9 @@ public class CartRepository : Repository<Cart>, ICartRepository
             .ThenInclude(i => i.ProductOffer)
             .ThenInclude(p => p.Discounts)
             .ThenInclude(pd => pd.Discount)
+            .Include(c => c.Items.Where(i => !i.IsDeleted))
+            .ThenInclude(i => i.ProductOffer)
+            .ThenInclude(o => o.Product)
             .FirstOrDefaultAsync();
     }
 
